@@ -20,7 +20,7 @@ export default function Home() {
       .catch(() => {});
   }, []);
 
-  const aum = data ? `£${fmt(data.totalValue / 1000, 0)}K` : "£100K";
+  const aum = data ? `$${fmt(data.totalValue / 1000, 0)}K` : "$100K";
   const totalReturn = data ? `${data.totalReturnPct >= 0 ? "+" : ""}${fmt(data.totalReturnPct, 2)}%` : "0.00%";
 
   return (
