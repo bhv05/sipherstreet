@@ -14,36 +14,45 @@ async function fetchAlpaca(endpoint) {
 
 export async function GET() {
   try {
-    // Fetch account info and positions in parallel
     const [account, positions] = await Promise.all([
       fetchAlpaca("/v2/account"),
       fetchAlpaca("/v2/positions"),
     ]);
 
-    // Format positions data
-    const formattedPositions = positions.map((p) => ({
-      symbol: p.symbol,
-      qty: parseFloat(p.qty),
-      side: parseFloat(p.qty) > 0 ? "LONG" : "SHORT",
-      avgCost: parseFloat(p.avg_entry_price),
-      currentPrice: parseFloat(p.current_price),
-      marketValue: parseFloat(p.market_value),
-      pl: parseFloat(p.unrealized_pl),
-      plPct: parseFloat(p.unrealized_plpc) * 100,
-    }));
+    // Fetch asset names for each position
+    const assetPromises = positions.map((p) =>
+      fetchAlpaca(`/v2/assets/${p.symbol}`).catch(() => ({ name: p.symbol }))
+    );
+    const assets = await Promise.all(assetPromises);
 
-    // Build response
+    const totalPortfolioValue = parseFloat(account.portfolio_value);
+
+    const formattedPositions = positions.map((p, i) => {
+      const marketValue = parseFloat(p.market_value);
+      const costBasis = parseFloat(p.cost_basis);
+      const totalReturn = costBasis !== 0 ? ((marketValue - costBasis) / Math.abs(costBasis)) * 100 : 0;
+
+      return {
+        company: assets[i]?.name || p.symbol,
+        symbol: p.symbol,
+        qty: parseFloat(p.qty),
+        side: parseFloat(p.qty) > 0 ? "LONG" : "SHORT",
+        costBasis: parseFloat(p.avg_entry_price),
+        currentPrice: parseFloat(p.current_price),
+        positionSize: Math.abs(marketValue),
+        allocation: (Math.abs(marketValue) / totalPortfolioValue) * 100,
+        totalReturn: totalReturn,
+        pl: parseFloat(p.unrealized_pl),
+      };
+    });
+
+    // Sort by allocation descending
+    formattedPositions.sort((a, b) => b.allocation - a.allocation);
+
     const data = {
       equity: parseFloat(account.equity),
       cash: parseFloat(account.cash),
-      totalValue: parseFloat(account.portfolio_value),
-      dayPL: parseFloat(account.equity) - parseFloat(account.last_equity),
-      dayPLPct:
-        ((parseFloat(account.equity) - parseFloat(account.last_equity)) /
-          parseFloat(account.last_equity)) *
-        100,
-      totalPL:
-        parseFloat(account.equity) - parseFloat(account.initial_margin || 100000),
+      totalValue: totalPortfolioValue,
       positions: formattedPositions,
     };
 

@@ -1,39 +1,30 @@
+/*
+  HOW TO ADD HEADSHOTS:
+  1. Put your photos in public/team/ folder (e.g. public/team/bhavya.jpg)
+  2. Update the "image" field below to match the filename
+  3. Push to GitHub and Vercel will auto-deploy
+  
+  Recommended: square images, at least 300x300px
+*/
+
 const TEAM = [
   {
-    name: "Alexandra Chen",
-    role: "Portfolio Manager",
-    desc: "Finance & CS double major. 3 years of equity research experience.",
+    name: "Bhavya Patel",
+    role: "Founder",
+    desc: "",
+    image: "/team/bhavya.jpg",
   },
   {
-    name: "Marcus Williams",
-    role: "Head of Research",
-    desc: "Economics major. Specializes in semiconductor and tech sector analysis.",
-  },
-  {
-    name: "Sarah Kowalski",
-    role: "Risk Analyst",
-    desc: "Applied Math major. Leads quantitative risk modeling and position sizing.",
-  },
-  {
-    name: "James Nakamura",
-    role: "Trading Lead",
-    desc: "Finance major. Manages order execution and portfolio rebalancing.",
-  },
-  {
-    name: "Priya Sharma",
-    role: "Macro Strategist",
-    desc: "Econ & Political Science. Tracks global macro trends and policy impacts.",
-  },
-  {
-    name: "David Okonkwo",
-    role: "Junior Analyst",
-    desc: "Finance sophomore. Covers consumer discretionary and industrials.",
+    name: "Henish Patel",
+    role: "Founder",
+    desc: "",
+    image: "/team/henish.jpg",
   },
 ];
 
 export default function Team() {
   return (
-    <div className="page-section" style={{ maxWidth: 1000 }}>
+    <div className="page-section" style={{ maxWidth: 800 }}>
       <p className="section-label">Our People</p>
       <h2 className="section-title">
         The <span>Team</span>
@@ -43,7 +34,8 @@ export default function Team() {
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          gap: 20,
+          gap: 32,
+          justifyItems: "center",
         }}
       >
         {TEAM.map((m) => (
@@ -51,55 +43,88 @@ export default function Team() {
             key={m.name}
             className="hover-card"
             style={{
-              padding: 32,
-              background: "#0a0a0a",
-              border: "1px solid #1a1a1a",
+              padding: 40,
+              background: "#f8fafc",
+              border: "1px solid #e2e8f0",
+              borderRadius: 4,
+              textAlign: "center",
+              width: "100%",
+              maxWidth: 340,
             }}
           >
-            {/* Avatar with initials */}
+            {/* Headshot circle */}
             <div
               style={{
-                width: 48,
-                height: 48,
+                width: 120,
+                height: 120,
                 borderRadius: "50%",
-                background: "linear-gradient(135deg, #10b981, #065f46)",
+                background: "linear-gradient(135deg, #1e3a5f, #2c3e5a)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: 18,
+                fontSize: 36,
                 fontWeight: 300,
                 color: "#fff",
-                marginBottom: 20,
+                margin: "0 auto 24px",
+                overflow: "hidden",
               }}
             >
-              {m.name
-                .split(" ")
-                .map((n) => n[0])
-                .join("")}
+              {m.image ? (
+                <img
+                  src={m.image}
+                  alt={m.name}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                  onError={(e) => {
+                    e.target.style.display = "none";
+                    e.target.parentElement.innerText = m.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("");
+                  }}
+                />
+              ) : (
+                m.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")
+              )}
             </div>
             <h3
               style={{
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: 600,
-                color: "#e0e0e0",
-                marginBottom: 4,
+                color: "#1a2a44",
+                marginBottom: 6,
               }}
             >
               {m.name}
             </h3>
             <p
               style={{
-                fontSize: 12,
-                color: "#10b981",
-                marginBottom: 12,
+                fontSize: 13,
+                color: "#1e3a5f",
                 letterSpacing: "0.05em",
+                fontWeight: 500,
               }}
             >
               {m.role}
             </p>
-            <p style={{ fontSize: 13, color: "#777", lineHeight: 1.6 }}>
-              {m.desc}
-            </p>
+            {m.desc && (
+              <p
+                style={{
+                  fontSize: 13,
+                  color: "#5a6a7e",
+                  lineHeight: 1.6,
+                  marginTop: 12,
+                }}
+              >
+                {m.desc}
+              </p>
+            )}
           </div>
         ))}
       </div>

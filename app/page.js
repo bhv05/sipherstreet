@@ -1,79 +1,112 @@
-export default function About() {
-  const pillars = [
-    {
-      title: "Fundamental Research",
-      desc: "Every position is backed by thorough bottom-up analysis, financial modeling, and competitive landscape assessment.",
-    },
-    {
-      title: "Risk Management",
-      desc: "Disciplined position sizing, portfolio hedging, and drawdown limits ensure capital preservation in all market conditions.",
-    },
-    {
-      title: "Long/Short Strategy",
-      desc: "We capture alpha on both sides of the market, profiting from overvalued shorts and undervalued longs across sectors.",
-    },
-    {
-      title: "Team Development",
-      desc: "We cultivate the next generation of investment professionals through mentorship, live portfolio management, and real-time decision making.",
-    },
-  ];
+import Link from "next/link";
 
+export default function Home() {
   return (
-    <div className="page-section" style={{ maxWidth: 900 }}>
-      <p className="section-label">About Us</p>
-      <h2 className="section-title">
-        Our <span>Philosophy</span>
-      </h2>
+    <section
+      style={{
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        textAlign: "center",
+        minHeight: "100vh",
+        padding: "120px 24px 80px",
+      }}
+    >
+      {/* Subtle background */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(ellipse at 50% 0%, rgba(30,58,95,0.06) 0%, transparent 60%)",
+          pointerEvents: "none",
+        }}
+      />
+
+      <p className="section-label" style={{ marginBottom: 16 }}>
+        Global Equities · Long/Short
+      </p>
+
+      <h1
+        style={{
+          fontSize: "clamp(36px, 6vw, 72px)",
+          fontWeight: 200,
+          color: "#1a2a44",
+          lineHeight: 1.1,
+          marginBottom: 24,
+          letterSpacing: "-0.02em",
+        }}
+      >
+        Sipher
+        <br />
+        <span style={{ fontWeight: 600 }}>Street</span>
+      </h1>
 
       <p
         style={{
-          color: "#999",
+          maxWidth: 520,
+          color: "#5a6a7e",
           fontSize: 16,
-          lineHeight: 1.8,
-          borderLeft: "2px solid #10b981",
-          paddingLeft: 24,
+          lineHeight: 1.7,
           marginBottom: 48,
         }}
       >
-        Sipher Street is a student-run investment fund focused on generating
-        risk-adjusted returns through fundamental, bottom-up equity analysis. We
-        employ a long/short strategy across global equities, combining deep
-        sector expertise with rigorous quantitative risk management.
+        A student-managed investment fund deploying long/short equity strategies
+        across global markets with disciplined risk management.
       </p>
 
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-          gap: 24,
+          display: "flex",
+          gap: 16,
+          flexWrap: "wrap",
+          justifyContent: "center",
         }}
       >
-        {pillars.map((p) => (
-          <div
-            key={p.title}
-            className="hover-card"
-            style={{
-              padding: 28,
-              border: "1px solid #1a1a1a",
-              background: "#0a0a0a",
-            }}
-          >
-            <h3
+        <Link href="/portfolio">
+          <button className="btn-primary">View Portfolio</button>
+        </Link>
+        <Link href="/pitches">
+          <button className="btn-outline">Our Pitches</button>
+        </Link>
+      </div>
+
+      {/* Stats row */}
+      <div
+        style={{
+          display: "flex",
+          gap: 64,
+          marginTop: 80,
+          flexWrap: "wrap",
+          justifyContent: "center",
+        }}
+      >
+        {[
+          ["$150K", "AUM"],
+          ["9.05%", "Total Return"],
+          ["35", "Trades Executed"],
+          ["2", "Founders"],
+        ].map(([value, label]) => (
+          <div key={label} style={{ textAlign: "center" }}>
+            <div style={{ fontSize: 28, fontWeight: 300, color: "#1a2a44" }}>
+              {value}
+            </div>
+            <div
               style={{
-                fontSize: 15,
-                fontWeight: 600,
-                color: "#e0e0e0",
-                marginBottom: 10,
+                fontSize: 11,
+                color: "#8896a6",
+                letterSpacing: "0.15em",
+                textTransform: "uppercase",
+                marginTop: 4,
               }}
             >
-              {p.title}
-            </h3>
-            <p style={{ fontSize: 13, color: "#777", lineHeight: 1.7 }}>
-              {p.desc}
-            </p>
+              {label}
+            </div>
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 }

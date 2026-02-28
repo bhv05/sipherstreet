@@ -12,7 +12,7 @@ export default function Contact() {
       </h2>
       <p
         style={{
-          color: "#666",
+          color: "#5a6a7e",
           fontSize: 14,
           lineHeight: 1.7,
           marginBottom: 48,
@@ -26,15 +26,16 @@ export default function Contact() {
         <div
           style={{
             padding: 40,
-            border: "1px solid #10b981",
-            background: "rgba(16,185,129,0.05)",
+            border: "1px solid #1e3a5f",
+            background: "rgba(30,58,95,0.04)",
             textAlign: "center",
+            borderRadius: 4,
           }}
         >
-          <div style={{ fontSize: 24, color: "#10b981", marginBottom: 12 }}>
+          <div style={{ fontSize: 24, color: "#1e3a5f", marginBottom: 12 }}>
             ✓
           </div>
-          <p style={{ color: "#ccc", fontSize: 15 }}>
+          <p style={{ color: "#1a2a44", fontSize: 15 }}>
             Message sent successfully. We'll be in touch.
           </p>
         </div>
@@ -79,14 +80,13 @@ export default function Contact() {
       >
         {[
           ["Email", "fund@university.edu"],
-          ["Location", "University Campus"],
-          ["Meeting", "Tuesdays, 6:00 PM"],
+          ["Location", "LSE Campus"],
         ].map(([label, value]) => (
           <div key={label}>
             <div
               style={{
                 fontSize: 11,
-                color: "#555",
+                color: "#8896a6",
                 textTransform: "uppercase",
                 letterSpacing: "0.1em",
                 marginBottom: 6,
@@ -94,7 +94,7 @@ export default function Contact() {
             >
               {label}
             </div>
-            <div style={{ fontSize: 14, color: "#ccc" }}>{value}</div>
+            <div style={{ fontSize: 14, color: "#1a2a44" }}>{value}</div>
           </div>
         ))}
       </div>

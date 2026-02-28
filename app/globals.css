@@ -1,10 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --green: #10b981;
-  --bg: #050505;
-  --card: #0a0a0a;
-  --border: #1a1a1a;
+  --navy: #1a2a44;
+  --navy-light: #2c3e5a;
+  --navy-dark: #0f1c30;
+  --accent: #1e3a5f;
+  --bg: #ffffff;
+  --card: #f8fafc;
+  --border: #e2e8f0;
+  --text: #1a2a44;
+  --text-light: #5a6a7e;
+  --green: #16a34a;
+  --red: #dc2626;
 }
 
 * {
@@ -15,7 +22,7 @@
 
 body {
   background: var(--bg);
-  color: #e0e0e0;
+  color: var(--text);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -25,44 +32,34 @@ a {
   text-decoration: none;
 }
 
-/* Smooth scrolling */
 html {
   scroll-behavior: smooth;
 }
 
-/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg);
+  background: #f1f5f9;
 }
 ::-webkit-scrollbar-thumb {
-  background: #222;
+  background: #cbd5e1;
   border-radius: 3px;
 }
 
 /* Utility classes */
-.text-green {
-  color: var(--green);
-}
-.bg-card {
-  background: var(--card);
-}
-.border-main {
-  border: 1px solid var(--border);
-}
 .section-label {
   letter-spacing: 0.3em;
   font-size: 11px;
-  color: var(--green);
+  color: var(--accent);
   text-transform: uppercase;
   margin-bottom: 12px;
+  font-weight: 600;
 }
 .section-title {
   font-size: clamp(28px, 5vw, 40px);
   font-weight: 200;
-  color: #f0f0f0;
+  color: var(--navy);
   margin-bottom: 48px;
 }
 .section-title span {
@@ -77,10 +74,11 @@ html {
 
 /* Card hover effect */
 .hover-card {
-  transition: border-color 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 .hover-card:hover {
-  border-color: var(--green) !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 4px 12px rgba(26, 42, 68, 0.08);
 }
 
 /* Tag styles */
@@ -89,7 +87,7 @@ html {
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.1em;
-  background: rgba(16, 185, 129, 0.15);
+  background: rgba(22, 163, 74, 0.1);
   color: var(--green);
 }
 .tag-short {
@@ -97,8 +95,8 @@ html {
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.1em;
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
+  background: rgba(220, 38, 38, 0.1);
+  color: var(--red);
 }
 
 /* Table styles */
@@ -110,16 +108,20 @@ html {
 .data-table th {
   padding: 14px 16px;
   text-align: left;
-  color: #555;
-  font-weight: 500;
-  font-size: 11px;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 12px;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  border-bottom: 1px solid var(--border);
+  letter-spacing: 0.05em;
+  background: var(--navy);
 }
 .data-table td {
-  padding: 14px 16px;
-  border-bottom: 1px solid #111;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+.data-table tbody tr:hover {
+  background: #f1f5f9;
 }
 
 /* Form inputs */
@@ -128,50 +130,68 @@ html {
   padding: 14px 16px;
   background: var(--card);
   border: 1px solid var(--border);
-  color: #e0e0e0;
+  color: var(--text);
   font-size: 14px;
   outline: none;
   font-family: inherit;
   transition: border-color 0.3s;
+  border-radius: 4px;
 }
 .form-input:focus {
-  border-color: var(--green);
+  border-color: var(--accent);
 }
 .form-label {
   font-size: 11px;
-  color: #555;
+  color: var(--text-light);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   display: block;
   margin-bottom: 8px;
+  font-weight: 500;
 }
 
 /* Buttons */
 .btn-primary {
   padding: 14px 36px;
-  background: var(--green);
-  color: #000;
+  background: var(--navy);
+  color: #ffffff;
   border: none;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   letter-spacing: 0.05em;
-  transition: opacity 0.2s;
+  transition: background 0.2s;
+  border-radius: 4px;
 }
 .btn-primary:hover {
-  opacity: 0.9;
+  background: var(--navy-light);
 }
 .btn-outline {
   padding: 14px 36px;
   background: transparent;
-  color: #ccc;
-  border: 1px solid #333;
+  color: var(--navy);
+  border: 1px solid var(--border);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   letter-spacing: 0.05em;
   transition: border-color 0.2s;
+  border-radius: 4px;
 }
 .btn-outline:hover {
-  border-color: #666;
+  border-color: var(--navy);
+}
+
+/* Return colors */
+.return-positive {
+  background: rgba(22, 163, 74, 0.12);
+  color: var(--green);
+  font-weight: 600;
+  text-align: center;
+}
+.return-negative {
+  background: rgba(220, 38, 38, 0.12);
+  color: var(--red);
+  font-weight: 600;
+  text-align: center;
 }

@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 
 const NAV_ITEMS = [
   { label: "Home", href: "/" },
-  { label: "About", href: "/about" },
   { label: "Portfolio", href: "/portfolio" },
   { label: "Pitches", href: "/pitches" },
   { label: "Team", href: "/team" },
@@ -18,9 +17,9 @@ export default function Navbar() {
   const pathname = usePathname();
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const h = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", h);
+    return () => window.removeEventListener("scroll", h);
   }, []);
 
   return (
@@ -36,9 +35,9 @@ export default function Navbar() {
         alignItems: "center",
         justifyContent: "space-between",
         height: 64,
-        background: scrolled ? "rgba(5,5,5,0.92)" : "transparent",
+        background: scrolled ? "rgba(255,255,255,0.95)" : "transparent",
         backdropFilter: scrolled ? "blur(20px)" : "none",
-        borderBottom: scrolled ? "1px solid #111" : "1px solid transparent",
+        borderBottom: scrolled ? "1px solid #e2e8f0" : "1px solid transparent",
         transition: "all 0.3s",
       }}
     >
@@ -47,7 +46,7 @@ export default function Navbar() {
         style={{
           fontSize: 16,
           fontWeight: 300,
-          color: "#f0f0f0",
+          color: "#1a2a44",
           letterSpacing: "0.05em",
         }}
       >
@@ -61,7 +60,7 @@ export default function Navbar() {
           display: "none",
           background: "none",
           border: "none",
-          color: "#ccc",
+          color: "#1a2a44",
           fontSize: 24,
           cursor: "pointer",
         }}
@@ -77,9 +76,7 @@ export default function Navbar() {
             key={item.href}
             href={item.href}
             style={{
-              background: "none",
-              border: "none",
-              color: pathname === item.href ? "#10b981" : "#777",
+              color: pathname === item.href ? "#1e3a5f" : "#8896a6",
               fontSize: 12,
               letterSpacing: "0.1em",
               textTransform: "uppercase",
@@ -87,10 +84,10 @@ export default function Navbar() {
               transition: "color 0.2s",
             }}
             onMouseEnter={(e) => {
-              if (pathname !== item.href) e.target.style.color = "#ccc";
+              if (pathname !== item.href) e.target.style.color = "#1a2a44";
             }}
             onMouseLeave={(e) => {
-              if (pathname !== item.href) e.target.style.color = "#777";
+              if (pathname !== item.href) e.target.style.color = "#8896a6";
             }}
           >
             {item.label}
@@ -106,8 +103,8 @@ export default function Navbar() {
             top: 64,
             left: 0,
             right: 0,
-            background: "rgba(5,5,5,0.97)",
-            borderBottom: "1px solid #1a1a1a",
+            background: "rgba(255,255,255,0.98)",
+            borderBottom: "1px solid #e2e8f0",
             padding: "24px 32px",
             display: "flex",
             flexDirection: "column",
@@ -120,7 +117,7 @@ export default function Navbar() {
               href={item.href}
               onClick={() => setMenuOpen(false)}
               style={{
-                color: pathname === item.href ? "#10b981" : "#999",
+                color: pathname === item.href ? "#1e3a5f" : "#5a6a7e",
                 fontSize: 14,
                 letterSpacing: "0.1em",
                 textTransform: "uppercase",
@@ -134,12 +131,8 @@ export default function Navbar() {
 
       <style jsx global>{`
         @media (max-width: 768px) {
-          .desktop-nav {
-            display: none !important;
-          }
-          .mobile-menu-btn {
-            display: block !important;
-          }
+          .desktop-nav { display: none !important; }
+          .mobile-menu-btn { display: block !important; }
         }
       `}</style>
     </nav>
