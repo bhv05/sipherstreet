@@ -52,11 +52,15 @@ const PITCHES = [
 ];
 
 function PdfViewer({ pdf, ticker }) {
-  const [zoom, setZoom] = useState(100);
+  const [zoom, setZoom] = useState(1);
 
-  const zoomIn = (e) => { e.stopPropagation(); setZoom((z) => Math.min(z + 25, 200)); };
-  const zoomOut = (e) => { e.stopPropagation(); setZoom((z) => Math.max(z - 25, 50)); };
-  const zoomReset = (e) => { e.stopPropagation(); setZoom(100); };
+  const zoomIn = (e) => { e.stopPropagation(); setZoom((z) => Math.min(z + 0.25, 2.5)); };
+  const zoomOut = (e) => { e.stopPropagation(); setZoom((z) => Math.max(z - 0.25, 0.5)); };
+  const zoomReset = (e) => { e.stopPropagation(); setZoom(1); };
+
+  const pct = Math.round(zoom * 100);
+  const iframeW = `${100 / zoom}%`;
+  const iframeH = 600 / zoom;
 
   return (
     <div
@@ -70,7 +74,6 @@ function PdfViewer({ pdf, ticker }) {
           display: "flex",
           alignItems: "center",
           gap: 8,
-          marginBottom: 0,
           padding: "8px 12px",
           background: "#f1f5f9",
           border: "1px solid #e2e8f0",
@@ -89,7 +92,7 @@ function PdfViewer({ pdf, ticker }) {
         <span
           onClick={zoomReset}
           style={{ minWidth: 50, textAlign: "center", color: "#5a6a7e", cursor: "pointer", fontSize: 12 }}
-        >{zoom}%</span>
+        >{pct}%</span>
         <button
           onClick={zoomIn}
           style={{
@@ -100,7 +103,7 @@ function PdfViewer({ pdf, ticker }) {
         >+</button>
       </div>
 
-      {/* PDF frame */}
+      {/* PDF frame — zoom uses CSS transform scale */}
       <div
         style={{
           border: "1px solid #e2e8f0",
@@ -109,15 +112,21 @@ function PdfViewer({ pdf, ticker }) {
           overflow: "auto",
           height: 600,
           background: "#fff",
-          position: "relative",
         }}
       >
-        <div style={{ width: `${zoom}%`, transformOrigin: "top left" }}>
+        <div
+          style={{
+            transform: `scale(${zoom})`,
+            transformOrigin: "top left",
+            width: iframeW,
+            height: iframeH,
+          }}
+        >
           <iframe
-            src={`${pdf}#toolbar=0&navpanes=0&scrollbar=1`}
+            src={`${pdf}#toolbar=0&navpanes=0&scrollbar=0`}
             style={{
               width: "100%",
-              height: zoom === 100 ? 600 : 600 * (zoom / 100),
+              height: "100%",
               border: "none",
               display: "block",
             }}
