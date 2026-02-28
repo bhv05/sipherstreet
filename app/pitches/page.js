@@ -46,11 +46,11 @@ function PdfViewer({ pdf, company, onClose }) {
         right: 0,
         bottom: 0,
         zIndex: 200,
-        background: "rgba(0,0,0,0.5)",
+        background: "rgba(0,0,0,0.6)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: 24,
+        padding: 20,
       }}
       onClick={onClose}
     >
@@ -58,9 +58,9 @@ function PdfViewer({ pdf, company, onClose }) {
         style={{
           background: "#fff",
           borderRadius: 8,
-          width: "100%",
-          maxWidth: 900,
-          maxHeight: "90vh",
+          width: "95vw",
+          height: "92vh",
+          maxWidth: 1200,
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
@@ -74,12 +74,13 @@ function PdfViewer({ pdf, company, onClose }) {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "12px 16px",
+            padding: "12px 20px",
             background: "#f1f5f9",
             borderBottom: "1px solid #e2e8f0",
+            flexShrink: 0,
           }}
         >
-          <span style={{ fontSize: 14, fontWeight: 600, color: "#1a2a44" }}>
+          <span style={{ fontSize: 15, fontWeight: 600, color: "#1a2a44" }}>
             {company} — Pitch Deck
           </span>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -87,32 +88,32 @@ function PdfViewer({ pdf, company, onClose }) {
               onClick={zoomOut}
               disabled={zoomIndex === 0}
               style={{
-                width: 30, height: 30, border: "1px solid #e2e8f0", background: "#fff",
+                width: 32, height: 32, border: "1px solid #e2e8f0", background: "#fff",
                 borderRadius: 4, cursor: zoomIndex === 0 ? "default" : "pointer",
-                fontSize: 15, color: zoomIndex === 0 ? "#cbd5e1" : "#1a2a44",
+                fontSize: 16, color: zoomIndex === 0 ? "#cbd5e1" : "#1a2a44",
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}
             >−</button>
             <span
               onClick={zoomReset}
-              style={{ minWidth: 44, textAlign: "center", color: "#5a6a7e", cursor: "pointer", fontSize: 12 }}
+              style={{ minWidth: 48, textAlign: "center", color: "#5a6a7e", cursor: "pointer", fontSize: 13 }}
             >{zoom}%</span>
             <button
               onClick={zoomIn}
               disabled={zoomIndex === ZOOM_LEVELS.length - 1}
               style={{
-                width: 30, height: 30, border: "1px solid #e2e8f0", background: "#fff",
+                width: 32, height: 32, border: "1px solid #e2e8f0", background: "#fff",
                 borderRadius: 4, cursor: zoomIndex === ZOOM_LEVELS.length - 1 ? "default" : "pointer",
-                fontSize: 15, color: zoomIndex === ZOOM_LEVELS.length - 1 ? "#cbd5e1" : "#1a2a44",
+                fontSize: 16, color: zoomIndex === ZOOM_LEVELS.length - 1 ? "#cbd5e1" : "#1a2a44",
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}
             >+</button>
-            <div style={{ width: 1, height: 20, background: "#e2e8f0", margin: "0 4px" }} />
+            <div style={{ width: 1, height: 20, background: "#e2e8f0", margin: "0 6px" }} />
             <button
               onClick={onClose}
               style={{
-                width: 30, height: 30, border: "1px solid #e2e8f0", background: "#fff",
-                borderRadius: 4, cursor: "pointer", fontSize: 16, color: "#1a2a44",
+                width: 32, height: 32, border: "1px solid #e2e8f0", background: "#fff",
+                borderRadius: 4, cursor: "pointer", fontSize: 18, color: "#1a2a44",
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}
             >✕</button>
@@ -120,7 +121,7 @@ function PdfViewer({ pdf, company, onClose }) {
         </div>
 
         {/* PDF */}
-        <div style={{ flex: 1, height: "75vh" }}>
+        <div style={{ flex: 1 }}>
           <iframe
             key={zoom}
             src={pdfUrl}
@@ -170,35 +171,35 @@ export default function Pitches() {
                 <tr key={i}>
                   <td style={{ whiteSpace: "nowrap", color: "#1a2a44" }}>{p.date}</td>
                   <td>
-                    <div style={{ fontWeight: 500, color: "#1a2a44", marginBottom: 6 }}>
+                    <div style={{ fontWeight: 500, color: "#1a2a44", marginBottom: 8 }}>
                       {p.company}
                     </div>
-                    <div style={{ display: "flex", gap: 12 }}>
+                    <div style={{ display: "flex", gap: 16 }}>
                       <span
                         onClick={(e) => {
                           e.stopPropagation();
                           setOpenDeck(i);
                         }}
                         style={{
-                          fontSize: 12,
+                          fontSize: 14,
                           color: "#1e3a5f",
                           textDecoration: "underline",
                           cursor: "pointer",
-                          fontWeight: 500,
+                          fontWeight: 600,
                         }}
                       >
-                        📄 Deck
+                        📄 Pitch
                       </span>
                       <a
                         href={p.model}
                         download
                         onClick={(e) => e.stopPropagation()}
                         style={{
-                          fontSize: 12,
+                          fontSize: 14,
                           color: "#1e3a5f",
                           textDecoration: "underline",
                           cursor: "pointer",
-                          fontWeight: 500,
+                          fontWeight: 600,
                         }}
                       >
                         📊 Model
