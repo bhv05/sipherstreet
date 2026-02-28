@@ -188,7 +188,7 @@ export default function Pitches() {
                           fontWeight: 600,
                         }}
                       >
-                        📄 Pitch
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18'%3E%3Cpath d='M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6z' fill='%23e53e3e'/%3E%3Cpath d='M14 2v6h6' fill='%23fc8181'/%3E%3Ctext x='12' y='17' text-anchor='middle' font-size='6' font-weight='bold' fill='white' font-family='Arial'%3EPDF%3C/text%3E%3C/svg%3E" alt="" style={{verticalAlign: "middle", marginRight: 4}} /> Pitch
                       </span>
                       <a
                         href={p.model}
@@ -202,7 +202,7 @@ export default function Pitches() {
                           fontWeight: 600,
                         }}
                       >
-                        📊 Model
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18'%3E%3Cpath d='M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6z' fill='%23217346'/%3E%3Cpath d='M14 2v6h6' fill='%2333a867'/%3E%3Ctext x='12' y='17' text-anchor='middle' font-size='5.5' font-weight='bold' fill='white' font-family='Arial'%3EXLS%3C/text%3E%3C/svg%3E" alt="" style={{verticalAlign: "middle", marginRight: 4}} /> Model
                       </a>
                     </div>
                   </td>
