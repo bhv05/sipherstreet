@@ -14,7 +14,7 @@ const TEAM = [
     name: "Bhavya Patel",
     role: "Founder",
     desc: "",
-    image: "/team/bhavya.jpg",
+    image: "/team/BhavyaPatelHeadShot.jpg",
   },
   {
     name: "Henish Patel",

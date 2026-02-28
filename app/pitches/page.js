@@ -51,16 +51,27 @@ const PITCHES = [
   },
 ];
 
+const ZOOM_LEVELS = [50, 75, 100, 125, 150, 200];
+
 function PdfViewer({ pdf, ticker }) {
-  const [zoom, setZoom] = useState(1);
+  const [zoomIndex, setZoomIndex] = useState(2); // starts at 100%
+  const zoom = ZOOM_LEVELS[zoomIndex];
 
-  const zoomIn = (e) => { e.stopPropagation(); setZoom((z) => Math.min(z + 0.25, 2.5)); };
-  const zoomOut = (e) => { e.stopPropagation(); setZoom((z) => Math.max(z - 0.25, 0.5)); };
-  const zoomReset = (e) => { e.stopPropagation(); setZoom(1); };
+  const zoomIn = (e) => {
+    e.stopPropagation();
+    setZoomIndex((i) => Math.min(i + 1, ZOOM_LEVELS.length - 1));
+  };
+  const zoomOut = (e) => {
+    e.stopPropagation();
+    setZoomIndex((i) => Math.max(i - 1, 0));
+  };
+  const zoomReset = (e) => {
+    e.stopPropagation();
+    setZoomIndex(2);
+  };
 
-  const pct = Math.round(zoom * 100);
-  const iframeW = `${100 / zoom}%`;
-  const iframeH = 600 / zoom;
+  // Native PDF zoom via URL parameter — re-renders at full quality
+  const pdfUrl = `${pdf}#toolbar=0&navpanes=0&zoom=${zoom}`;
 
   return (
     <div
@@ -83,56 +94,55 @@ function PdfViewer({ pdf, ticker }) {
       >
         <button
           onClick={zoomOut}
+          disabled={zoomIndex === 0}
           style={{
             width: 32, height: 32, border: "1px solid #e2e8f0", background: "#fff",
-            borderRadius: 4, cursor: "pointer", fontSize: 16, color: "#1a2a44",
+            borderRadius: 4, cursor: zoomIndex === 0 ? "default" : "pointer",
+            fontSize: 16, color: zoomIndex === 0 ? "#cbd5e1" : "#1a2a44",
             display: "flex", alignItems: "center", justifyContent: "center",
           }}
         >−</button>
         <span
           onClick={zoomReset}
-          style={{ minWidth: 50, textAlign: "center", color: "#5a6a7e", cursor: "pointer", fontSize: 12 }}
-        >{pct}%</span>
+          style={{
+            minWidth: 50, textAlign: "center", color: "#5a6a7e",
+            cursor: "pointer", fontSize: 12, userSelect: "none",
+          }}
+        >{zoom}%</span>
         <button
           onClick={zoomIn}
+          disabled={zoomIndex === ZOOM_LEVELS.length - 1}
           style={{
             width: 32, height: 32, border: "1px solid #e2e8f0", background: "#fff",
-            borderRadius: 4, cursor: "pointer", fontSize: 16, color: "#1a2a44",
+            borderRadius: 4, cursor: zoomIndex === ZOOM_LEVELS.length - 1 ? "default" : "pointer",
+            fontSize: 16, color: zoomIndex === ZOOM_LEVELS.length - 1 ? "#cbd5e1" : "#1a2a44",
             display: "flex", alignItems: "center", justifyContent: "center",
           }}
         >+</button>
       </div>
 
-      {/* PDF frame — zoom uses CSS transform scale */}
+      {/* PDF frame — uses native browser PDF zoom */}
       <div
         style={{
           border: "1px solid #e2e8f0",
           borderTop: "none",
           borderRadius: "0 0 4px 4px",
-          overflow: "auto",
+          overflow: "hidden",
           height: 600,
           background: "#fff",
         }}
       >
-        <div
+        <iframe
+          key={zoom}
+          src={pdfUrl}
           style={{
-            transform: `scale(${zoom})`,
-            transformOrigin: "top left",
-            width: iframeW,
-            height: iframeH,
+            width: "100%",
+            height: "100%",
+            border: "none",
+            display: "block",
           }}
-        >
-          <iframe
-            src={`${pdf}#toolbar=0&navpanes=0&scrollbar=0`}
-            style={{
-              width: "100%",
-              height: "100%",
-              border: "none",
-              display: "block",
-            }}
-            title={`${ticker} Pitch Deck`}
-          />
-        </div>
+          title={`${ticker} Pitch Deck`}
+        />
       </div>
     </div>
   );
