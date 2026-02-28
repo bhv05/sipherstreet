@@ -1,26 +1,177 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --green: #10b981;
+  --bg: #050505;
+  --card: #0a0a0a;
+  --border: #1a1a1a;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: #e0e0e0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: #222;
+  border-radius: 3px;
+}
+
+/* Utility classes */
+.text-green {
+  color: var(--green);
+}
+.bg-card {
+  background: var(--card);
+}
+.border-main {
+  border: 1px solid var(--border);
+}
+.section-label {
+  letter-spacing: 0.3em;
+  font-size: 11px;
+  color: var(--green);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.section-title {
+  font-size: clamp(28px, 5vw, 40px);
+  font-weight: 200;
+  color: #f0f0f0;
+  margin-bottom: 48px;
+}
+.section-title span {
+  font-weight: 600;
+}
+.page-section {
+  min-height: 100vh;
+  padding: 120px 24px 80px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* Card hover effect */
+.hover-card {
+  transition: border-color 0.3s ease;
+}
+.hover-card:hover {
+  border-color: var(--green) !important;
+}
+
+/* Tag styles */
+.tag-long {
+  padding: 3px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--green);
+}
+.tag-short {
+  padding: 3px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+/* Table styles */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.data-table th {
+  padding: 14px 16px;
+  text-align: left;
+  color: #555;
+  font-weight: 500;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-bottom: 1px solid var(--border);
+}
+.data-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #111;
+}
+
+/* Form inputs */
+.form-input {
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: #e0e0e0;
+  font-size: 14px;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.3s;
+}
+.form-input:focus {
+  border-color: var(--green);
+}
+.form-label {
+  font-size: 11px;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  display: block;
+  margin-bottom: 8px;
+}
+
+/* Buttons */
+.btn-primary {
+  padding: 14px 36px;
+  background: var(--green);
+  color: #000;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: opacity 0.2s;
+}
+.btn-primary:hover {
+  opacity: 0.9;
+}
+.btn-outline {
+  padding: 14px 36px;
+  background: transparent;
+  color: #ccc;
+  border: 1px solid #333;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: border-color 0.2s;
+}
+.btn-outline:hover {
+  border-color: #666;
 }
