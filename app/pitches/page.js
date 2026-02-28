@@ -9,6 +9,7 @@ import { useState } from "react";
   4. Push to GitHub and Vercel will auto-deploy
 
   Decision options: "Buy" (green), "Short" (red), "Pass" (grey)
+  Date format: "3-Feb-2026" — will auto-split into two lines
 */
 
 const PITCHES = [
@@ -19,13 +20,22 @@ const PITCHES = [
     targetPrice: "$29",
     transactionPrice: "$22",
     pitchTeam: "Kristen Arieta, Adelyn Clemmer, Alex Moeller, Quinn Reilly",
-    deck: "/pitches/VRT.pdf",
+    deck: "/pitches/wbi-deck.pdf",
     model: "/pitches/wbi-model.xlsx",
   },
   // Add more pitches here following the same format
 ];
 
 const ZOOM_LEVELS = [50, 75, 100, 125, 150, 200];
+
+function formatDate(dateStr) {
+  // Splits "3-Feb-2026" into "3-Feb" and "2026"
+  const parts = dateStr.split("-");
+  if (parts.length === 3) {
+    return { line1: `${parts[0]}-${parts[1]}`, line2: parts[2] };
+  }
+  return { line1: dateStr, line2: "" };
+}
 
 function PdfViewer({ pdf, company, onClose }) {
   const [zoomIndex, setZoomIndex] = useState(2);
@@ -167,42 +177,62 @@ export default function Pitches() {
           <tbody>
             {PITCHES.map((p, i) => {
               const ds = getDecisionStyle(p.decision);
+              const dt = formatDate(p.date);
               return (
                 <tr key={i}>
-                  <td style={{ whiteSpace: "nowrap", color: "#1a2a44" }}>{p.date}</td>
+                  <td style={{ color: "#1a2a44", lineHeight: 1.4 }}>
+                    <div style={{ fontWeight: 500 }}>{dt.line1}</div>
+                    <div style={{ color: "#5a6a7e", fontSize: 12 }}>{dt.line2}</div>
+                  </td>
                   <td>
-                    <div style={{ fontWeight: 500, color: "#1a2a44", marginBottom: 8 }}>
+                    <div style={{ fontWeight: 600, color: "#1a2a44", marginBottom: 8, fontSize: 15 }}>
                       {p.company}
                     </div>
-                    <div style={{ display: "flex", gap: 16 }}>
+                    <div style={{ display: "flex", gap: 20, marginTop: 2 }}>
                       <span
                         onClick={(e) => {
                           e.stopPropagation();
                           setOpenDeck(i);
                         }}
                         style={{
-                          fontSize: 14,
+                          fontSize: 15,
                           color: "#1e3a5f",
                           textDecoration: "underline",
                           cursor: "pointer",
                           fontWeight: 600,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 6,
                         }}
                       >
-                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18'%3E%3Cpath d='M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6z' fill='%23e53e3e'/%3E%3Cpath d='M14 2v6h6' fill='%23fc8181'/%3E%3Ctext x='12' y='17' text-anchor='middle' font-size='6' font-weight='bold' fill='white' font-family='Arial'%3EPDF%3C/text%3E%3C/svg%3E" alt="" style={{verticalAlign: "middle", marginRight: 4}} /> Pitch
+                        <svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6z" fill="#e53e3e"/>
+                          <path d="M14 2v6h6" fill="#fc8181"/>
+                          <text x="12" y="17.5" textAnchor="middle" fontSize="6.5" fontWeight="bold" fill="white" fontFamily="Arial">PDF</text>
+                        </svg>
+                        Pitch
                       </span>
                       <a
                         href={p.model}
                         download
                         onClick={(e) => e.stopPropagation()}
                         style={{
-                          fontSize: 14,
+                          fontSize: 15,
                           color: "#1e3a5f",
                           textDecoration: "underline",
                           cursor: "pointer",
                           fontWeight: 600,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 6,
                         }}
                       >
-                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18'%3E%3Cpath d='M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6z' fill='%23217346'/%3E%3Cpath d='M14 2v6h6' fill='%2333a867'/%3E%3Ctext x='12' y='17' text-anchor='middle' font-size='5.5' font-weight='bold' fill='white' font-family='Arial'%3EXLS%3C/text%3E%3C/svg%3E" alt="" style={{verticalAlign: "middle", marginRight: 4}} /> Model
+                        <svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6z" fill="#217346"/>
+                          <path d="M14 2v6h6" fill="#33a867"/>
+                          <text x="12" y="17.5" textAnchor="middle" fontSize="5.5" fontWeight="bold" fill="white" fontFamily="Arial">XLS</text>
+                        </svg>
+                        Model
                       </a>
                     </div>
                   </td>
