@@ -17,7 +17,7 @@ const PITCHES = [
     thesis:
       "AI infrastructure demand continues to accelerate. Data center revenue growth outpacing consensus estimates.",
     target: "$155",
-    pdf: "/pitches/nvda.pdf",
+    pdf: "/pitches/VRT.pdf",
   },
   {
     ticker: "TSLA",
