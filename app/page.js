@@ -1,6 +1,28 @@
+"use client";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
+function fmt(n, decimals = 2) {
+  if (n == null || isNaN(n)) return "—";
+  return n.toLocaleString(undefined, {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+}
+
 export default function Home() {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    fetch("/api/portfolio")
+      .then((res) => res.json())
+      .then((d) => { if (!d.error) setData(d); })
+      .catch(() => {});
+  }, []);
+
+  const aum = data ? `£${fmt(data.totalValue / 1000, 0)}K` : "£100K";
+  const totalReturn = data ? `${data.totalReturnPct >= 0 ? "+" : ""}${fmt(data.totalReturnPct, 2)}%` : "0.00%";
+
   return (
     <section
       style={{
@@ -14,7 +36,6 @@ export default function Home() {
         padding: "120px 24px 80px",
       }}
     >
-      {/* Subtle background */}
       <div
         style={{
           position: "absolute",
@@ -26,7 +47,7 @@ export default function Home() {
       />
 
       <p className="section-label" style={{ marginBottom: 16 }}>
-        Global Equities · Long/Short
+        L/S Strategies
       </p>
 
       <h1
@@ -73,7 +94,7 @@ export default function Home() {
         </Link>
       </div>
 
-      {/* Stats row */}
+      {/* Stats row — live from Alpaca */}
       <div
         style={{
           display: "flex",
@@ -84,10 +105,8 @@ export default function Home() {
         }}
       >
         {[
-          ["$150K", "AUM"],
-          ["9.05%", "Total Return"],
-          ["35", "Trades Executed"],
-          ["2", "Founders"],
+          [aum, "AUM"],
+          [totalReturn, "Total Return"],
         ].map(([value, label]) => (
           <div key={label} style={{ textAlign: "center" }}>
             <div style={{ fontSize: 28, fontWeight: 300, color: "#1a2a44" }}>

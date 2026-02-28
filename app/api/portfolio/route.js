@@ -1,4 +1,5 @@
 const BASE_URL = "https://paper-api.alpaca.markets";
+const INITIAL_CAPITAL = 100000;
 
 const headers = {
   "APCA-API-KEY-ID": process.env.ALPACA_API_KEY,
@@ -26,6 +27,9 @@ export async function GET() {
     const assets = await Promise.all(assetPromises);
 
     const totalPortfolioValue = parseFloat(account.portfolio_value);
+    const equity = parseFloat(account.equity);
+    const cash = parseFloat(account.cash);
+    const totalReturnPct = ((equity - INITIAL_CAPITAL) / INITIAL_CAPITAL) * 100;
 
     const formattedPositions = positions.map((p, i) => {
       const marketValue = parseFloat(p.market_value);
@@ -46,13 +50,14 @@ export async function GET() {
       };
     });
 
-    // Sort by allocation descending
     formattedPositions.sort((a, b) => b.allocation - a.allocation);
 
     const data = {
-      equity: parseFloat(account.equity),
-      cash: parseFloat(account.cash),
+      equity,
+      cash,
       totalValue: totalPortfolioValue,
+      initialCapital: INITIAL_CAPITAL,
+      totalReturnPct,
       positions: formattedPositions,
     };
 
