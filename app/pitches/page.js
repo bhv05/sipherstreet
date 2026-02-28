@@ -143,7 +143,7 @@ export default function Pitches() {
                     border: "none",
                   }}
                   title={`${p.ticker} Pitch Deck`}
-                  sandbox="allow-same-origin allow-scripts"
+                
                 />
                 {/* Invisible overlay to block right-click save */}
                 <div
