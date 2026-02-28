@@ -20,7 +20,7 @@ const PITCHES = [
     targetPrice: "$29",
     transactionPrice: "$22",
     pitchTeam: "Kristen Arieta, Adelyn Clemmer, Alex Moeller, Quinn Reilly",
-    deck: "/pitches/wbi-deck.pdf",
+    deck: "/pitches/VRT.pdf",
     model: "/pitches/wbi-model.xlsx",
   },
   // Add more pitches here following the same format
