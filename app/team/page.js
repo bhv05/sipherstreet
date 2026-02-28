@@ -1,3 +1,5 @@
+"use client";
+
 /*
   HOW TO ADD HEADSHOTS:
   1. Put your photos in public/team/ folder (e.g. public/team/bhavya.jpg)
