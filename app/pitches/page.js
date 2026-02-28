@@ -17,7 +17,7 @@ const PITCHES = [
     thesis:
       "AI infrastructure demand continues to accelerate. Data center revenue growth outpacing consensus estimates.",
     target: "$155",
-    pdf: "/pitches/VRT.pdf",
+    pdf: "/pitches/nvda.pdf",
   },
   {
     ticker: "TSLA",
@@ -50,6 +50,84 @@ const PITCHES = [
     pdf: "/pitches/msft.pdf",
   },
 ];
+
+function PdfViewer({ pdf, ticker }) {
+  const [zoom, setZoom] = useState(100);
+
+  const zoomIn = (e) => { e.stopPropagation(); setZoom((z) => Math.min(z + 25, 200)); };
+  const zoomOut = (e) => { e.stopPropagation(); setZoom((z) => Math.max(z - 25, 50)); };
+  const zoomReset = (e) => { e.stopPropagation(); setZoom(100); };
+
+  return (
+    <div
+      style={{ marginTop: 20 }}
+      onClick={(e) => e.stopPropagation()}
+      onContextMenu={(e) => e.preventDefault()}
+    >
+      {/* Zoom controls */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          marginBottom: 0,
+          padding: "8px 12px",
+          background: "#f1f5f9",
+          border: "1px solid #e2e8f0",
+          borderRadius: "4px 4px 0 0",
+          fontSize: 13,
+        }}
+      >
+        <button
+          onClick={zoomOut}
+          style={{
+            width: 32, height: 32, border: "1px solid #e2e8f0", background: "#fff",
+            borderRadius: 4, cursor: "pointer", fontSize: 16, color: "#1a2a44",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}
+        >−</button>
+        <span
+          onClick={zoomReset}
+          style={{ minWidth: 50, textAlign: "center", color: "#5a6a7e", cursor: "pointer", fontSize: 12 }}
+        >{zoom}%</span>
+        <button
+          onClick={zoomIn}
+          style={{
+            width: 32, height: 32, border: "1px solid #e2e8f0", background: "#fff",
+            borderRadius: 4, cursor: "pointer", fontSize: 16, color: "#1a2a44",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}
+        >+</button>
+      </div>
+
+      {/* PDF frame */}
+      <div
+        style={{
+          border: "1px solid #e2e8f0",
+          borderTop: "none",
+          borderRadius: "0 0 4px 4px",
+          overflow: "auto",
+          height: 600,
+          background: "#fff",
+          position: "relative",
+        }}
+      >
+        <div style={{ width: `${zoom}%`, transformOrigin: "top left" }}>
+          <iframe
+            src={`${pdf}#toolbar=0&navpanes=0&scrollbar=1`}
+            style={{
+              width: "100%",
+              height: zoom === 100 ? 600 : 600 * (zoom / 100),
+              border: "none",
+              display: "block",
+            }}
+            title={`${ticker} Pitch Deck`}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Pitches() {
   const [openPdf, setOpenPdf] = useState(null);
@@ -121,43 +199,9 @@ export default function Pitches() {
               </div>
             </div>
 
-            {/* PDF Viewer — download restricted */}
+            {/* PDF Viewer — with zoom, no download */}
             {openPdf === p.ticker && (
-              <div
-                style={{
-                  marginTop: 20,
-                  border: "1px solid #e2e8f0",
-                  borderRadius: 4,
-                  overflow: "hidden",
-                  background: "#fff",
-                  position: "relative",
-                }}
-                onClick={(e) => e.stopPropagation()}
-                onContextMenu={(e) => e.preventDefault()}
-              >
-                <iframe
-                  src={`${p.pdf}#toolbar=0&navpanes=0&scrollbar=1`}
-                  style={{
-                    width: "100%",
-                    height: 600,
-                    border: "none",
-                  }}
-                  title={`${p.ticker} Pitch Deck`}
-                
-                />
-                {/* Invisible overlay to block right-click save */}
-                <div
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: "transparent",
-                    pointerEvents: "none",
-                  }}
-                />
-              </div>
+              <PdfViewer pdf={p.pdf} ticker={p.ticker} />
             )}
           </div>
         ))}
