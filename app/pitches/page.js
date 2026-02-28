@@ -121,7 +121,7 @@ export default function Pitches() {
               </div>
             </div>
 
-            {/* PDF Viewer */}
+            {/* PDF Viewer — download restricted */}
             {openPdf === p.ticker && (
               <div
                 style={{
@@ -130,17 +130,32 @@ export default function Pitches() {
                   borderRadius: 4,
                   overflow: "hidden",
                   background: "#fff",
+                  position: "relative",
                 }}
                 onClick={(e) => e.stopPropagation()}
+                onContextMenu={(e) => e.preventDefault()}
               >
                 <iframe
-                  src={p.pdf}
+                  src={`${p.pdf}#toolbar=0&navpanes=0&scrollbar=1`}
                   style={{
                     width: "100%",
                     height: 600,
                     border: "none",
                   }}
                   title={`${p.ticker} Pitch Deck`}
+                  sandbox="allow-same-origin allow-scripts"
+                />
+                {/* Invisible overlay to block right-click save */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: "transparent",
+                    pointerEvents: "none",
+                  }}
                 />
               </div>
             )}
