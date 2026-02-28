@@ -15,9 +15,7 @@ export default function Footer() {
       <div style={{ fontSize: 12, color: "#8896a6" }}>
         © 2026 Sipher Street. Student-run investment fund.
       </div>
-      <div style={{ fontSize: 11, color: "#a0aec0" }}>
-        Paper trading via Alpaca · Not real capital
-      </div>
+      
     </footer>
   );
 }
