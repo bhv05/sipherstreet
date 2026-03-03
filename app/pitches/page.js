@@ -14,14 +14,14 @@ import { useState } from "react";
 
 const PITCHES = [
   {
-    date: "3-Feb-2026",
-    company: "WaterBridge (NYSE: WBI)",
+    date: "02-Mar-2026",
+    company: "Applovin Corp. (NASDAQ: APP)",
     decision: "Buy",
-    targetPrice: "$29",
-    transactionPrice: "$22",
-    pitchTeam: "Kristen Arieta, Adelyn Clemmer, Alex Moeller, Quinn Reilly",
-    deck: "/pitches/VRT.pdf",
-    model: "/pitches/wbi-model.xlsx",
+    targetPrice: "$590",
+    transactionPrice: "$434.14",
+    pitchTeam: "Bhavya Patel, Henish Patel",
+    deck: "/pitches/Applovin.pdf",
+    model: "/pitches/APP_vf.xlsx",
   },
   // Add more pitches here following the same format
 ];
