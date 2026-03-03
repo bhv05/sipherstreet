@@ -7,7 +7,7 @@ export default function About() {
       </h2>
 
       <div style={{ display: "grid", gap: 40 }}>
-        {/* Intro */}
+        {/* Our Story */}
         <div>
           <h3
             style={{
@@ -34,34 +34,7 @@ export default function About() {
           </p>
         </div>
 
-        {/* Mission */}
-        <div>
-          <h3
-            style={{
-              fontSize: 18,
-              fontWeight: 600,
-              color: "#1a2a44",
-              marginBottom: 12,
-            }}
-          >
-            Our Mission
-          </h3>
-          <p
-            style={{
-              fontSize: 15,
-              color: "#5a6a7e",
-              lineHeight: 1.8,
-            }}
-          >
-            We exist to bridge the gap between academic finance and real-world
-            portfolio management. Our mission is to develop practical investment
-            skills, produce high-quality equity research, and build a track record
-            that demonstrates the power of fundamental analysis applied with
-            conviction and discipline.
-          </p>
-        </div>
-
-        {/* Approach — 3 Strategy Columns with left border accent */}
+        {/* Our Approach */}
         <div>
           <h3
             style={{
@@ -155,7 +128,34 @@ export default function About() {
           </div>
         </div>
 
-        {/* Values — 3 items with box card style */}
+        {/* Our Mission */}
+        <div>
+          <h3
+            style={{
+              fontSize: 18,
+              fontWeight: 600,
+              color: "#1a2a44",
+              marginBottom: 12,
+            }}
+          >
+            Our Mission
+          </h3>
+          <p
+            style={{
+              fontSize: 15,
+              color: "#5a6a7e",
+              lineHeight: 1.8,
+            }}
+          >
+            We exist to bridge the gap between academic finance and real-world
+            portfolio management. Our mission is to develop practical investment
+            skills, produce high-quality equity research, and build a track record
+            that demonstrates the power of fundamental analysis applied with
+            conviction and discipline.
+          </p>
+        </div>
+
+        {/* What We Value */}
         <div>
           <h3
             style={{
