@@ -15,12 +15,14 @@ const TEAM = [
     role: "Founder",
     desc: "",
     image: "/team/BhavyaPatelHeadShot.jpg",
+    email: "bhavya@sipherstreet.com",
   },
   {
     name: "Henish Patel",
     role: "Founder",
     desc: "",
     image: "/team/henish.jpg",
+    email: "henish@sipherstreet.com",
   },
 ];
 
@@ -115,6 +117,17 @@ export default function Team() {
             >
               {m.role}
             </p>
+            {m.email && (
+              <p
+                style={{
+                  fontSize: 13,
+                  color: "#5a6a7e",
+                  marginTop: 10,
+                }}
+              >
+                E: {m.email}
+              </p>
+            )}
             {m.desc && (
               <p
                 style={{
