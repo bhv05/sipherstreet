@@ -3,6 +3,51 @@ import { useState } from "react";
 
 export default function Contact() {
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState(null);
+  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+
+  const handleChange = (field) => (e) => {
+    setForm({ ...form, [field]: e.target.value });
+  };
+
+  const handleSubmit = async () => {
+    // Basic validation
+    if (!form.name || !form.email || !form.subject || !form.message) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
+    setSending(true);
+    setError(null);
+
+    try {
+      const res = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          access_key: process.env.NEXT_PUBLIC_WEB3FORMS_KEY,
+          subject: `Sipher Street Contact: ${form.subject}`,
+          from_name: form.name,
+          name: form.name,
+          email: form.email,
+          message: form.message,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setSent(true);
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
+    } catch (err) {
+      setError("Failed to send message. Please try again later.");
+    } finally {
+      setSending(false);
+    }
+  };
 
   return (
     <div className="page-section" style={{ maxWidth: 600 }}>
@@ -41,30 +86,68 @@ export default function Contact() {
         </div>
       ) : (
         <div style={{ display: "grid", gap: 20 }}>
-          {[
-            ["Name", "text"],
-            ["Email", "email"],
-            ["Subject", "text"],
-          ].map(([label, type]) => (
-            <div key={label}>
-              <label className="form-label">{label}</label>
-              <input type={type} className="form-input" />
+          {error && (
+            <div
+              style={{
+                padding: "12px 16px",
+                background: "#fef2f2",
+                border: "1px solid #fecaca",
+                borderRadius: 4,
+                color: "#dc2626",
+                fontSize: 13,
+              }}
+            >
+              {error}
             </div>
-          ))}
+          )}
+          <div>
+            <label className="form-label">Name</label>
+            <input
+              type="text"
+              className="form-input"
+              value={form.name}
+              onChange={handleChange("name")}
+            />
+          </div>
+          <div>
+            <label className="form-label">Email</label>
+            <input
+              type="email"
+              className="form-input"
+              value={form.email}
+              onChange={handleChange("email")}
+            />
+          </div>
+          <div>
+            <label className="form-label">Subject</label>
+            <input
+              type="text"
+              className="form-input"
+              value={form.subject}
+              onChange={handleChange("subject")}
+            />
+          </div>
           <div>
             <label className="form-label">Message</label>
             <textarea
               rows={5}
               className="form-input"
               style={{ resize: "vertical" }}
+              value={form.message}
+              onChange={handleChange("message")}
             />
           </div>
           <button
-            onClick={() => setSent(true)}
+            onClick={handleSubmit}
+            disabled={sending}
             className="btn-primary"
-            style={{ justifySelf: "start" }}
+            style={{
+              justifySelf: "start",
+              opacity: sending ? 0.6 : 1,
+              cursor: sending ? "default" : "pointer",
+            }}
           >
-            Send Message
+            {sending ? "Sending..." : "Send Message"}
           </button>
         </div>
       )}
@@ -79,7 +162,7 @@ export default function Contact() {
         }}
       >
         {[
-          ["Email", "fund@university.edu"],
+          ["Email", "team@sipherstreet.com"],
           ["Location", "LSE Campus"],
         ].map(([label, value]) => (
           <div key={label}>
