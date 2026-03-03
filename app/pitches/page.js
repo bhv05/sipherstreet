@@ -18,7 +18,7 @@ const PITCHES = [
     company: "Applovin Corp. (NASDAQ: APP)",
     decision: "Buy",
     targetPrice: "$590",
-    transactionPrice: "$434.14",
+    transactionPrice: "$434",
     pitchTeam: "Bhavya Patel, Henish Patel",
     deck: "/pitches/Applovin.pdf",
     model: "/pitches/APP_vf.xlsx",
