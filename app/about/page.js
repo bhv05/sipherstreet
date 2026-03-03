@@ -61,14 +61,14 @@ export default function About() {
           </p>
         </div>
 
-        {/* Approach */}
+        {/* Approach — 3 Strategy Columns with left border accent */}
         <div>
           <h3
             style={{
               fontSize: 18,
               fontWeight: 600,
               color: "#1a2a44",
-              marginBottom: 12,
+              marginBottom: 16,
             }}
           >
             Our Approach
@@ -78,17 +78,84 @@ export default function About() {
               fontSize: 15,
               color: "#5a6a7e",
               lineHeight: 1.8,
+              marginBottom: 24,
             }}
           >
             Sipher Street employs a long/short equity strategy across global
-            markets. Every position begins with a rigorous investment thesis,
-            supported by financial modelling, competitive analysis, and a clearly
-            defined risk/reward framework. We size positions carefully and maintain
-            strict risk limits to protect capital in all market environments.
+            markets, built around three complementary pillars. Every position
+            begins with a rigorous investment thesis, supported by financial
+            modelling, competitive analysis, and a clearly defined risk/reward
+            framework.
           </p>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: 16,
+            }}
+          >
+            {[
+              [
+                "01",
+                "Quality Compounders",
+                "We identify businesses that can consistently reinvest cash flows at high incremental returns on capital over long periods. These companies generate exponential earnings growth through expanding reinvestment, rising productivity, or disciplined capital returns without needing an external catalyst or rerating to create value.",
+              ],
+              [
+                "02",
+                "Event & Catalyst Driven",
+                "We target discrete, time-bounded corporate or market events such as M&A, spin-offs, restructurings, earnings inflections, and regulatory decisions that are expected to materially alter a company's valuation. These setups offer asymmetric, often market-agnostic payoffs driven by quantifiable probabilities and deep fundamental work.",
+              ],
+              [
+                "03",
+                "Short Ideas",
+                "We take short positions where our proprietary research uncovers structural deterioration, over-earning, or misunderstood risks the market has yet to price in. Each short is anchored by a differentiated insight, whether a flawed business model, unsustainable unit economics, or an approaching negative catalyst, and framed with strict risk limits.",
+              ],
+            ].map(([num, title, desc]) => (
+              <div
+                key={title}
+                style={{
+                  padding: "28px 24px",
+                  borderLeft: "3px solid #1a2a44",
+                  background: "transparent",
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: "#94a3b8",
+                    letterSpacing: "0.1em",
+                    display: "block",
+                    marginBottom: 8,
+                  }}
+                >
+                  {num}
+                </span>
+                <h4
+                  style={{
+                    fontSize: 15,
+                    fontWeight: 600,
+                    color: "#1a2a44",
+                    marginBottom: 10,
+                  }}
+                >
+                  {title}
+                </h4>
+                <p
+                  style={{
+                    fontSize: 13,
+                    color: "#5a6a7e",
+                    lineHeight: 1.7,
+                  }}
+                >
+                  {desc}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Values */}
+        {/* Values — 3 items with box card style */}
         <div>
           <h3
             style={{
@@ -103,15 +170,23 @@ export default function About() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+              gridTemplateColumns: "repeat(3, 1fr)",
               gap: 16,
             }}
           >
             {[
-              ["Intellectual Rigour", "We demand evidence-based reasoning and challenge every assumption before committing capital."],
-              ["Transparency", "Our portfolio, performance, and research are open for scrutiny. We believe accountability drives excellence."],
-              ["Continuous Learning", "Markets evolve and so must we. We are committed to constant improvement in our process and thinking."],
-              ["Conviction", "When our research supports a thesis, we have the courage to act on it — on both the long and short side."],
+              [
+                "Intellectual Rigour",
+                "We demand evidence-based reasoning and challenge every assumption before committing capital. Conclusions must be earned through analysis, not borrowed from consensus.",
+              ],
+              [
+                "Conviction",
+                "When our research supports a thesis, we have the courage to act on it. We size positions with confidence and hold through volatility when the fundamentals remain intact.",
+              ],
+              [
+                "Perspicacious",
+                "We cultivate sharp, penetrating insight into businesses and markets. Surface-level analysis is never sufficient; we seek to understand what others overlook and act where the crowd cannot.",
+              ],
             ].map(([title, desc]) => (
               <div
                 key={title}
@@ -121,6 +196,8 @@ export default function About() {
                   background: "#f8fafc",
                   border: "1px solid #e2e8f0",
                   borderRadius: 4,
+                  display: "flex",
+                  flexDirection: "column",
                 }}
               >
                 <h4
@@ -128,12 +205,18 @@ export default function About() {
                     fontSize: 14,
                     fontWeight: 600,
                     color: "#1a2a44",
-                    marginBottom: 8,
+                    marginBottom: 10,
                   }}
                 >
                   {title}
                 </h4>
-                <p style={{ fontSize: 13, color: "#5a6a7e", lineHeight: 1.7 }}>
+                <p
+                  style={{
+                    fontSize: 13,
+                    color: "#5a6a7e",
+                    lineHeight: 1.7,
+                  }}
+                >
                   {desc}
                 </p>
               </div>
