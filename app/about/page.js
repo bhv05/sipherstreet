@@ -30,7 +30,7 @@ export default function About() {
             Economics with a shared conviction: that disciplined, research-driven
             investing can be learned by doing. What began as a conversation about
             markets grew into a fully operational student-run fund, managing a
-            paper portfolio using real-time data and institutional-grade analysis.
+            portfolio using real-time data and institutional-grade analysis.
           </p>
         </div>
 
