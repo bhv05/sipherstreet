@@ -28,6 +28,23 @@ const PITCHES = [
 
 const ZOOM_LEVELS = [50, 75, 100, 125, 150, 200];
 
+/*
+  QUALITY_BOOST multiplies the render resolution beyond what DPR alone
+  requires. A value of 2 means on a 2x retina display at 100% zoom,
+  the canvas is rendered at 4x the display pixels. This is what makes
+  chart labels, logos, and bold text razor-sharp instead of slightly soft.
+  Increase to 2.5 or 3 if you want even more crispness (at the cost of
+  slightly more memory and render time per page).
+*/
+var QUALITY_BOOST = 2;
+
+/*
+  MINIMUM_SCALE ensures that even at 50% zoom on a 1x display, we never
+  render below this PDF.js scale factor. PDF.js scale 3 roughly equals
+  ~216 DPI which keeps text legible and clean.
+*/
+var MINIMUM_SCALE = 3;
+
 function formatDate(dateStr) {
   var parts = dateStr.split("-");
   if (parts.length === 3) {
@@ -95,13 +112,6 @@ function XlsIconSmall() {
   );
 }
 
-/*
-  KEY CHANGE: Instead of rendering once to a JPEG blob, this version
-  renders directly to <canvas> elements and RE-RENDERS every time zoom
-  changes. The render scale accounts for both the zoom level and the
-  device pixel ratio so text and graphics stay perfectly sharp at every
-  zoom level on both standard and retina displays.
-*/
 function PdfViewer({ pdf, company, onClose }) {
   var pdfDocRef = useRef(null);
   var canvasRefs = useRef([]);
@@ -114,7 +124,6 @@ function PdfViewer({ pdf, company, onClose }) {
   var contentRef = useRef(null);
   var zoom = ZOOM_LEVELS[zoomIndex];
 
-  /* Measure container width */
   useEffect(function () {
     var measure = function () {
       if (contentRef.current) {
@@ -127,7 +136,6 @@ function PdfViewer({ pdf, company, onClose }) {
     return function () { clearTimeout(timer); };
   }, []);
 
-  /* Load the PDF document once */
   useEffect(function () {
     var cancelled = false;
     async function load() {
@@ -151,11 +159,16 @@ function PdfViewer({ pdf, company, onClose }) {
   }, [pdf]);
 
   /*
-    Re-render ALL pages when zoom or baseWidth changes.
-    Each canvas is rendered at: displayWidth * devicePixelRatio
-    Then the canvas CSS size is set to displayWidth so the browser
-    downscales, giving retina-sharp output. When zoom goes up,
-    displayWidth goes up and we re-render at the new higher resolution.
+    Render pipeline:
+    1. Calculate display width from baseWidth * zoom%
+    2. Calculate render scale = (displayWidth / nativePageWidth) * DPR * QUALITY_BOOST
+    3. Enforce MINIMUM_SCALE floor so low zoom still looks sharp
+    4. Render canvas at that scale, then set CSS size to displayWidth
+    5. Browser downscales the oversized canvas = super-crisp output
+
+    This means at 100% zoom on a 2x retina Mac with QUALITY_BOOST=2,
+    the canvas is rendered at ~4x display pixels. Charts, logos, bold
+    text, and small labels all come out razor-sharp.
   */
   useEffect(function () {
     var doc = pdfDocRef.current;
@@ -174,20 +187,20 @@ function PdfViewer({ pdf, company, onClose }) {
         var page = await doc.getPage(i);
         var nativeViewport = page.getViewport({ scale: 1 });
 
-        /* Scale so the page fills displayWidth, then multiply by DPR for sharpness */
-        var renderScale = (displayWidth / nativeViewport.width) * dpr;
+        /* The key formula: display scale * DPR * quality boost, with a minimum floor */
+        var calculatedScale = (displayWidth / nativeViewport.width) * dpr * QUALITY_BOOST;
+        var renderScale = Math.max(calculatedScale, MINIMUM_SCALE);
         var viewport = page.getViewport({ scale: renderScale });
 
         var canvas = canvasRefs.current[i - 1];
         if (!canvas || renderIdRef.current !== thisRenderId) continue;
 
-        /* Canvas pixel buffer = full resolution */
         canvas.width = viewport.width;
         canvas.height = viewport.height;
 
-        /* CSS display size = what the user sees (no stretching) */
+        /* CSS size = what the user actually sees */
         canvas.style.width = displayWidth + "px";
-        canvas.style.height = Math.round(viewport.height / dpr) + "px";
+        canvas.style.height = Math.round(displayWidth * (nativeViewport.height / nativeViewport.width)) + "px";
 
         var ctx = canvas.getContext("2d");
         await page.render({ canvasContext: ctx, viewport: viewport }).promise;
