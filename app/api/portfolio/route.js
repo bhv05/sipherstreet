@@ -10,6 +10,7 @@ function fallbackResponse() {
     initialCapital: INITIAL_CAPITAL,
     totalReturnPct: 0,
     positions: [],
+    lastUpdated: new Date().toISOString(),
   });
 }
 
@@ -65,6 +66,7 @@ export async function GET() {
         allocation: (Math.abs(marketValue) / totalPortfolioValue) * 100,
         totalReturn: totalReturn,
         pl: parseFloat(p.unrealized_pl),
+        changeToday: parseFloat(p.change_today) * 100 || 0,
       };
     });
 
@@ -77,6 +79,7 @@ export async function GET() {
       initialCapital: INITIAL_CAPITAL,
       totalReturnPct,
       positions: formattedPositions,
+      lastUpdated: new Date().toISOString(),
     };
 
     return Response.json(data);
