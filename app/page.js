@@ -10,28 +10,22 @@ function fmt(n, decimals = 2) {
   });
 }
 
-/*
-  Builds the array of ticker items from portfolio data.
-  Each item: { label, value, change, isPositive }
-  If there are few positions, we pad with fund-level stats
-  so the strip always has enough content to scroll smoothly.
-*/
 function buildTickerItems(data) {
   if (!data || !data.positions) return [];
 
   var items = [];
 
-  /* Each position: SYMBOL  $price  ▲/▼ change% */
   data.positions.forEach(function (pos) {
+    var positive = pos.totalReturn >= 0;
     items.push({
       symbol: pos.symbol,
       price: "$" + fmt(pos.currentPrice),
-      change: pos.changeToday,
+      change: pos.totalReturn,
+      positive: positive,
       type: "position",
     });
   });
 
-  /* Fund-level stats to fill the strip */
   items.push({
     symbol: "AUM",
     price: "$" + fmt(data.totalValue, 0),
@@ -40,7 +34,7 @@ function buildTickerItems(data) {
   });
 
   items.push({
-    symbol: "TOTAL RETURN",
+    symbol: "PORTFOLIO",
     price: (data.totalReturnPct >= 0 ? "+" : "") + fmt(data.totalReturnPct, 2) + "%",
     change: null,
     type: "stat",
@@ -62,27 +56,18 @@ function TickerStrip({ data }) {
   var items = buildTickerItems(data);
   if (items.length === 0) return null;
 
-  /*
-    We render the items 4 times to ensure seamless looping.
-    The CSS animation slides the entire strip left by 50%
-    (which is 2 full sets), then snaps back — creating
-    an infinite seamless scroll.
-  */
   var allItems = items.concat(items).concat(items).concat(items);
-
-  /* Speed: roughly 30px per second per item, minimum 20s */
   var duration = Math.max(items.length * 4, 20);
 
   return (
     <div
       style={{
         width: "100%",
-        maxWidth: 900,
-        margin: "48px auto 0",
-        overflow: "hidden",
-        borderRadius: 4,
         background: "#0f1c30",
+        overflow: "hidden",
         position: "relative",
+        marginTop: 64,
+        borderBottom: "1px solid #1a2a44",
       }}
     >
       {/* Fade edges */}
@@ -92,7 +77,7 @@ function TickerStrip({ data }) {
           top: 0,
           left: 0,
           bottom: 0,
-          width: 40,
+          width: 60,
           background: "linear-gradient(to right, #0f1c30, transparent)",
           zIndex: 2,
           pointerEvents: "none",
@@ -104,7 +89,7 @@ function TickerStrip({ data }) {
           top: 0,
           right: 0,
           bottom: 0,
-          width: 40,
+          width: 60,
           background: "linear-gradient(to left, #0f1c30, transparent)",
           zIndex: 2,
           pointerEvents: "none",
@@ -118,10 +103,11 @@ function TickerStrip({ data }) {
           var arrow = "";
 
           if (item.change != null) {
-            var pos = item.change >= 0;
+            var pos = item.positive;
             arrow = pos ? "\u25B2" : "\u25BC";
             changeColor = pos ? "#4ade80" : "#f87171";
-            changeText = (pos ? "+" : "") + fmt(item.change, 2) + "%";
+            var abs = Math.abs(item.change);
+            changeText = (pos ? "+" : "-") + fmt(abs, 1) + "%";
           }
 
           if (item.isReturn) {
@@ -135,7 +121,7 @@ function TickerStrip({ data }) {
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 8,
-                padding: "10px 28px",
+                padding: "11px 32px",
                 whiteSpace: "nowrap",
                 flexShrink: 0,
               }}
@@ -151,7 +137,6 @@ function TickerStrip({ data }) {
                 {item.symbol}
               </span>
 
-              {/* Subtle dot separator */}
               <span style={{ color: "#334155", fontSize: 8 }}>{"\u2022"}</span>
 
               <span
@@ -179,22 +164,6 @@ function TickerStrip({ data }) {
           );
         })}
       </div>
-
-      {/* "As of last close" label */}
-      {data && data.lastUpdated && (
-        <div
-          style={{
-            textAlign: "center",
-            padding: "0 0 8px",
-            fontSize: 9,
-            color: "#475569",
-            letterSpacing: "0.08em",
-            textTransform: "uppercase",
-          }}
-        >
-          Live when markets are open · Prices as of last close
-        </div>
-      )}
 
       <style jsx>{`
         .ticker-track {
@@ -235,127 +204,145 @@ export default function Home() {
     ? (data.totalReturnPct >= 0 ? "+" : "") + fmt(data.totalReturnPct, 2) + "%"
     : "0.00%";
 
+  var showTicker = data && data.positions && data.positions.length > 0;
+
   return (
-    <section
-      style={{
-        position: "relative",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        textAlign: "center",
-        minHeight: "100vh",
-        padding: "120px 24px 80px",
-      }}
-    >
-      <div
+    <div>
+      {/* Full-width ticker — directly below navbar */}
+      {showTicker && <TickerStrip data={data} />}
+
+      {/* Hero section */}
+      <section
         style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "radial-gradient(ellipse at 50% 0%, rgba(30,58,95,0.06) 0%, transparent 60%)",
-          pointerEvents: "none",
-        }}
-      />
-
-      <p className="section-label" style={{ marginBottom: 16 }}>
-        L/S Strategies
-      </p>
-
-      <picture style={{ display: "block", marginBottom: 32 }}>
-        <source srcSet="/logo-hero.svg" type="image/svg+xml" />
-        <img
-          src="/logo-hero.png"
-          alt="Sipher Street"
-          style={{
-            height: "auto",
-            width: "clamp(280px, 55vw, 440px)",
-            maxWidth: "100%",
-            objectFit: "contain",
-            display: "block",
-          }}
-          fetchPriority="high"
-        />
-      </picture>
-
-      <p
-        style={{
-          maxWidth: 520,
-          color: "#5a6a7e",
-          fontSize: 16,
-          lineHeight: 1.7,
-          marginBottom: 48,
-        }}
-      >
-        A student-managed investment fund deploying long/short equity strategies
-        across global markets with disciplined risk management.
-      </p>
-
-      <div
-        style={{
+          position: "relative",
           display: "flex",
-          gap: 16,
-          flexWrap: "wrap",
+          flexDirection: "column",
+          alignItems: "center",
           justifyContent: "center",
+          textAlign: "center",
+          minHeight: showTicker ? "calc(100vh - 106px)" : "100vh",
+          padding: showTicker ? "60px 24px 80px" : "120px 24px 80px",
         }}
       >
-        <Link href="/portfolio">
-          <button className="btn-primary">View Portfolio</button>
-        </Link>
-        <Link href="/pitches">
-          <button className="btn-outline">Our Pitches</button>
-        </Link>
-      </div>
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "radial-gradient(ellipse at 50% 0%, rgba(30,58,95,0.06) 0%, transparent 60%)",
+            pointerEvents: "none",
+          }}
+        />
 
-      {/* Live Ticker Strip */}
-      {data && data.positions && data.positions.length > 0 && (
-        <TickerStrip data={data} />
-      )}
+        <p className="section-label" style={{ marginBottom: 16 }}>
+          L/S Strategies
+        </p>
 
-      {/* Stats row — live from Alpaca */}
-      <div className="home-stats">
-        {[
-          [aum, "AUM"],
-          [totalReturn, "Total Return"],
-        ].map(function (pair) {
-          var value = pair[0];
-          var label = pair[1];
-          return (
-            <div key={label} style={{ textAlign: "center" }}>
-              <div style={{ fontSize: 28, fontWeight: 300, color: "#1a2a44" }}>
-                {value}
+        <picture style={{ display: "block", marginBottom: 32 }}>
+          <source srcSet="/logo-hero.svg" type="image/svg+xml" />
+          <img
+            src="/logo-hero.png"
+            alt="Sipher Street"
+            style={{
+              height: "auto",
+              width: "clamp(280px, 55vw, 440px)",
+              maxWidth: "100%",
+              objectFit: "contain",
+              display: "block",
+            }}
+            fetchPriority="high"
+          />
+        </picture>
+
+        <p
+          style={{
+            maxWidth: 520,
+            color: "#5a6a7e",
+            fontSize: 16,
+            lineHeight: 1.7,
+            marginBottom: 48,
+          }}
+        >
+          A student-managed investment fund deploying long/short equity strategies
+          across global markets with disciplined risk management.
+        </p>
+
+        <div
+          style={{
+            display: "flex",
+            gap: 16,
+            flexWrap: "wrap",
+            justifyContent: "center",
+          }}
+        >
+          <Link href="/portfolio">
+            <button className="btn-primary">View Portfolio</button>
+          </Link>
+          <Link href="/pitches">
+            <button className="btn-outline">Our Pitches</button>
+          </Link>
+        </div>
+
+        {/* Stats row */}
+        <div className="home-stats">
+          {[
+            [aum, "AUM"],
+            [totalReturn, "Total Return"],
+          ].map(function (pair) {
+            var value = pair[0];
+            var label = pair[1];
+            return (
+              <div key={label} style={{ textAlign: "center" }}>
+                <div style={{ fontSize: 28, fontWeight: 300, color: "#1a2a44" }}>
+                  {value}
+                </div>
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: "#8896a6",
+                    letterSpacing: "0.15em",
+                    textTransform: "uppercase",
+                    marginTop: 4,
+                  }}
+                >
+                  {label}
+                </div>
               </div>
-              <div
-                style={{
-                  fontSize: 11,
-                  color: "#8896a6",
-                  letterSpacing: "0.15em",
-                  textTransform: "uppercase",
-                  marginTop: 4,
-                }}
-              >
-                {label}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
 
-      <style jsx>{`
-        .home-stats {
-          display: flex;
-          gap: 64px;
-          margin-top: 48px;
-          flex-wrap: wrap;
-          justify-content: center;
-        }
-        @media (max-width: 768px) {
+        {/* Last close note */}
+        {showTicker && (
+          <div
+            style={{
+              marginTop: 32,
+              fontSize: 10,
+              color: "#b0bac6",
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+            }}
+          >
+            Live when markets are open · Prices as of last close
+          </div>
+        )}
+
+        <style jsx>{`
           .home-stats {
-            gap: 36px;
-            margin-top: 36px;
+            display: flex;
+            gap: 64px;
+            margin-top: 56px;
+            flex-wrap: wrap;
+            justify-content: center;
           }
-        }
-      `}</style>
-    </section>
+          @media (max-width: 768px) {
+            .home-stats {
+              gap: 36px;
+              margin-top: 40px;
+            }
+          }
+        `}</style>
+      </section>
+    </div>
   );
 }
