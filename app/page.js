@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 
 function fmt(n, decimals = 2) {
   if (n == null || isNaN(n)) return "—";
