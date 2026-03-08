@@ -12,10 +12,32 @@ export default function Footer() {
         background: "#f8fafc",
       }}
     >
-      <div style={{ fontSize: 12, color: "#8896a6" }}>
-        © 2026 Sipher Street. Student-run investment fund.
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          fontSize: 12,
+          color: "#8896a6",
+        }}
+      >
+        <span style={{ flexShrink: 0, display: "flex", alignItems: "center" }}>
+          <img
+            src="/logo.png"
+            alt="Sipher Street"
+            width={100}
+            height={28}
+            style={{
+              height: 28,
+              width: "auto",
+              objectFit: "contain",
+              display: "block",
+              verticalAlign: "middle",
+            }}
+          />
+        </span>
+        <span>© 2026 Sipher Street. Student-run investment fund.</span>
       </div>
-      
     </footer>
   );
 }

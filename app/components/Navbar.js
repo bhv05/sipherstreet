@@ -42,16 +42,17 @@ export default function Navbar() {
         transition: "all 0.3s",
       }}
     >
-      <Link
-        href="/"
-        style={{
-          fontSize: 16,
-          fontWeight: 300,
-          color: "#1a2a44",
-          letterSpacing: "0.05em",
-        }}
-      >
-        SIPHER<span style={{ fontWeight: 700 }}>STREET</span>
+      <Link href="/" style={{ display: "flex", alignItems: "center" }}>
+        <img
+          src="/logo.png"
+          alt="Sipher Street"
+          style={{
+            height: 44,
+            width: "auto",
+            objectFit: "contain",
+            display: "block",
+          }}
+        />
       </Link>
 
       {/* Mobile menu button */}

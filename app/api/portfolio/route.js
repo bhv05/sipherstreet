@@ -1,28 +1,46 @@
 const BASE_URL = "https://paper-api.alpaca.markets";
 const INITIAL_CAPITAL = 100000;
 
-const headers = {
-  "APCA-API-KEY-ID": process.env.ALPACA_API_KEY,
-  "APCA-API-SECRET-KEY": process.env.ALPACA_SECRET_KEY,
-  "Content-Type": "application/json",
-};
+function fallbackResponse() {
+  return Response.json({
+    error: "Alpaca not configured or unauthorized",
+    equity: INITIAL_CAPITAL,
+    cash: INITIAL_CAPITAL,
+    totalValue: INITIAL_CAPITAL,
+    initialCapital: INITIAL_CAPITAL,
+    totalReturnPct: 0,
+    positions: [],
+  });
+}
 
-async function fetchAlpaca(endpoint) {
+async function fetchAlpaca(endpoint, headers) {
   const res = await fetch(`${BASE_URL}${endpoint}`, { headers });
   if (!res.ok) throw new Error(`Alpaca API error: ${res.status}`);
   return res.json();
 }
 
 export async function GET() {
+  const apiKey = process.env.ALPACA_API_KEY;
+  const secretKey = process.env.ALPACA_SECRET_KEY;
+  if (!apiKey || !secretKey) {
+    return fallbackResponse();
+  }
+
+  const headers = {
+    "APCA-API-KEY-ID": apiKey,
+    "APCA-API-SECRET-KEY": secretKey,
+    "Content-Type": "application/json",
+  };
+
   try {
     const [account, positions] = await Promise.all([
-      fetchAlpaca("/v2/account"),
-      fetchAlpaca("/v2/positions"),
+      fetchAlpaca("/v2/account", headers),
+      fetchAlpaca("/v2/positions", headers),
     ]);
 
     // Fetch asset names for each position
     const assetPromises = positions.map((p) =>
-      fetchAlpaca(`/v2/assets/${p.symbol}`).catch(() => ({ name: p.symbol }))
+      fetchAlpaca(`/v2/assets/${p.symbol}`, headers).catch(() => ({ name: p.symbol }))
     );
     const assets = await Promise.all(assetPromises);
 
@@ -63,10 +81,7 @@ export async function GET() {
 
     return Response.json(data);
   } catch (error) {
-    console.error("Alpaca API error:", error);
-    return Response.json(
-      { error: "Failed to fetch portfolio data" },
-      { status: 500 }
-    );
+    console.error("Alpaca API error:", error.message || error);
+    return fallbackResponse();
   }
 }

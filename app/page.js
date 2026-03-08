@@ -50,20 +50,21 @@ export default function Home() {
         L/S Strategies
       </p>
 
-      <h1
-        style={{
-          fontSize: "clamp(36px, 6vw, 72px)",
-          fontWeight: 200,
-          color: "#1a2a44",
-          lineHeight: 1.1,
-          marginBottom: 24,
-          letterSpacing: "-0.02em",
-        }}
-      >
-        Sipher
-        <br />
-        <span style={{ fontWeight: 600 }}>Street</span>
-      </h1>
+      <picture style={{ display: "block", marginBottom: 32 }}>
+        <source srcSet="/logo-hero.svg" type="image/svg+xml" />
+        <img
+          src="/logo-hero.png"
+          alt="Sipher Street"
+          style={{
+            height: "auto",
+            width: "clamp(280px, 55vw, 440px)",
+            maxWidth: "100%",
+            objectFit: "contain",
+            display: "block",
+          }}
+          fetchPriority="high"
+        />
+      </picture>
 
       <p
         style={{
