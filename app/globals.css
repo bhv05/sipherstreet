@@ -155,7 +155,7 @@ html {
   background: var(--card);
   border: 1px solid var(--border);
   color: var(--text);
-  font-size: 14px;
+  font-size: 16px;
   outline: none;
   font-family: inherit;
   transition: border-color 0.3s;
@@ -218,4 +218,25 @@ html {
   color: var(--red);
   font-weight: 600;
   text-align: center;
+}
+
+/* ===== MOBILE RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .page-section {
+    padding: 100px 16px 60px;
+    min-height: auto;
+  }
+  .section-title {
+    margin-bottom: 32px;
+  }
+  .data-table th,
+  .data-table td {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+  .btn-primary,
+  .btn-outline {
+    padding: 12px 28px;
+    font-size: 13px;
+  }
 }
