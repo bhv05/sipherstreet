@@ -1,26 +1,7 @@
 export default function Footer() {
   return (
-    <footer
-      style={{
-        borderTop: "1px solid #e2e8f0",
-        padding: "40px 32px",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        flexWrap: "wrap",
-        gap: 16,
-        background: "#f8fafc",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-          fontSize: 12,
-          color: "#8896a6",
-        }}
-      >
+    <footer className="site-footer">
+      <div className="footer-inner">
         <span style={{ flexShrink: 0, display: "flex", alignItems: "center" }}>
           <img
             src="/logo.png"
@@ -38,6 +19,31 @@ export default function Footer() {
         </span>
         <span>© 2026 Sipher Street. Student-run investment fund.</span>
       </div>
+
+      <style jsx>{`
+        .site-footer {
+          border-top: 1px solid #e2e8f0;
+          padding: 40px 32px;
+          background: #f8fafc;
+        }
+        .footer-inner {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          font-size: 12px;
+          color: #8896a6;
+        }
+        @media (max-width: 768px) {
+          .site-footer {
+            padding: 32px 20px;
+          }
+          .footer-inner {
+            flex-direction: column;
+            text-align: center;
+            gap: 10px;
+          }
+        }
+      `}</style>
     </footer>
   );
 }

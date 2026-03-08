@@ -96,15 +96,7 @@ export default function Home() {
       </div>
 
       {/* Stats row — live from Alpaca */}
-      <div
-        style={{
-          display: "flex",
-          gap: 64,
-          marginTop: 80,
-          flexWrap: "wrap",
-          justifyContent: "center",
-        }}
-      >
+      <div className="home-stats">
         {[
           [aum, "AUM"],
           [totalReturn, "Total Return"],
@@ -127,6 +119,22 @@ export default function Home() {
           </div>
         ))}
       </div>
+
+      <style jsx>{`
+        .home-stats {
+          display: flex;
+          gap: 64px;
+          margin-top: 80px;
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+        @media (max-width: 768px) {
+          .home-stats {
+            gap: 36px;
+            margin-top: 56px;
+          }
+        }
+      `}</style>
     </section>
   );
 }
