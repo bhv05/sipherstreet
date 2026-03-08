@@ -16,8 +16,90 @@ function fmtReturn(n) {
   return n < 0 ? `(${str})` : str;
 }
 
+/*
+  Returns { background, color } for the total return cell.
+  
+  Gradient logic:
+    - 0% return  → nearly transparent bg, muted text
+    - ±30% return → full intensity (peak green or peak red)
+    - Beyond ±30% → stays at peak (clamped)
+  
+  The intensity (0 to 1) is: Math.min(|return| / 30, 1)
+  
+  Green uses rgba(22, 163, 74, intensity * 0.25) for bg
+  and interpolates text from #86b89a (muted) to #15803d (vivid)
+  
+  Red uses rgba(220, 38, 38, intensity * 0.25) for bg
+  and interpolates text from #c48a8a (muted) to #b91c1c (vivid)
+*/
+function getReturnStyle(value) {
+  if (value == null || isNaN(value)) return {};
+
+  var abs = Math.abs(value);
+  var intensity = Math.min(abs / 30, 1);
+
+  if (value >= 0) {
+    /* Green gradient */
+    var bgAlpha = (intensity * 0.25).toFixed(3);
+    /* Text: interpolate from muted green (134,184,154) to vivid green (21,128,61) */
+    var r = Math.round(134 + (21 - 134) * intensity);
+    var g = Math.round(184 + (128 - 184) * intensity);
+    var b = Math.round(154 + (61 - 154) * intensity);
+    return {
+      background: "rgba(22, 163, 74, " + bgAlpha + ")",
+      color: "rgb(" + r + "," + g + "," + b + ")",
+      fontWeight: 600,
+      textAlign: "center",
+    };
+  } else {
+    /* Red gradient */
+    var bgAlpha = (intensity * 0.25).toFixed(3);
+    /* Text: interpolate from muted red (196,138,138) to vivid red (185,28,28) */
+    var r = Math.round(196 + (185 - 196) * intensity);
+    var g = Math.round(138 + (28 - 138) * intensity);
+    var b = Math.round(138 + (28 - 138) * intensity);
+    return {
+      background: "rgba(220, 38, 38, " + bgAlpha + ")",
+      color: "rgb(" + r + "," + g + "," + b + ")",
+      fontWeight: 600,
+      textAlign: "center",
+    };
+  }
+}
+
+/*
+  Same gradient logic but for the mobile badge (slightly higher bg opacity
+  so it reads well on the card background)
+*/
+function getReturnBadgeStyle(value) {
+  if (value == null || isNaN(value)) return {};
+
+  var abs = Math.abs(value);
+  var intensity = Math.min(abs / 30, 1);
+
+  if (value >= 0) {
+    var bgAlpha = (0.06 + intensity * 0.20).toFixed(3);
+    var r = Math.round(134 + (21 - 134) * intensity);
+    var g = Math.round(184 + (128 - 184) * intensity);
+    var b = Math.round(154 + (61 - 154) * intensity);
+    return {
+      background: "rgba(22, 163, 74, " + bgAlpha + ")",
+      color: "rgb(" + r + "," + g + "," + b + ")",
+    };
+  } else {
+    var bgAlpha = (0.06 + intensity * 0.20).toFixed(3);
+    var r = Math.round(196 + (185 - 196) * intensity);
+    var g = Math.round(138 + (28 - 138) * intensity);
+    var b = Math.round(138 + (28 - 138) * intensity);
+    return {
+      background: "rgba(220, 38, 38, " + bgAlpha + ")",
+      color: "rgb(" + r + "," + g + "," + b + ")",
+    };
+  }
+}
+
 function PositionCard({ pos }) {
-  const positive = pos.totalReturn >= 0;
+  var badgeStyle = getReturnBadgeStyle(pos.totalReturn);
   return (
     <div
       style={{
@@ -54,11 +136,8 @@ function PositionCard({ pos }) {
             fontSize: 12,
             fontWeight: 600,
             borderRadius: 3,
-            background: positive
-              ? "rgba(22, 163, 74, 0.12)"
-              : "rgba(220, 38, 38, 0.12)",
-            color: positive ? "#16a34a" : "#dc2626",
             flexShrink: 0,
+            ...badgeStyle,
           }}
         >
           {fmtReturn(pos.totalReturn)}
@@ -252,7 +331,7 @@ export default function Portfolio() {
             </thead>
             <tbody>
               {d.positions.map((pos) => {
-                const positive = pos.totalReturn >= 0;
+                var returnStyle = getReturnStyle(pos.totalReturn);
                 return (
                   <tr key={pos.symbol}>
                     <td style={{ fontWeight: 500 }}>{pos.company}</td>
@@ -271,11 +350,7 @@ export default function Portfolio() {
                     <td style={{ textAlign: "center" }}>
                       {fmt(pos.allocation, 1)}%
                     </td>
-                    <td
-                      className={
-                        positive ? "return-positive" : "return-negative"
-                      }
-                    >
+                    <td style={returnStyle}>
                       {fmtReturn(pos.totalReturn)}
                     </td>
                   </tr>
