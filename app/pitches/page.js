@@ -29,14 +29,13 @@ const PITCHES = [
 const ZOOM_LEVELS = [50, 75, 100, 125, 150, 200];
 
 function formatDate(dateStr) {
-  const parts = dateStr.split("-");
+  var parts = dateStr.split("-");
   if (parts.length === 3) {
     return { line1: parts[0] + "-" + parts[1], line2: parts[2] };
   }
   return { line1: dateStr, line2: "" };
 }
 
-/* Load PDF.js from CDN (renders PDFs as images so they work on all devices) */
 function loadPdfJs() {
   return new Promise(function (resolve, reject) {
     if (window.pdfjsLib) {
@@ -96,16 +95,26 @@ function XlsIconSmall() {
   );
 }
 
+/*
+  KEY CHANGE: Instead of rendering once to a JPEG blob, this version
+  renders directly to <canvas> elements and RE-RENDERS every time zoom
+  changes. The render scale accounts for both the zoom level and the
+  device pixel ratio so text and graphics stay perfectly sharp at every
+  zoom level on both standard and retina displays.
+*/
 function PdfViewer({ pdf, company, onClose }) {
-  const [pages, setPages] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const [zoomIndex, setZoomIndex] = useState(2);
-  const [baseWidth, setBaseWidth] = useState(800);
-  const contentRef = useRef(null);
-  const blobUrls = useRef([]);
-  const zoom = ZOOM_LEVELS[zoomIndex];
+  var pdfDocRef = useRef(null);
+  var canvasRefs = useRef([]);
+  var renderIdRef = useRef(0);
+  var [numPages, setNumPages] = useState(0);
+  var [loading, setLoading] = useState(true);
+  var [error, setError] = useState(false);
+  var [zoomIndex, setZoomIndex] = useState(2);
+  var [baseWidth, setBaseWidth] = useState(800);
+  var contentRef = useRef(null);
+  var zoom = ZOOM_LEVELS[zoomIndex];
 
+  /* Measure container width */
   useEffect(function () {
     var measure = function () {
       if (contentRef.current) {
@@ -118,33 +127,18 @@ function PdfViewer({ pdf, company, onClose }) {
     return function () { clearTimeout(timer); };
   }, []);
 
+  /* Load the PDF document once */
   useEffect(function () {
     var cancelled = false;
-
     async function load() {
       try {
         var pdfjsLib = await loadPdfJs();
         var doc = await pdfjsLib.getDocument(pdf).promise;
-        var rendered = [];
-
-        for (var i = 1; i <= doc.numPages; i++) {
-          if (cancelled) return;
-          var page = await doc.getPage(i);
-          var viewport = page.getViewport({ scale: 2.5 });
-          var canvas = document.createElement("canvas");
-          canvas.width = viewport.width;
-          canvas.height = viewport.height;
-          var ctx = canvas.getContext("2d");
-          await page.render({ canvasContext: ctx, viewport: viewport }).promise;
-          var blob = await new Promise(function (res) {
-            canvas.toBlob(res, "image/jpeg", 0.92);
-          });
-          var url = URL.createObjectURL(blob);
-          blobUrls.current.push(url);
-          rendered.push(url);
-          if (!cancelled) setPages(rendered.slice());
+        if (!cancelled) {
+          pdfDocRef.current = doc;
+          setNumPages(doc.numPages);
+          setLoading(false);
         }
-        if (!cancelled) setLoading(false);
       } catch (e) {
         if (!cancelled) {
           setError(true);
@@ -152,76 +146,98 @@ function PdfViewer({ pdf, company, onClose }) {
         }
       }
     }
-
     load();
     return function () { cancelled = true; };
   }, [pdf]);
 
+  /*
+    Re-render ALL pages when zoom or baseWidth changes.
+    Each canvas is rendered at: displayWidth * devicePixelRatio
+    Then the canvas CSS size is set to displayWidth so the browser
+    downscales, giving retina-sharp output. When zoom goes up,
+    displayWidth goes up and we re-render at the new higher resolution.
+  */
   useEffect(function () {
-    return function () {
-      blobUrls.current.forEach(function (url) { URL.revokeObjectURL(url); });
-    };
-  }, []);
+    var doc = pdfDocRef.current;
+    if (!doc || numPages === 0) return;
+
+    renderIdRef.current += 1;
+    var thisRenderId = renderIdRef.current;
+
+    async function renderAll() {
+      var dpr = window.devicePixelRatio || 1;
+      var displayWidth = baseWidth * (zoom / 100);
+
+      for (var i = 1; i <= doc.numPages; i++) {
+        if (renderIdRef.current !== thisRenderId) return;
+
+        var page = await doc.getPage(i);
+        var nativeViewport = page.getViewport({ scale: 1 });
+
+        /* Scale so the page fills displayWidth, then multiply by DPR for sharpness */
+        var renderScale = (displayWidth / nativeViewport.width) * dpr;
+        var viewport = page.getViewport({ scale: renderScale });
+
+        var canvas = canvasRefs.current[i - 1];
+        if (!canvas || renderIdRef.current !== thisRenderId) continue;
+
+        /* Canvas pixel buffer = full resolution */
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+
+        /* CSS display size = what the user sees (no stretching) */
+        canvas.style.width = displayWidth + "px";
+        canvas.style.height = Math.round(viewport.height / dpr) + "px";
+
+        var ctx = canvas.getContext("2d");
+        await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+      }
+    }
+
+    renderAll();
+  }, [numPages, zoom, baseWidth]);
 
   var zoomIn = function () { setZoomIndex(function (i) { return Math.min(i + 1, ZOOM_LEVELS.length - 1); }); };
   var zoomOut = function () { setZoomIndex(function (i) { return Math.max(i - 1, 0); }); };
   var zoomReset = function () { setZoomIndex(2); };
 
-  var imgWidth = baseWidth * (zoom / 100);
+  var pageElements = [];
+  for (var i = 0; i < numPages; i++) {
+    pageElements.push(i);
+  }
 
   return (
     <div
       style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 200,
-        background: "rgba(0,0,0,0.6)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+        position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+        zIndex: 200, background: "rgba(0,0,0,0.6)",
+        display: "flex", alignItems: "center", justifyContent: "center",
         padding: 10,
       }}
       onClick={onClose}
     >
       <div
         style={{
-          background: "#fff",
-          borderRadius: 8,
-          width: "95vw",
-          height: "92vh",
-          maxWidth: 1200,
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden",
+          background: "#fff", borderRadius: 8,
+          width: "95vw", height: "92vh", maxWidth: 1200,
+          display: "flex", flexDirection: "column", overflow: "hidden",
         }}
         onClick={function (e) { e.stopPropagation(); }}
         onContextMenu={function (e) { e.preventDefault(); }}
       >
+        {/* Header */}
         <div
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "12px 16px",
-            background: "#f1f5f9",
-            borderBottom: "1px solid #e2e8f0",
-            flexShrink: 0,
-            gap: 8,
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            padding: "12px 16px", background: "#f1f5f9",
+            borderBottom: "1px solid #e2e8f0", flexShrink: 0, gap: 8,
           }}
         >
           <span
             style={{
-              fontSize: 14,
-              fontWeight: 600,
-              color: "#1a2a44",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-              flex: 1,
-              minWidth: 0,
+              fontSize: 14, fontWeight: 600, color: "#1a2a44",
+              overflow: "hidden", textOverflow: "ellipsis",
+              whiteSpace: "nowrap", flex: 1, minWidth: 0,
             }}
           >
             {company}
@@ -236,15 +252,11 @@ function PdfViewer({ pdf, company, onClose }) {
                 fontSize: 16, color: zoomIndex === 0 ? "#cbd5e1" : "#1a2a44",
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}
-            >
-              {"\u2212"}
-            </button>
+            >{"\u2212"}</button>
             <span
               onClick={zoomReset}
               style={{ minWidth: 44, textAlign: "center", color: "#5a6a7e", cursor: "pointer", fontSize: 12 }}
-            >
-              {zoom + "%"}
-            </span>
+            >{zoom + "%"}</span>
             <button
               onClick={zoomIn}
               disabled={zoomIndex === ZOOM_LEVELS.length - 1}
@@ -254,9 +266,7 @@ function PdfViewer({ pdf, company, onClose }) {
                 fontSize: 16, color: zoomIndex === ZOOM_LEVELS.length - 1 ? "#cbd5e1" : "#1a2a44",
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}
-            >
-              +
-            </button>
+            >+</button>
             <div style={{ width: 1, height: 20, background: "#e2e8f0", margin: "0 4px" }} />
             <button
               onClick={onClose}
@@ -265,24 +275,21 @@ function PdfViewer({ pdf, company, onClose }) {
                 borderRadius: 4, cursor: "pointer", fontSize: 18, color: "#1a2a44",
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}
-            >
-              {"\u2715"}
-            </button>
+            >{"\u2715"}</button>
           </div>
         </div>
 
+        {/* Scrollable page area */}
         <div
           ref={contentRef}
           style={{
-            flex: 1,
-            overflow: "auto",
-            background: "#e5e7eb",
+            flex: 1, overflow: "auto", background: "#e5e7eb",
             WebkitOverflowScrolling: "touch",
           }}
           onContextMenu={function (e) { e.preventDefault(); }}
         >
           <div style={{ padding: 20 }}>
-            {loading && pages.length === 0 && (
+            {loading && (
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 300 }}>
                 <div style={{ fontSize: 14, color: "#5a6a7e", letterSpacing: "0.1em", textAlign: "center" }}>
                   LOADING PITCH DECK...
@@ -296,18 +303,15 @@ function PdfViewer({ pdf, company, onClose }) {
               </div>
             )}
 
-            {pages.map(function (url, i) {
+            {pageElements.map(function (idx) {
               return (
-                <img
-                  key={i}
-                  src={url}
-                  alt=""
-                  draggable={false}
+                <canvas
+                  key={idx}
+                  ref={function (el) { canvasRefs.current[idx] = el; }}
                   style={{
-                    width: imgWidth,
-                    maxWidth: zoom <= 100 ? "100%" : "none",
                     display: "block",
                     margin: "0 auto 8px",
+                    maxWidth: zoom <= 100 ? "100%" : "none",
                     pointerEvents: "none",
                     userSelect: "none",
                     WebkitUserSelect: "none",
@@ -316,12 +320,6 @@ function PdfViewer({ pdf, company, onClose }) {
                 />
               );
             })}
-
-            {loading && pages.length > 0 && (
-              <div style={{ textAlign: "center", padding: 16, color: "#8896a6", fontSize: 12 }}>
-                Loading more pages...
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -337,25 +335,13 @@ function getDecisionStyle(decision) {
 }
 
 var linkStyle = {
-  fontSize: 14,
-  color: "#1e3a5f",
-  textDecoration: "underline",
-  cursor: "pointer",
-  fontWeight: 600,
-  display: "flex",
-  alignItems: "center",
-  gap: 6,
+  fontSize: 14, color: "#1e3a5f", textDecoration: "underline",
+  cursor: "pointer", fontWeight: 600, display: "flex", alignItems: "center", gap: 6,
 };
 
 var linkStyleDesktop = {
-  fontSize: 15,
-  color: "#1e3a5f",
-  textDecoration: "underline",
-  cursor: "pointer",
-  fontWeight: 600,
-  display: "flex",
-  alignItems: "center",
-  gap: 6,
+  fontSize: 15, color: "#1e3a5f", textDecoration: "underline",
+  cursor: "pointer", fontWeight: 600, display: "flex", alignItems: "center", gap: 6,
 };
 
 function PitchCard({ p, index, onOpenDeck }) {
