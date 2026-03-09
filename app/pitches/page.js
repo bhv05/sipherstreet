@@ -14,16 +14,6 @@ import { useState, useEffect, useRef } from "react";
 
 const PITCHES = [
   {
-    date: "02-Mar-2026",
-    company: "Applovin Corp. (NASDAQ: APP)",
-    decision: "Buy",
-    targetPrice: "$590",
-    transactionPrice: "$434",
-    pitchTeam: "Bhavya Patel, Henish Patel",
-    deck: "/pitches/Applovin_memo_vf.pdf",
-    model: "/pitches/APP_vf.xlsx",
-  },
-  {
     date: "09-Mar-2026",
     company: "Intuit Inc. (NASDAQ: INTU)",
     decision: "Buy",
@@ -33,6 +23,16 @@ const PITCHES = [
     deck: "/pitches/Intuit_memo_vf.pdf",
     model: "/pitches/INTU_vf.xlsx",
   },
+  {
+    date: "02-Mar-2026",
+    company: "Applovin Corp. (NASDAQ: APP)",
+    decision: "Buy",
+    targetPrice: "$590",
+    transactionPrice: "$434",
+    pitchTeam: "Bhavya Patel, Henish Patel",
+    deck: "/pitches/Applovin_memo_vf.pdf",
+    model: "/pitches/APP_vf.xlsx",
+  },  
 ];
 
 const ZOOM_LEVELS = [50, 75, 100, 125, 150, 200];
