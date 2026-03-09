@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import useReveal from "../components/useReveal";
 
 function fmt(n, decimals = 2) {
   if (n == null || isNaN(n)) return "—";
@@ -384,8 +383,6 @@ export default function Portfolio() {
   var chartLoading = stateChartLoading[0];
   var setChartLoading = stateChartLoading[1];
 
-  var headerReveal = useReveal();
-
   useEffect(function () {
     fetch("/api/portfolio")
       .then(function (res) { return res.json(); })
@@ -453,7 +450,7 @@ export default function Portfolio() {
 
   return (
     <div className="page-section">
-      <div ref={headerReveal.ref} className={"reveal" + (headerReveal.inView ? " in-view" : "")}>
+      <div>
         <p className="section-label">Live Data</p>
         <h2 className="section-title" style={{ marginBottom: 8 }}>
           The <span>Portfolio</span>
