@@ -20,10 +20,19 @@ const PITCHES = [
     targetPrice: "$590",
     transactionPrice: "$434",
     pitchTeam: "Bhavya Patel, Henish Patel",
-    deck: "/pitches/Applovin.pdf",
+    deck: "/pitches/Applovin_memo_vf.pdf",
     model: "/pitches/APP_vf.xlsx",
   },
-  // Add more pitches here following the same format
+  {
+    date: "09-Mar-2026",
+    company: "Nike Inc. (NYSE: NKE)",
+    decision: "Buy",
+    targetPrice: "$604",
+    transactionPrice: "$474",
+    pitchTeam: "Bhavya Patel, Henish Patel",
+    deck: "/pitches/Intuit_memo_vf.pdf",
+    model: "/pitches/INTU_vf.xlsx",
+  },
 ];
 
 const ZOOM_LEVELS = [50, 75, 100, 125, 150, 200];
