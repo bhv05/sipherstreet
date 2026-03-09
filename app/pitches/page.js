@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import useReveal from "../components/useReveal";
 
 /*
   HOW TO ADD A NEW PITCH:
@@ -410,14 +411,19 @@ export default function Pitches() {
   var openDeckValue = openDeck[0];
   var setOpenDeck = openDeck[1];
 
+  var headerReveal = useReveal();
+  var contentReveal = useReveal();
+
   return (
     <div className="page-section" style={{ maxWidth: 1100 }}>
-      <p className="section-label">Investment Theses</p>
-      <h2 className="section-title">
-        Active <span>Pitches</span>
-      </h2>
+      <div ref={headerReveal.ref} className={"reveal" + (headerReveal.inView ? " in-view" : "")}>
+        <p className="section-label">Investment Theses</p>
+        <h2 className="section-title">
+          Active <span>Pitches</span>
+        </h2>
+      </div>
 
-      <div className="pitches-desktop">
+      <div ref={contentReveal.ref} className={"reveal pitches-desktop" + (contentReveal.inView ? " in-view" : "")}>
         <div style={{ border: "1px solid #e2e8f0", borderRadius: 4, overflow: "auto" }}>
           <table className="data-table">
             <thead>

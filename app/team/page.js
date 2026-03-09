@@ -1,4 +1,5 @@
 "use client";
+import useReveal from "../components/useReveal";
 
 /*
   HOW TO ADD HEADSHOTS:
@@ -46,14 +47,21 @@ function LinkedInIcon() {
 }
 
 export default function Team() {
+  var headerReveal = useReveal();
+  var cardsReveal = useReveal();
+
   return (
     <div className="page-section" style={{ maxWidth: 800 }}>
-      <p className="section-label">Our People</p>
-      <h2 className="section-title">
-        The <span>Team</span>
-      </h2>
+      <div ref={headerReveal.ref} className={"reveal" + (headerReveal.inView ? " in-view" : "")}>
+        <p className="section-label">Our People</p>
+        <h2 className="section-title">
+          The <span>Team</span>
+        </h2>
+      </div>
 
       <div
+        ref={cardsReveal.ref}
+        className={"reveal" + (cardsReveal.inView ? " in-view" : "")}
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",

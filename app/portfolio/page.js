@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import useReveal from "../components/useReveal";
 
 function fmt(n, decimals = 2) {
   if (n == null || isNaN(n)) return "—";
@@ -383,6 +384,10 @@ export default function Portfolio() {
   var chartLoading = stateChartLoading[0];
   var setChartLoading = stateChartLoading[1];
 
+  var headerReveal = useReveal();
+  var tableReveal = useReveal();
+  var chartReveal = useReveal();
+
   useEffect(function () {
     fetch("/api/portfolio")
       .then(function (res) { return res.json(); })
@@ -450,16 +455,18 @@ export default function Portfolio() {
 
   return (
     <div className="page-section">
-      <p className="section-label">Live Data</p>
-      <h2 className="section-title" style={{ marginBottom: 8 }}>
-        The <span>Portfolio</span>
-      </h2>
-      <p style={{ fontSize: 13, color: "#8896a6", marginBottom: 40 }}>
-        Sipher Street Live Portfolio (as of last close) : Holdings
-      </p>
+      <div ref={headerReveal.ref} className={"reveal" + (headerReveal.inView ? " in-view" : "")}>
+        <p className="section-label">Live Data</p>
+        <h2 className="section-title" style={{ marginBottom: 8 }}>
+          The <span>Portfolio</span>
+        </h2>
+        <p style={{ fontSize: 13, color: "#8896a6", marginBottom: 40 }}>
+          Sipher Street Live Portfolio (as of last close) : Holdings
+        </p>
+      </div>
 
       {/* Desktop Table */}
-      <div className="portfolio-desktop">
+      <div ref={tableReveal.ref} className={"reveal portfolio-desktop" + (tableReveal.inView ? " in-view" : "")}>
         <div style={{ border: "1px solid #e2e8f0", overflow: "auto", borderRadius: 4 }}>
           <table className="data-table">
             <thead>
@@ -532,7 +539,7 @@ export default function Portfolio() {
 
       {/* Performance Chart — only shows when there are 2+ data points */}
       {chartData && chartData.portfolio && chartData.portfolio.length >= 2 && (
-        <div style={{ marginTop: 56 }}>
+        <div ref={chartReveal.ref} className={"reveal" + (chartReveal.inView ? " in-view" : "")} style={{ marginTop: 56 }}>
           <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginBottom: 24 }}>
             <div>
               <p className="section-label" style={{ marginBottom: 4 }}>Performance</p>

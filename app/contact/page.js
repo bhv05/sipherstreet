@@ -1,11 +1,15 @@
 "use client";
 import { useState } from "react";
+import useReveal from "../components/useReveal";
 
 export default function Contact() {
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState(null);
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+  var headerReveal = useReveal();
+  var formReveal = useReveal();
+  var infoReveal = useReveal();
 
   const handleChange = (field) => (e) => {
     setForm({ ...form, [field]: e.target.value });
@@ -51,22 +55,25 @@ export default function Contact() {
 
   return (
     <div className="page-section" style={{ maxWidth: 600 }}>
-      <p className="section-label">Get In Touch</p>
-      <h2 className="section-title" style={{ marginBottom: 12 }}>
-        Contact <span>Us</span>
-      </h2>
-      <p
-        style={{
-          color: "#5a6a7e",
-          fontSize: 14,
-          lineHeight: 1.7,
-          marginBottom: 48,
-        }}
-      >
-        Interested in joining our team or learning more about our investment
-        process? We'd love to hear from you.
-      </p>
+      <div ref={headerReveal.ref} className={"reveal" + (headerReveal.inView ? " in-view" : "")}>
+        <p className="section-label">Get In Touch</p>
+        <h2 className="section-title" style={{ marginBottom: 12 }}>
+          Contact <span>Us</span>
+        </h2>
+        <p
+          style={{
+            color: "#5a6a7e",
+            fontSize: 14,
+            lineHeight: 1.7,
+            marginBottom: 48,
+          }}
+        >
+          Interested in joining our team or learning more about our investment
+          process? We'd love to hear from you.
+        </p>
+      </div>
 
+      <div ref={formReveal.ref} className={"reveal" + (formReveal.inView ? " in-view" : "")}>
       {sent ? (
         <div
           style={{
@@ -151,9 +158,12 @@ export default function Contact() {
           </button>
         </div>
       )}
+      </div>
 
       {/* Contact info */}
       <div
+        ref={infoReveal.ref}
+        className={"reveal" + (infoReveal.inView ? " in-view" : "")}
         style={{
           marginTop: 64,
           display: "flex",
