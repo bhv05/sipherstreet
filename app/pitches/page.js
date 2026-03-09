@@ -25,7 +25,7 @@ const PITCHES = [
   },
   {
     date: "09-Mar-2026",
-    company: "Nike Inc. (NYSE: NKE)",
+    company: "Intuit Inc. (NASDAQ: INTU)",
     decision: "Buy",
     targetPrice: "$604",
     transactionPrice: "$474",
