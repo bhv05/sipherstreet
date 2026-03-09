@@ -423,7 +423,8 @@ export default function Pitches() {
         </h2>
       </div>
 
-      <div ref={contentReveal.ref} className={"reveal pitches-desktop" + (contentReveal.inView ? " in-view" : "")}>
+      <div ref={contentReveal.ref} className={"reveal" + (contentReveal.inView ? " in-view" : "")}>
+      <div className="pitches-desktop">
         <div style={{ border: "1px solid #e2e8f0", borderRadius: 4, overflow: "auto" }}>
           <table className="data-table">
             <thead>
@@ -481,6 +482,7 @@ export default function Pitches() {
             </tbody>
           </table>
         </div>
+      </div>
       </div>
 
       <div className="pitches-mobile">

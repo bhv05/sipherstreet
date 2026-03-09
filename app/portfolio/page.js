@@ -385,8 +385,6 @@ export default function Portfolio() {
   var setChartLoading = stateChartLoading[1];
 
   var headerReveal = useReveal();
-  var tableReveal = useReveal();
-  var chartReveal = useReveal();
 
   useEffect(function () {
     fetch("/api/portfolio")
@@ -466,7 +464,7 @@ export default function Portfolio() {
       </div>
 
       {/* Desktop Table */}
-      <div ref={tableReveal.ref} className={"reveal portfolio-desktop" + (tableReveal.inView ? " in-view" : "")}>
+      <div className="portfolio-desktop">
         <div style={{ border: "1px solid #e2e8f0", overflow: "auto", borderRadius: 4 }}>
           <table className="data-table">
             <thead>
@@ -539,7 +537,7 @@ export default function Portfolio() {
 
       {/* Performance Chart — only shows when there are 2+ data points */}
       {chartData && chartData.portfolio && chartData.portfolio.length >= 2 && (
-        <div ref={chartReveal.ref} className={"reveal" + (chartReveal.inView ? " in-view" : "")} style={{ marginTop: 56 }}>
+        <div style={{ marginTop: 56 }}>
           <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginBottom: 24 }}>
             <div>
               <p className="section-label" style={{ marginBottom: 4 }}>Performance</p>
