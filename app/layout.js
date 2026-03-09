@@ -4,7 +4,10 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
 export const metadata = {
-  title: "Sipher Street — Student Hedge Fund",
+  title: {
+    template: "%s - Sipher Street",
+    default: "Sipher Street - Home",
+  },
   description:
     "A student-managed investment fund deploying long/short equity strategies across global markets.",
   icons: {
