@@ -247,7 +247,7 @@ export default function Home() {
             L/S Strategies
           </p>
 
-          <picture style={{ display: "block", marginBottom: 32 }}>
+          <picture style={{ display: "block", marginBottom: 32, textAlign: "center" }}>
             <source srcSet="/logo-hero.svg" type="image/svg+xml" />
             <img
               src="/logo-hero.png"
@@ -257,7 +257,8 @@ export default function Home() {
                 width: "clamp(280px, 55vw, 440px)",
                 maxWidth: "100%",
                 objectFit: "contain",
-                display: "block",
+                display: "inline-block",
+                margin: "0 auto",
               }}
               fetchPriority="high"
             />
