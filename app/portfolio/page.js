@@ -134,11 +134,16 @@ function PerformanceChart({ portfolio, benchmark }) {
   var benchMap = {};
   benchmark.forEach(function (b) { benchMap[b.date] = b.value; });
 
+  var lastKnownBench = null;
   var merged = portfolio.map(function (p) {
+    if (benchMap[p.date] != null) {
+      lastKnownBench = benchMap[p.date];
+    }
+    
     return {
       date: p.date,
       portfolio: p.value,
-      benchmark: benchMap[p.date] || null,
+      benchmark: lastKnownBench,
     };
   });
 
