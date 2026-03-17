@@ -334,7 +334,7 @@ function PerformanceChart({ portfolio, benchmark }) {
         {/* $100k baseline (neutral line) */}
         <line
           x1={pad.left} y1={yScale(100000)} x2={dims.w - pad.right} y2={yScale(100000)}
-          stroke="#cbd5e1" strokeWidth="1" strokeDasharray="2,2" opacity="0.6"
+          stroke="#94a3b8" strokeWidth="2" opacity="0.5"
         />
 
         {/* Hover crosshair + dots */}
