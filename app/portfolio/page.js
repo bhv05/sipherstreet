@@ -323,7 +323,7 @@ function PerformanceChart({ portfolio, benchmark }) {
 
         {/* Benchmark line (S&P 500) */}
         {benchmarkPath && (
-          <path d={benchmarkPath} fill="none" stroke="#cbd5e1" strokeWidth="2" strokeDasharray="6,4" />
+          <path d={benchmarkPath} fill="none" stroke="#64748b" strokeWidth="2" strokeDasharray="5,5" />
         )}
 
         {/* Portfolio line */}
@@ -334,7 +334,7 @@ function PerformanceChart({ portfolio, benchmark }) {
         {/* $100k baseline (neutral line) */}
         <line
           x1={pad.left} y1={yScale(100000)} x2={dims.w - pad.right} y2={yScale(100000)}
-          stroke="#94a3b8" strokeWidth="1.5" opacity="0.4"
+          stroke="#cbd5e1" strokeWidth="1" strokeDasharray="2,2" opacity="0.6"
         />
 
         {/* Hover crosshair + dots */}
@@ -589,7 +589,7 @@ export default function Portfolio() {
                 )}
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <div style={{ width: 20, height: 0, borderTop: "2px dashed #cbd5e1" }} />
+                <div style={{ width: 20, height: 0, borderTop: "2px dashed #64748b" }} />
                 <span style={{ fontSize: 12, color: "#5a6a7e" }}>S&P 500</span>
                 {chartBenchReturn !== null && (
                   <span style={{
