@@ -331,10 +331,10 @@ function PerformanceChart({ portfolio, benchmark }) {
           <path d={portfolioPath} fill="none" stroke="#1a2a44" strokeWidth="2.5" />
         )}
 
-        {/* $100k baseline */}
+        {/* $100k baseline (neutral line) */}
         <line
           x1={pad.left} y1={yScale(100000)} x2={dims.w - pad.right} y2={yScale(100000)}
-          stroke="#94a3b8" strokeWidth="1" strokeDasharray="3,3" opacity="0.5"
+          stroke="#ef4444" strokeWidth="2" strokeDasharray="6,4" opacity="0.8"
         />
 
         {/* Hover crosshair + dots */}
