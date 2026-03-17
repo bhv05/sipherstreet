@@ -23,7 +23,7 @@ const TEAM = [
     name: "Henish Patel",
     role: "Founder",
     desc: "",
-    image: "/team/henish.jpg",
+    image: "/team/HenishPatelHeadShot.png",
     email: "henish@sipherstreet.com",
     linkedin: "https://www.linkedin.com/in/henish-patel-526729270/",
   },
