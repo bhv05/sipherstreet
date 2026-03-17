@@ -130,22 +130,44 @@ function PerformanceChart({ portfolio, benchmark }) {
     return function () { window.removeEventListener("resize", measure); };
   }, []);
 
-  /* Merge portfolio and benchmark into aligned data by date */
+  /* Fill out every single calendar day to ensure even time scaling */
+  var portMap = {};
+  portfolio.forEach(function (p) { portMap[p.date] = p.value; });
+
   var benchMap = {};
   benchmark.forEach(function (b) { benchMap[b.date] = b.value; });
 
-  var lastKnownBench = null;
-  var merged = portfolio.map(function (p) {
-    if (benchMap[p.date] != null) {
-      lastKnownBench = benchMap[p.date];
-    }
+  var merged = [];
+  if (portfolio.length > 0) {
+    var firstParts = portfolio[0].date.split("-");
+    var lastParts = portfolio[portfolio.length - 1].date.split("-");
     
-    return {
-      date: p.date,
-      portfolio: p.value,
-      benchmark: lastKnownBench,
-    };
-  });
+    var current = new Date(firstParts[0], firstParts[1] - 1, firstParts[2]);
+    var lastDate = new Date(lastParts[0], lastParts[1] - 1, lastParts[2]);
+    
+    var lastKnownPort = null;
+    var lastKnownBench = null;
+    
+    while (current <= lastDate) {
+      var yyyy = current.getFullYear();
+      var mm = String(current.getMonth() + 1).padStart(2, "0");
+      var dd = String(current.getDate()).padStart(2, "0");
+      var dStr = yyyy + "-" + mm + "-" + dd;
+      
+      if (portMap[dStr] != null) lastKnownPort = portMap[dStr];
+      if (benchMap[dStr] != null) lastKnownBench = benchMap[dStr];
+      
+      if (lastKnownPort != null) {
+        merged.push({
+          date: dStr,
+          portfolio: lastKnownPort,
+          benchmark: lastKnownBench,
+        });
+      }
+      
+      current.setDate(current.getDate() + 1);
+    }
+  }
 
   if (merged.length < 2) return null;
 
