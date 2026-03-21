@@ -116,7 +116,7 @@ function EarningsCard({ ticker, data, position, nav }) {
   var days = daysUntil(data.date);
   var isUpcoming = data.date && days >= 0 && days <= 14;
   var isPast = data.date && days < 0;
-  var isETF = data.date === null;
+  var isETF = !!data.is_etf;
 
   /* Position exposure data */
   var posData = null;

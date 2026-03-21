@@ -7,12 +7,11 @@ JSON file that the frontend earnings cards consume automatically.
 
 Data sources:
   - Alpaca Trading API   → current holdings (ticker list)
-  - Financial Modeling Prep (FMP) → earnings dates, consensus EPS, revenue,
-    historical beat/miss, company names
-  - Yahoo Finance (yfinance) → implied move from ATM straddle pricing
+  - Yahoo Finance (yfinance) → earnings dates, consensus EPS, revenue,
+    historical beat/miss, company names, implied move from ATM straddle pricing
 
 Required environment variables:
-  ALPACA_API_KEY, ALPACA_SECRET_KEY, FMP_API_KEY
+  ALPACA_API_KEY, ALPACA_SECRET_KEY
 
 Usage:
   python scripts/update_earnings.py
@@ -22,18 +21,10 @@ import os
 import sys
 import json
 import time
-import requests
 from datetime import datetime, timedelta
-
-# ---------------------------------------------------------------------------
-# Optional: yfinance for implied-move calculation (graceful fallback if missing)
-# ---------------------------------------------------------------------------
-try:
-    import yfinance as yf
-    HAS_YFINANCE = True
-except ImportError:
-    HAS_YFINANCE = False
-    print("WARNING: yfinance not installed — implied move will use historical fallback only.")
+import yfinance as yf
+import pandas as pd
+import requests
 
 # ---------------------------------------------------------------------------
 # Configuration
@@ -41,7 +32,6 @@ except ImportError:
 ALPACA_BASE = "https://paper-api.alpaca.markets"
 ALPACA_KEY = os.environ.get("ALPACA_API_KEY", "")
 ALPACA_SECRET = os.environ.get("ALPACA_SECRET_KEY", "")
-FMP_KEY = os.environ.get("FMP_API_KEY", "")
 
 ALPACA_HEADERS = {
     "APCA-API-KEY-ID": ALPACA_KEY,
@@ -53,9 +43,6 @@ KNOWN_ETFS = {
     "XLP", "XLY", "XLB", "XLRE", "XLC", "GLD", "SLV", "TLT", "HYG",
     "LQD", "VXX", "ARKK", "DIA", "EEM", "VTI", "VOO",
 }
-
-# Delay between FMP calls to respect rate limits
-FMP_DELAY = 0.6  # seconds
 
 # Output path (relative to repo root)
 OUTPUT_PATH = os.path.join(os.path.dirname(__file__), "..", "public", "earnings-data.json")
@@ -73,187 +60,192 @@ def fetch_alpaca(endpoint):
 
 
 # ---------------------------------------------------------------------------
-# FMP helpers
+# Utility
 # ---------------------------------------------------------------------------
-def fmp_get(path, params=None):
-    """Make a request to the FMP API with the API key injected."""
-    if params is None:
-        params = {}
-    params["apikey"] = FMP_KEY
-    url = f"https://financialmodelingprep.com/api/v3/{path}"
-    resp = requests.get(url, params=params, timeout=15)
-    resp.raise_for_status()
-    time.sleep(FMP_DELAY)
-    return resp.json()
-
-
-def get_company_name(symbol):
-    """Return the company name for a ticker from FMP profile."""
+def format_revenue(revenue_value):
+    """Convert a raw revenue number into a human-friendly string like $1.48B."""
+    if revenue_value is None or pd.isna(revenue_value):
+        return None
     try:
-        data = fmp_get(f"profile/{symbol}")
-        if data and isinstance(data, list) and len(data) > 0:
-            return data[0].get("companyName", symbol)
-    except Exception as exc:
-        print(f"  [warn] Could not fetch company name for {symbol}: {exc}")
-    return symbol
+        rev = float(revenue_value)
+        if rev >= 1e9:
+            return f"${rev / 1e9:.2f}B"
+        elif rev >= 1e6:
+            return f"${rev / 1e6:.0f}M"
+        else:
+            return f"${rev:,.0f}"
+    except (ValueError, TypeError):
+        return None
 
-
-def is_etf(symbol):
+def is_etf(symbol, ticker_obj):
     """Check whether a symbol is an ETF."""
     if symbol in KNOWN_ETFS:
         return True
     try:
-        data = fmp_get(f"profile/{symbol}")
-        if data and isinstance(data, list) and len(data) > 0:
-            return bool(data[0].get("isEtf"))
+        quote_type = ticker_obj.info.get("quoteType", "")
+        if quote_type == "ETF":
+            return True
     except Exception:
         pass
     return False
 
 
-def get_earnings_date(symbol):
-    """Return the next upcoming earnings date + consensus estimates for a symbol."""
+# ---------------------------------------------------------------------------
+# yfinance Extraction
+# ---------------------------------------------------------------------------
+def get_earnings_info(symbol, ticker_obj):
+    """
+    Extract earnings calendar and historical surprises from yfinance.
+    Returns (date, timing, eps, rev, last_q_result, last_q_surprise, beat_rate)
+    """
+    date_str, timing, eps, rev = None, None, None, None
+    last_res, last_surp, beat_rate = None, None, None
+    
+    # 1. Consensus & Upcoming Date
     try:
-        today = datetime.now().strftime("%Y-%m-%d")
-        future = (datetime.now() + timedelta(days=120)).strftime("%Y-%m-%d")
-        data = fmp_get("earning_calendar", {"from": today, "to": future})
-        for entry in data:
-            if entry.get("symbol") == symbol:
+        cal = ticker_obj.calendar
+        if cal and isinstance(cal, dict):
+            # Earnings Date is usually a list of datetime.date objects
+            dt_list = cal.get("Earnings Date")
+            if dt_list and len(dt_list) > 0:
+                nxt_dt = dt_list[0]
+                date_str = nxt_dt.strftime("%Y-%m-%d")
+                # yfinance calendar dates usually imply AMC or BMO. We default to AMC because yfinance strips time.
                 timing = "AMC"
-                time_str = str(entry.get("time", "")).lower()
-                if "bmo" in time_str or "before" in time_str:
-                    timing = "BMO"
-                return {
-                    "date": entry.get("date"),
-                    "timing": timing,
-                    "consensus_eps": entry.get("epsEstimated"),
-                    "consensus_revenue": format_revenue(entry.get("revenueEstimated")),
-                }
-    except Exception as exc:
-        print(f"  [warn] Could not fetch earnings date for {symbol}: {exc}")
-    return None
+            
+            eps_val = cal.get("Earnings Average")
+            if eps_val is not None and not pd.isna(eps_val):
+                eps = round(float(eps_val), 2)
+                
+            rev_val = cal.get("Revenue Average")
+            if rev_val is not None:
+                rev = format_revenue(rev_val)
+    except Exception as e:
+        print(f"  [warn] Failed parsing calendar for {symbol}: {e}")
 
-
-def get_earnings_history(symbol):
-    """Return last-quarter result and rolling 4-quarter beat rate."""
+    # 2. Historical Surprises
     try:
-        data = fmp_get(f"earnings-surprises/{symbol}")
-        if not data or not isinstance(data, list):
-            return None
+        if hasattr(ticker_obj, "earnings_dates") and ticker_obj.earnings_dates is not None:
+            df = ticker_obj.earnings_dates
+            # df has columns: 'EPS Estimate', 'Reported EPS', 'Surprise(%)'
+            # Index is typically a DatetimeIndex
+            
+            # Filter to past reported earnings only (where Reported EPS is not NaN)
+            past = df[df["Reported EPS"].notna()].sort_index(ascending=False)
+            
+            if len(past) > 0:
+                # Last quarter performance
+                last_q = past.iloc[0]
+                actual = last_q["Reported EPS"]
+                estim = last_q["EPS Estimate"]
+                
+                if pd.notna(actual) and pd.notna(estim):
+                    surp = round(float(actual - estim), 2)
+                    last_surp = surp
+                    if surp > 0:
+                        last_res = "beat"
+                    elif surp < 0:
+                        last_res = "miss"
+                    else:
+                        last_res = "inline"
+                        
+                # 4-Quarter trailing beat rate
+                recent_4 = past.head(4)
+                beats = 0
+                total = 0
+                for _, row in recent_4.iterrows():
+                    a = row["Reported EPS"]
+                    e = row["EPS Estimate"]
+                    if pd.notna(a) and pd.notna(e):
+                        total += 1
+                        if a > e:
+                            beats += 1
+                if total > 0:
+                    beat_rate = f"{beats}/{total}"
 
-        recent = data[:4]
-        last_q = recent[0] if recent else None
+    except Exception as e:
+        print(f"  [warn] Failed parsing historical surprises for {symbol}: {e}")
 
-        last_quarter_result = None
-        last_quarter_surprise = None
-        if last_q:
-            actual = last_q.get("actualEarningResult")
-            estimated = last_q.get("estimatedEarning")
-            if actual is not None and estimated is not None:
-                surprise = round(actual - estimated, 2)
-                if surprise > 0:
-                    last_quarter_result = "beat"
-                elif surprise < 0:
-                    last_quarter_result = "miss"
-                else:
-                    last_quarter_result = "inline"
-                last_quarter_surprise = surprise
-
-        beats = 0
-        total = 0
-        for q in recent:
-            actual = q.get("actualEarningResult")
-            estimated = q.get("estimatedEarning")
-            if actual is not None and estimated is not None:
-                total += 1
-                if actual > estimated:
-                    beats += 1
-
-        return {
-            "last_quarter_result": last_quarter_result,
-            "last_quarter_surprise": last_quarter_surprise,
-            "beat_rate_4q": f"{beats}/{total}" if total > 0 else None,
-        }
-    except Exception as exc:
-        print(f"  [warn] Could not fetch earnings history for {symbol}: {exc}")
-    return None
+    return date_str, timing, eps, rev, last_res, last_surp, beat_rate
 
 
-# ---------------------------------------------------------------------------
-# Implied move (yfinance)
-# ---------------------------------------------------------------------------
-def get_implied_move(symbol, earnings_date_str):
+def get_implied_move(symbol, ticker_obj, earnings_date_str):
     """Calculate the implied move from the ATM straddle nearest to earnings."""
     if not earnings_date_str:
-        return None
+        return _historical_earnings_move(symbol, ticker_obj)
 
-    # Try options-based calculation first
-    if HAS_YFINANCE:
-        try:
-            ticker = yf.Ticker(symbol)
-            info = ticker.info or {}
-            current_price = info.get("regularMarketPrice") or info.get("previousClose")
-            if not current_price:
-                return _historical_earnings_move(symbol)
-
-            earnings_date = datetime.strptime(earnings_date_str, "%Y-%m-%d")
-            expirations = ticker.options
-            target_expiry = None
-            for exp in expirations:
-                exp_date = datetime.strptime(exp, "%Y-%m-%d")
-                if exp_date >= earnings_date:
-                    target_expiry = exp
-                    break
-
-            if not target_expiry:
-                return _historical_earnings_move(symbol)
-
-            chain = ticker.option_chain(target_expiry)
-            calls = chain.calls
-            puts = chain.puts
-            strikes = calls["strike"].values
-            atm_strike = min(strikes, key=lambda x: abs(x - current_price))
-
-            atm_call = calls[calls["strike"] == atm_strike]
-            atm_put = puts[puts["strike"] == atm_strike]
-            if atm_call.empty or atm_put.empty:
-                return _historical_earnings_move(symbol)
-
-            call_mid = (atm_call["bid"].values[0] + atm_call["ask"].values[0]) / 2
-            put_mid = (atm_put["bid"].values[0] + atm_put["ask"].values[0]) / 2
-            straddle_pct = round((call_mid + put_mid) / current_price * 100, 1)
-            return straddle_pct
-
-        except Exception as exc:
-            print(f"  [warn] Options unavailable for {symbol}: {exc}")
-
-    return _historical_earnings_move(symbol)
-
-
-def _historical_earnings_move(symbol):
-    """Fallback: average absolute % move on past earnings days."""
-    if not HAS_YFINANCE:
-        return None
     try:
-        surprises = fmp_get(f"earnings-surprises/{symbol}")
-        if not surprises or len(surprises) < 2:
+        info = ticker_obj.info or {}
+        current_price = info.get("regularMarketPrice") or info.get("previousClose")
+        if not current_price:
+            return _historical_earnings_move(symbol, ticker_obj)
+
+        earnings_date = datetime.strptime(earnings_date_str, "%Y-%m-%d")
+        expirations = ticker_obj.options
+        target_expiry = None
+        for exp in expirations:
+            exp_date = datetime.strptime(exp, "%Y-%m-%d")
+            if exp_date >= earnings_date:
+                target_expiry = exp
+                break
+
+        if not target_expiry:
+            return _historical_earnings_move(symbol, ticker_obj)
+
+        chain = ticker_obj.option_chain(target_expiry)
+        calls = chain.calls
+        puts = chain.puts
+        
+        if calls.empty or puts.empty:
+            return _historical_earnings_move(symbol, ticker_obj)
+            
+        strikes = calls["strike"].values
+        atm_strike = min(strikes, key=lambda x: abs(x - current_price))
+
+        atm_call = calls[calls["strike"] == atm_strike]
+        atm_put = puts[puts["strike"] == atm_strike]
+        if atm_call.empty or atm_put.empty:
+            return _historical_earnings_move(symbol, ticker_obj)
+
+        call_mid = (atm_call["bid"].values[0] + atm_call["ask"].values[0]) / 2
+        put_mid = (atm_put["bid"].values[0] + atm_put["ask"].values[0]) / 2
+        straddle_pct = round((call_mid + put_mid) / current_price * 100, 1)
+        return straddle_pct
+
+    except Exception as exc:
+        print(f"  [warn] Options unavailable for {symbol}: {exc}")
+
+    return _historical_earnings_move(symbol, ticker_obj)
+
+
+def _historical_earnings_move(symbol, ticker_obj):
+    """Fallback: average absolute % move on past earnings days."""
+    try:
+        if not hasattr(ticker_obj, "earnings_dates") or ticker_obj.earnings_dates is None:
+            return None
+            
+        df = ticker_obj.earnings_dates
+        past = df[df["Reported EPS"].notna()].sort_index(ascending=False).head(4)
+        
+        if len(past) < 2:
             return None
 
-        ticker = yf.Ticker(symbol)
         moves = []
-        for earning in surprises[:4]:
-            date_str = earning.get("date")
-            if not date_str:
-                continue
+        for earn_date, _ in past.iterrows():
             try:
-                earn_date = datetime.strptime(date_str, "%Y-%m-%d")
+                # earn_date is a pandas Timestamp, often tz-aware
+                if earn_date.tzinfo is not None:
+                    earn_date = earn_date.tz_localize(None)
+                    
                 start = earn_date - timedelta(days=3)
                 end = earn_date + timedelta(days=3)
-                hist = ticker.history(
-                    start=start.strftime("%Y-%m-%d"),
-                    end=end.strftime("%Y-%m-%d"),
-                )
+                hist = ticker_obj.history(start=start.strftime("%Y-%m-%d"), end=end.strftime("%Y-%m-%d"))
+                
                 if len(hist) >= 2:
+                    # Remove tz from hist index if present
+                    if hist.index.tz is not None:
+                        hist.index = hist.index.tz_localize(None)
+                        
                     before_idx = hist.index.get_indexer([earn_date], method="ffill")[0]
                     after_idx = min(before_idx + 1, len(hist) - 1)
                     if 0 <= before_idx < len(hist) and after_idx < len(hist):
@@ -272,25 +264,6 @@ def _historical_earnings_move(symbol):
 
 
 # ---------------------------------------------------------------------------
-# Utility
-# ---------------------------------------------------------------------------
-def format_revenue(revenue_value):
-    """Convert a raw revenue number into a human-friendly string like $1.48B."""
-    if revenue_value is None:
-        return None
-    try:
-        rev = float(revenue_value)
-        if rev >= 1e9:
-            return f"${rev / 1e9:.2f}B"
-        elif rev >= 1e6:
-            return f"${rev / 1e6:.0f}M"
-        else:
-            return f"${rev:,.0f}"
-    except (ValueError, TypeError):
-        return None
-
-
-# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 def build_earnings_data():
@@ -298,9 +271,6 @@ def build_earnings_data():
 
     if not ALPACA_KEY or not ALPACA_SECRET:
         print("ERROR: ALPACA_API_KEY and ALPACA_SECRET_KEY must be set.")
-        sys.exit(1)
-    if not FMP_KEY:
-        print("ERROR: FMP_API_KEY must be set.")
         sys.exit(1)
 
     # 1) Fetch current holdings
@@ -318,8 +288,9 @@ def build_earnings_data():
         print(f"\nProcessing {symbol}...")
 
         try:
-            company = get_company_name(symbol)
-            etf = is_etf(symbol)
+            ticker_obj = yf.Ticker(symbol)
+            company = ticker_obj.info.get("longName") or ticker_obj.info.get("shortName") or symbol
+            etf = is_etf(symbol, ticker_obj)
 
             entry = {
                 "ticker": symbol,
@@ -340,35 +311,24 @@ def build_earnings_data():
                 entry["note"] = f"ETF, {side} position"
                 print(f"  -> ETF ({side})")
             else:
-                # Earnings date + consensus
-                earnings = get_earnings_date(symbol)
-                if earnings:
-                    entry["date"] = earnings["date"]
-                    entry["timing"] = earnings["timing"]
-                    entry["consensus_eps"] = earnings["consensus_eps"]
-                    entry["consensus_revenue"] = earnings["consensus_revenue"]
-                    print(f"  -> Earnings: {earnings['date']} {earnings['timing']}")
+                date_str, timing, eps, rev, last_res, last_surp, beat_rate = get_earnings_info(symbol, ticker_obj)
+                
+                entry["date"] = date_str
+                entry["timing"] = timing
+                entry["consensus_eps"] = eps
+                entry["consensus_revenue"] = rev
+                entry["last_quarter_result"] = last_res
+                entry["last_quarter_surprise"] = last_surp
+                entry["beat_rate_4q"] = beat_rate
+                
+                if date_str:
+                    print(f"  -> Earnings: {date_str} {timing} | EPS: {eps} | Rev: {rev}")
+                    print(f"  -> History: {last_res} | {beat_rate} beats")
                 else:
-                    entry["date"] = None
-                    entry["timing"] = None
-                    entry["consensus_eps"] = None
-                    entry["consensus_revenue"] = None
-                    print("  -> No upcoming earnings date found")
-
-                # Historical beat/miss
-                history = get_earnings_history(symbol)
-                if history:
-                    entry["last_quarter_result"] = history["last_quarter_result"]
-                    entry["last_quarter_surprise"] = history["last_quarter_surprise"]
-                    entry["beat_rate_4q"] = history["beat_rate_4q"]
-                    print(f"  -> History: {history['last_quarter_result']} | {history['beat_rate_4q']} beats")
-                else:
-                    entry["last_quarter_result"] = None
-                    entry["last_quarter_surprise"] = None
-                    entry["beat_rate_4q"] = None
+                    print("  -> No upcoming earnings date found in Yahoo Finance")
 
                 # Implied move
-                impl = get_implied_move(symbol, entry.get("date"))
+                impl = get_implied_move(symbol, ticker_obj, date_str)
                 entry["implied_move"] = impl
                 if impl:
                     print(f"  -> Implied move: ±{impl}%")
