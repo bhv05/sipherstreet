@@ -1,8 +1,9 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { Link } from "next-view-transitions";
 
 function fmt(n, decimals = 2) {
-  if (n == null || isNaN(n)) return "—";
+  if (n == null || isNaN(n)) return "-";
   return n.toLocaleString(undefined, {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
@@ -10,7 +11,7 @@ function fmt(n, decimals = 2) {
 }
 
 function fmtReturn(n) {
-  if (n == null || isNaN(n)) return "—";
+  if (n == null || isNaN(n)) return "-";
   const abs = Math.abs(n);
   const str = abs.toFixed(1) + "%";
   return n < 0 ? `(${str})` : str;
@@ -77,7 +78,10 @@ function PositionCard({ pos }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
         <div>
           <div style={{ fontWeight: 600, color: "#1a2a44", fontSize: 15, marginBottom: 4 }}>{pos.company}</div>
-          <div style={{ fontSize: 12, color: "#5a6a7e" }}>{pos.symbol}</div>
+          <div style={{ fontSize: 12, color: "#5a6a7e" }}>
+            {pos.symbol}
+            <Link href={"/activity?ticker=" + pos.symbol} style={{ marginLeft: 6, fontSize: 11, color: "#1e3a5f", fontWeight: 500, opacity: 0.7 }} title="View activity">↗</Link>
+          </div>
         </div>
         <span style={{ padding: "4px 12px", fontSize: 12, fontWeight: 600, borderRadius: 3, flexShrink: 0, ...badgeStyle }}>
           {fmtReturn(pos.totalReturn)}
@@ -508,7 +512,10 @@ export default function Portfolio() {
                 return (
                   <tr key={pos.symbol}>
                     <td style={{ fontWeight: 500 }}>{pos.company}</td>
-                    <td style={{ textAlign: "center", color: "#5a6a7e" }}>{pos.symbol}</td>
+                    <td style={{ textAlign: "center", color: "#5a6a7e" }}>
+                      {pos.symbol}
+                      <Link href={"/activity?ticker=" + pos.symbol} style={{ marginLeft: 6, fontSize: 11, color: "#1e3a5f", fontWeight: 500, opacity: 0.7 }} title="View activity">↗</Link>
+                    </td>
                     <td style={{ textAlign: "right" }}>{"$" + fmt(pos.costBasis)}</td>
                     <td style={{ textAlign: "right" }}>{"$" + fmt(pos.currentPrice)}</td>
                     <td style={{ textAlign: "right" }}>{"$" + fmt(pos.positionSize, 0)}</td>
@@ -559,7 +566,7 @@ export default function Portfolio() {
         </div>
       </div>
 
-      {/* Performance Chart — only shows when there are 2+ data points */}
+      {/* Performance Chart, only shows when there are 2+ data points */}
       {chartData && chartData.portfolio && chartData.portfolio.length >= 2 && (
         <div style={{ marginTop: 56 }}>
           <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginBottom: 24 }}>

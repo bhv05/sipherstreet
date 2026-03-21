@@ -36,7 +36,7 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Page transition — subtle fade with gentle upward reveal */
+/* Page transition: subtle fade with gentle upward reveal */
 ::view-transition-old(root) {
   animation: page-out 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }

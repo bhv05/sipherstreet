@@ -1,0 +1,37 @@
+{
+  "portfolio_beta": 0.32,
+  "sharpe_ratio": "TBD",
+  "net_exposure_target": 30,
+
+  "manual_entries": [],
+
+  "earnings_lookup": {
+    "NVDA": { "company": "Nvidia Corp", "date": "2026-05-28", "timing": "AMC", "consensus_eps": 0.89 },
+    "META": { "company": "Meta Platforms", "date": "2026-04-30", "timing": "AMC", "consensus_eps": 5.28 },
+    "AMZN": { "company": "Amazon.com", "date": "2026-04-24", "timing": "AMC", "consensus_eps": 1.37 },
+    "INTU": { "company": "Intuit Inc.", "date": "2026-05-22", "timing": "AMC", "consensus_eps": 11.65 },
+    "APP":  { "company": "AppLovin Corp.", "date": "2026-05-07", "timing": "AMC", "consensus_eps": 1.82 },
+    "AAPL": { "company": "Apple Inc.", "date": "2026-05-01", "timing": "AMC", "consensus_eps": 1.63 },
+    "MSFT": { "company": "Microsoft Corp.", "date": "2026-04-29", "timing": "AMC", "consensus_eps": 3.22 },
+    "GOOG": { "company": "Alphabet Inc.", "date": "2026-04-29", "timing": "AMC", "consensus_eps": 2.02 },
+    "GOOGL": { "company": "Alphabet Inc.", "date": "2026-04-29", "timing": "AMC", "consensus_eps": 2.02 },
+    "TSLA": { "company": "Tesla Inc.", "date": "2026-04-22", "timing": "AMC", "consensus_eps": 0.44 },
+    "NFLX": { "company": "Netflix Inc.", "date": "2026-04-17", "timing": "AMC", "consensus_eps": 5.73 }
+  },
+
+  "trade_descriptions": {
+    "INTU_long": "Capitalizing on recent post-earnings weakness. We view the core SMB accounting segment as highly resilient and see this selloff as a compelling entry point.",
+    "APP_long": "Initiating core position ahead of seasonal ad spend inflection. We believe the market underprices the momentum and cash generation of the AppDiscovery engine.",
+    "APP_trim": "Taking partial profits following a strong run off our entry. We are trimming to manage position sizing risk while keeping a structural long bias.",
+    "NVDA_long": "Initiating exposure based on channel checks confirming accelerating demand and sustained pricing power for next-gen architecture.",
+    "NVDA_add": "Increasing weight as hyperscaler capex forecasts continue to revise upward, securing the near-term revenue runway.",
+    "META_long": "Entering to capture accelerating ad monetization and increased engagement metrics driven by new AI infrastructure.",
+    "AMZN_long": "Building position on AWS growth re-acceleration and clear line of sight to margin expansion through operational efficiency.",
+    "XLU_short": "Establishing a short position to hedge against interest rate sensitivity and potential yield curve steepening."
+  },
+
+  "pitch_links": {
+    "INTU": "/pitches",
+    "APP": "/pitches"
+  }
+}

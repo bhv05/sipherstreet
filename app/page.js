@@ -4,7 +4,7 @@ import { Link } from "next-view-transitions";
 import useReveal from "./components/useReveal";
 
 function fmt(n, decimals = 2) {
-  if (n == null || isNaN(n)) return "—";
+  if (n == null || isNaN(n)) return "-";
   return n.toLocaleString(undefined, {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
@@ -213,7 +213,7 @@ export default function Home() {
 
   return (
     <div>
-      {/* Full-width ticker — directly below navbar */}
+      {/* Full-width ticker, directly below navbar */}
       {showTicker && <TickerStrip data={data} />}
 
       {/* Hero section */}
@@ -359,7 +359,7 @@ export default function Home() {
         `}</style>
       </section>
 
-      {/* Dark section — Fund Edge */}
+      {/* Dark section: Fund Edge */}
       <section
         ref={darkReveal.ref}
         className={"reveal" + (darkReveal.inView ? " in-view" : "")}

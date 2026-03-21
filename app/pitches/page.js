@@ -10,7 +10,7 @@ import useReveal from "../components/useReveal";
   4. Push to GitHub and Vercel will auto-deploy
 
   Decision options: "Buy" (green), "Short" (red), "Pass" (grey)
-  Date format: "3-Feb-2026" — will auto-split into two lines
+  Date format: "3-Feb-2026", will auto-split into two lines
 */
 
 const PITCHES = [
