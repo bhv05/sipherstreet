@@ -111,37 +111,160 @@ function TimelineEntry({ entry, config, isLast }) {
   );
 }
 
-/* ── Earnings Card ── */
-function EarningsCard({ ticker, data }) {
+/* ── Earnings Risk Briefing Card ── */
+function EarningsCard({ ticker, data, position, nav }) {
   var days = daysUntil(data.date);
   var isUpcoming = data.date && days >= 0 && days <= 14;
   var isPast = data.date && days < 0;
+  var isETF = data.date === null;
+
+  /* Position exposure data */
+  var posData = null;
+  if (position) {
+    var mv = Math.abs(parseFloat(position.market_value || 0));
+    var side = parseFloat(position.qty || 0) > 0 ? "long" : "short";
+    posData = {
+      side: side,
+      weight: nav > 0 ? (mv / nav * 100).toFixed(1) : "-",
+      entryPrice: parseFloat(position.avg_entry_price || 0).toFixed(2),
+      currentPrice: parseFloat(position.current_price || 0).toFixed(2),
+      plPct: position.unrealized_plpc != null ? (parseFloat(position.unrealized_plpc) * 100).toFixed(1) : null,
+    };
+  }
+
+  /* Countdown text */
+  var countdownEl = null;
+  if (!isETF && data.date) {
+    var countdownText = isPast ? "Reported" : days === 0 ? "Today" : days === 1 ? "Tomorrow" : days + " days";
+    if (isUpcoming) {
+      countdownEl = <span className="earn-countdown-pill">{countdownText}</span>;
+    } else if (isPast) {
+      countdownEl = <span className="earn-countdown-muted">{countdownText}</span>;
+    } else {
+      countdownEl = <span className="earn-countdown-muted">{countdownText}</span>;
+    }
+  }
+
+  /* Card classes */
+  var cardClass = "earn-card";
+  if (isUpcoming) cardClass += " earn-urgent";
 
   return (
-    <div className={"earn-card" + (isUpcoming ? " earn-upcoming" : "")}>
+    <div className={cardClass}>
+      {/* Row 1: Header */}
       <div className="earn-header">
-        <span className="earn-ticker">{ticker}</span>
-        {isUpcoming && <span className="earn-badge">UPCOMING</span>}
+        <div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span className="earn-ticker">{ticker}</span>
+            {posData && (
+              <span className={"earn-side-pill earn-side-" + posData.side}>
+                {posData.side === "long" ? "Long" : "Short"}
+              </span>
+            )}
+          </div>
+          <div className="earn-company">{data.company}</div>
+        </div>
+        <div style={{ textAlign: "right", flexShrink: 0 }}>
+          {countdownEl}
+        </div>
       </div>
-      <div className="earn-company">{data.company}</div>
-      <div className="earn-row">
-        <span className="earn-label">Report date</span>
-        <span className="earn-val">
-          {formatDate(data.date)}
-          {data.timing ? " · " + data.timing : ""}
-        </span>
-      </div>
-      {data.consensus_eps != null && (
-        <div className="earn-row">
-          <span className="earn-label">Est. EPS</span>
-          <span className="earn-val">${fmt(data.consensus_eps)}</span>
+
+      {/* Divider */}
+      <div className="earn-divider" />
+
+      {/* Row 2: Position Exposure */}
+      {posData ? (
+        <div className="earn-data-block">
+          {!isETF && data.date && (
+            <div className="earn-row">
+              <span className="earn-label">Report date</span>
+              <span className="earn-val">{formatDate(data.date)}{data.timing ? " · " + data.timing : ""}</span>
+            </div>
+          )}
+          {isETF && (
+            <div className="earn-row">
+              <span className="earn-label">Status</span>
+              <span className="earn-val" style={{ color: "#8896a6" }}>{data.note || "ETF, no earnings"}</span>
+            </div>
+          )}
+          <div className="earn-row">
+            <span className="earn-label">Position weight</span>
+            <span className="earn-val">{posData.weight}% of NAV</span>
+          </div>
+          <div className="earn-row">
+            <span className="earn-label">Entry / Current</span>
+            <span className="earn-val">${posData.entryPrice} / ${posData.currentPrice}</span>
+          </div>
+          <div className="earn-row">
+            <span className="earn-label">Unrealised P&L</span>
+            <span className="earn-val" style={{ color: posData.plPct && parseFloat(posData.plPct) >= 0 ? "#16a34a" : "#dc2626", fontWeight: 600 }}>
+              {posData.plPct != null ? (parseFloat(posData.plPct) >= 0 ? "+" : "") + posData.plPct + "%" : "-"}
+            </span>
+          </div>
+        </div>
+      ) : (
+        <div className="earn-data-block">
+          {!isETF && data.date && (
+            <div className="earn-row">
+              <span className="earn-label">Report date</span>
+              <span className="earn-val">{formatDate(data.date)}{data.timing ? " · " + data.timing : ""}</span>
+            </div>
+          )}
+          <div className="earn-row">
+            <span className="earn-label">Position</span>
+            <span className="earn-val" style={{ color: "#8896a6", fontStyle: "italic" }}>No current position</span>
+          </div>
         </div>
       )}
-      {isUpcoming && (
-        <div className="earn-row">
-          <span className="earn-label">Days until</span>
-          <span className="earn-val" style={{ color: "#b8860b", fontWeight: 600 }}>{days}d</span>
-        </div>
+
+      {/* Skip market expectations and history for ETFs */}
+      {!isETF && (
+        <>
+          {/* Divider */}
+          <div className="earn-divider" />
+
+          {/* Row 3: Market Expectations */}
+          <div className="earn-data-block">
+            <div className="earn-row">
+              <span className="earn-label">Est. EPS</span>
+              <span className="earn-val">{data.consensus_eps != null ? "$" + fmt(data.consensus_eps) : "-"}</span>
+            </div>
+            {data.consensus_revenue && (
+              <div className="earn-row">
+                <span className="earn-label">Est. Revenue</span>
+                <span className="earn-val">${data.consensus_revenue}</span>
+              </div>
+            )}
+            {data.implied_move != null && (
+              <div className="earn-row">
+                <span className="earn-label">Implied Move</span>
+                <span className="earn-val">{"\u00B1" + data.implied_move + "%"}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Divider */}
+          <div className="earn-divider" />
+
+          {/* Row 4: Historical Pattern */}
+          <div className="earn-data-block">
+            {data.last_quarter_result && (
+              <div className="earn-row">
+                <span className="earn-label">Last Quarter</span>
+                <span className="earn-val" style={{ color: data.last_quarter_result === "beat" ? "#16a34a" : "#dc2626", fontWeight: 600 }}>
+                  {data.last_quarter_result === "beat" ? "Beat" : "Miss"}
+                  {data.last_quarter_surprise != null ? " · " + (data.last_quarter_surprise >= 0 ? "+" : "") + "$" + Math.abs(data.last_quarter_surprise).toFixed(2) : ""}
+                </span>
+              </div>
+            )}
+            {data.beat_rate_4q && (
+              <div className="earn-row">
+                <span className="earn-label">Last 4 Qs</span>
+                <span className="earn-val">{data.beat_rate_4q} beats</span>
+              </div>
+            )}
+          </div>
+        </>
       )}
     </div>
   );
@@ -151,6 +274,7 @@ function EarningsCard({ ticker, data }) {
 function ActivityInner() {
   var [apiData, setApiData] = useState(null);
   var [config, setConfig] = useState(null);
+  var [earningsJson, setEarningsJson] = useState(null);
   var [loading, setLoading] = useState(true);
   var [apiError, setApiError] = useState(false);
   var [activeFilter, setActiveFilter] = useState("all");
@@ -193,6 +317,17 @@ function ActivityInner() {
           pitch_links: {},
         });
       });
+  }, []);
+
+  /* Fetch auto-generated earnings data (from pipeline) */
+  useEffect(function () {
+    fetch("/earnings-data.json")
+      .then(function (res) {
+        if (!res.ok) throw new Error("not found");
+        return res.json();
+      })
+      .then(function (d) { setEarningsJson(d); })
+      .catch(function () { setEarningsJson(null); });
   }, []);
 
   /* Build merged timeline */
@@ -280,23 +415,47 @@ function ActivityInner() {
   var sharpe = config && config.sharpe_ratio ? config.sharpe_ratio : "-";
   var netTarget = config ? config.net_exposure_target : 30;
 
-  /* Earnings — only for tickers currently in the portfolio */
+  /* Earnings: prefer auto-generated earnings-data.json, fallback to manual config */
   var earningsData = [];
-  if (config && config.earnings_lookup && apiData && apiData.positions) {
+  var positionsByTicker = {};
+  var accountNav = apiData && apiData.account ? parseFloat(apiData.account.equity) : 0;
+  var earningsLastUpdated = earningsJson ? earningsJson.last_updated : null;
+
+  if (apiData && apiData.positions) {
+    apiData.positions.forEach(function (pos) {
+      positionsByTicker[pos.symbol] = pos;
+    });
+  }
+
+  if (earningsJson && earningsJson.earnings_calendar && apiData && apiData.positions) {
+    /* Use the auto-generated pipeline data, but keep live position exposure from Alpaca */
+    var heldTickers = new Set(apiData.positions.map(function (p) { return p.symbol; }));
+    earningsJson.earnings_calendar.forEach(function (entry) {
+      if (heldTickers.has(entry.ticker)) {
+        earningsData.push({
+          ticker: entry.ticker,
+          data: entry,
+          position: positionsByTicker[entry.ticker] || null,
+        });
+      }
+    });
+  } else if (config && config.earnings_lookup && apiData && apiData.positions) {
+    /* Fallback to manual config */
     var lookup = config.earnings_lookup;
     apiData.positions.forEach(function (pos) {
       var sym = pos.symbol;
       if (lookup[sym]) {
-        earningsData.push({ ticker: sym, data: lookup[sym] });
+        earningsData.push({ ticker: sym, data: lookup[sym], position: pos });
       }
     });
-    // Sort by date ascending (nearest first)
-    earningsData.sort(function (a, b) {
-      if (!a.data.date) return 1;
-      if (!b.data.date) return -1;
-      return a.data.date < b.data.date ? -1 : 1;
-    });
   }
+
+  // Sort by date ascending (nearest first), nulls (ETFs) last
+  earningsData.sort(function (a, b) {
+    if (!a.data.date) return 1;
+    if (!b.data.date) return -1;
+    return a.data.date < b.data.date ? -1 : 1;
+  });
 
   /* Loading state */
   if (loading && !config) {
@@ -415,15 +574,20 @@ function ActivityInner() {
         )}
       </div>
 
-      {/* Section D — Upcoming Earnings (portfolio tickers only) */}
+      {/* Section D — Earnings Risk Briefing (portfolio tickers only) */}
       {earningsData.length > 0 && (
         <div ref={earningsReveal.ref} className={"earn-section reveal" + (earningsReveal.inView ? " in-view" : "")}>
           <p className="section-label">Earnings Watch</p>
           <h3 className="earn-heading">Upcoming Earnings</h3>
-          <p className="earn-sub">Reporting dates for current holdings</p>
+          <p className="earn-sub">Earnings risk briefing for current positions</p>
+          {earningsLastUpdated && (
+            <p style={{ fontSize: 11, color: "#8896a6", marginTop: -20, marginBottom: 24 }}>
+              Last updated: {new Date(earningsLastUpdated).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+            </p>
+          )}
           <div className="earn-grid">
             {earningsData.map(function (item) {
-              return <EarningsCard key={item.ticker} ticker={item.ticker} data={item.data} />;
+              return <EarningsCard key={item.ticker} ticker={item.ticker} data={item.data} position={item.position || null} nav={accountNav} />;
             })}
           </div>
         </div>
@@ -638,55 +802,87 @@ function ActivityInner() {
         }
         .activity-page .earn-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+          grid-template-columns: repeat(2, 1fr);
           gap: 16px;
         }
         .activity-page .earn-card {
           background: var(--card);
           border: 1px solid var(--border);
           border-radius: 10px;
-          padding: 20px;
+          padding: 18px 20px;
           transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
         .activity-page .earn-card:hover {
           border-color: var(--accent);
           box-shadow: 0 4px 12px rgba(26, 42, 68, 0.06);
         }
-        .activity-page .earn-upcoming {
-          border-color: rgba(184, 134, 11, 0.3);
+        .activity-page .earn-urgent {
+          border-left: 3px solid #b8860b;
+          border-radius: 0 10px 10px 0;
         }
         .activity-page .earn-header {
           display: flex;
-          align-items: center;
+          align-items: flex-start;
           justify-content: space-between;
-          margin-bottom: 2px;
+          margin-bottom: 4px;
         }
         .activity-page .earn-ticker {
           font-size: 16px;
-          font-weight: 700;
+          font-weight: 600;
           color: var(--navy);
         }
-        .activity-page .earn-badge {
-          font-size: 9px;
-          font-weight: 700;
-          letter-spacing: 0.1em;
-          color: #b8860b;
-          background: rgba(184, 134, 11, 0.08);
-          padding: 3px 8px;
+        .activity-page .earn-side-pill {
+          display: inline-block;
+          padding: 2px 8px;
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
           border-radius: 3px;
+        }
+        .activity-page .earn-side-long {
+          background: rgba(22, 163, 74, 0.1);
+          color: #16a34a;
+        }
+        .activity-page .earn-side-short {
+          background: rgba(220, 38, 38, 0.1);
+          color: #dc2626;
+        }
+        .activity-page .earn-countdown-pill {
+          display: inline-block;
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: 0.04em;
+          color: #92400e;
+          background: rgba(184, 134, 11, 0.1);
+          padding: 3px 10px;
+          border-radius: 3px;
+        }
+        .activity-page .earn-countdown-muted {
+          font-size: 11px;
+          color: #8896a6;
+          font-weight: 500;
         }
         .activity-page .earn-company {
           font-size: 12px;
           color: #8896a6;
-          margin-bottom: 14px;
-          padding-bottom: 12px;
-          border-bottom: 1px solid var(--border);
+          margin-top: 2px;
+        }
+        .activity-page .earn-divider {
+          height: 1px;
+          background: var(--border);
+          margin: 12px 0;
+        }
+        .activity-page .earn-data-block {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
         }
         .activity-page .earn-row {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 4px 0;
+          padding: 3px 0;
         }
         .activity-page .earn-label {
           font-size: 11px;

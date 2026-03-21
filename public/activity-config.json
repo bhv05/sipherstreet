@@ -6,17 +6,139 @@
   "manual_entries": [],
 
   "earnings_lookup": {
-    "NVDA": { "company": "Nvidia Corp", "date": "2026-05-28", "timing": "AMC", "consensus_eps": 0.89 },
-    "META": { "company": "Meta Platforms", "date": "2026-04-30", "timing": "AMC", "consensus_eps": 5.28 },
-    "AMZN": { "company": "Amazon.com", "date": "2026-04-24", "timing": "AMC", "consensus_eps": 1.37 },
-    "INTU": { "company": "Intuit Inc.", "date": "2026-05-22", "timing": "AMC", "consensus_eps": 11.65 },
-    "APP":  { "company": "AppLovin Corp.", "date": "2026-05-07", "timing": "AMC", "consensus_eps": 1.82 },
-    "AAPL": { "company": "Apple Inc.", "date": "2026-05-01", "timing": "AMC", "consensus_eps": 1.63 },
-    "MSFT": { "company": "Microsoft Corp.", "date": "2026-04-29", "timing": "AMC", "consensus_eps": 3.22 },
-    "GOOG": { "company": "Alphabet Inc.", "date": "2026-04-29", "timing": "AMC", "consensus_eps": 2.02 },
-    "GOOGL": { "company": "Alphabet Inc.", "date": "2026-04-29", "timing": "AMC", "consensus_eps": 2.02 },
-    "TSLA": { "company": "Tesla Inc.", "date": "2026-04-22", "timing": "AMC", "consensus_eps": 0.44 },
-    "NFLX": { "company": "Netflix Inc.", "date": "2026-04-17", "timing": "AMC", "consensus_eps": 5.73 }
+    "NVDA": {
+      "company": "Nvidia Corp",
+      "date": "2026-05-28",
+      "timing": "AMC",
+      "consensus_eps": 0.89,
+      "consensus_revenue": "44.5B",
+      "implied_move": 7.2,
+      "last_quarter_result": "beat",
+      "last_quarter_surprise": 0.06,
+      "beat_rate_4q": "4/4"
+    },
+    "META": {
+      "company": "Meta Platforms",
+      "date": "2026-04-30",
+      "timing": "AMC",
+      "consensus_eps": 5.28,
+      "consensus_revenue": "41.3B",
+      "implied_move": 9.1,
+      "last_quarter_result": "beat",
+      "last_quarter_surprise": 0.51,
+      "beat_rate_4q": "4/4"
+    },
+    "AMZN": {
+      "company": "Amazon.com",
+      "date": "2026-04-24",
+      "timing": "AMC",
+      "consensus_eps": 1.37,
+      "consensus_revenue": "155.2B",
+      "implied_move": 6.8,
+      "last_quarter_result": "beat",
+      "last_quarter_surprise": 0.23,
+      "beat_rate_4q": "4/4"
+    },
+    "INTU": {
+      "company": "Intuit Inc.",
+      "date": "2026-05-22",
+      "timing": "AMC",
+      "consensus_eps": 11.65,
+      "consensus_revenue": "7.79B",
+      "implied_move": 5.1,
+      "last_quarter_result": "miss",
+      "last_quarter_surprise": -0.08,
+      "beat_rate_4q": "3/4"
+    },
+    "APP": {
+      "company": "AppLovin Corp.",
+      "date": "2026-05-07",
+      "timing": "AMC",
+      "consensus_eps": 1.82,
+      "consensus_revenue": "1.48B",
+      "implied_move": 8.4,
+      "last_quarter_result": "beat",
+      "last_quarter_surprise": 0.14,
+      "beat_rate_4q": "4/4"
+    },
+    "AAPL": {
+      "company": "Apple Inc.",
+      "date": "2026-05-01",
+      "timing": "AMC",
+      "consensus_eps": 1.63,
+      "consensus_revenue": "94.2B",
+      "implied_move": 4.2,
+      "last_quarter_result": "beat",
+      "last_quarter_surprise": 0.05,
+      "beat_rate_4q": "4/4"
+    },
+    "MSFT": {
+      "company": "Microsoft Corp.",
+      "date": "2026-04-29",
+      "timing": "AMC",
+      "consensus_eps": 3.22,
+      "consensus_revenue": "68.4B",
+      "implied_move": 5.5,
+      "last_quarter_result": "beat",
+      "last_quarter_surprise": 0.10,
+      "beat_rate_4q": "4/4"
+    },
+    "GOOG": {
+      "company": "Alphabet Inc.",
+      "date": "2026-04-29",
+      "timing": "AMC",
+      "consensus_eps": 2.02,
+      "consensus_revenue": "89.1B",
+      "implied_move": 6.3,
+      "last_quarter_result": "beat",
+      "last_quarter_surprise": 0.12,
+      "beat_rate_4q": "4/4"
+    },
+    "GOOGL": {
+      "company": "Alphabet Inc.",
+      "date": "2026-04-29",
+      "timing": "AMC",
+      "consensus_eps": 2.02,
+      "consensus_revenue": "89.1B",
+      "implied_move": 6.3,
+      "last_quarter_result": "beat",
+      "last_quarter_surprise": 0.12,
+      "beat_rate_4q": "4/4"
+    },
+    "TSLA": {
+      "company": "Tesla Inc.",
+      "date": "2026-04-22",
+      "timing": "AMC",
+      "consensus_eps": 0.44,
+      "consensus_revenue": "25.5B",
+      "implied_move": 10.2,
+      "last_quarter_result": "miss",
+      "last_quarter_surprise": -0.03,
+      "beat_rate_4q": "2/4"
+    },
+    "NFLX": {
+      "company": "Netflix Inc.",
+      "date": "2026-04-17",
+      "timing": "AMC",
+      "consensus_eps": 5.73,
+      "consensus_revenue": "10.5B",
+      "implied_move": 7.8,
+      "last_quarter_result": "beat",
+      "last_quarter_surprise": 0.32,
+      "beat_rate_4q": "4/4"
+    },
+    "XLU": {
+      "company": "Utilities SPDR",
+      "date": null,
+      "timing": null,
+      "consensus_eps": null,
+      "consensus_revenue": null,
+      "implied_move": null,
+      "last_quarter_result": null,
+      "last_quarter_surprise": null,
+      "beat_rate_4q": null,
+      "note": "ETF, short hedge"
+    }
   },
 
   "trade_descriptions": {

@@ -1,0 +1,38 @@
+name: Update earnings data
+
+on:
+  schedule:
+    # Run daily at 6:00 AM UTC (1:00 AM EST, before US pre-market)
+    - cron: '0 6 * * *'
+  workflow_dispatch: # Allow manual trigger from GitHub UI
+
+jobs:
+  update-earnings:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r scripts/requirements.txt
+
+      - name: Run earnings update script
+        env:
+          ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+          ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+          FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
+        run: python scripts/update_earnings.py
+
+      - name: Commit and push if changed
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add public/earnings-data.json
+          git diff --staged --quiet || git commit -m "chore: update earnings data [$(date -u +%Y-%m-%d)]"
+          git push

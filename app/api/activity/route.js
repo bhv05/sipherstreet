@@ -52,6 +52,7 @@ export async function GET() {
         market_value: mv,
         current_price: parseFloat(p.current_price),
         avg_entry_price: parseFloat(p.avg_entry_price),
+        unrealized_plpc: p.unrealized_plpc != null ? parseFloat(p.unrealized_plpc) : null,
         symbol: p.symbol,
       };
     });
