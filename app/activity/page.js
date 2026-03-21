@@ -341,7 +341,7 @@ function ActivityInner() {
       {/* Section A — KPI Dashboard */}
       <div ref={kpiReveal.ref} className={"kpi-grid reveal" + (kpiReveal.inView ? " in-view" : "")}>
         <KpiCard
-          label="Net Exposure"
+          label="Net Long Exposure"
           value={netExposure}
           subtitle={"Target: " + netTarget + "%"}
           subtitleColor={exposures && Math.abs(parseFloat(exposures.netPct) - netTarget) < 15 ? "#16a34a" : "#8896a6"}
