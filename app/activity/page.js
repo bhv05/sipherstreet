@@ -232,7 +232,7 @@ function EarningsCard({ ticker, data, position, nav }) {
             {data.consensus_revenue && (
               <div className="earn-row">
                 <span className="earn-label">Est. Revenue</span>
-                <span className="earn-val">${data.consensus_revenue}</span>
+                <span className="earn-val">{data.consensus_revenue}</span>
               </div>
             )}
             {data.implied_move != null && (
