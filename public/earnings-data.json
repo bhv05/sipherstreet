@@ -1,30 +1,30 @@
 {
-  "last_updated": "2026-03-21T01:03:09Z",
+  "last_updated": "2026-03-21T01:17:37Z",
   "total_positions": 2,
   "earnings_calendar": [
     {
       "ticker": "APP",
-      "company": "APP",
-      "date": null,
-      "timing": null,
-      "consensus_eps": null,
-      "consensus_revenue": null,
-      "last_quarter_result": null,
-      "last_quarter_surprise": null,
-      "beat_rate_4q": null,
-      "implied_move": null
+      "company": "AppLovin Corporation",
+      "date": "2026-05-06",
+      "timing": "AMC",
+      "consensus_eps": 3.64,
+      "consensus_revenue": "$1.77B",
+      "last_quarter_result": "beat",
+      "last_quarter_surprise": 0.3,
+      "beat_rate_4q": "4/4",
+      "implied_move": 25.2
     },
     {
       "ticker": "INTU",
-      "company": "INTU",
-      "date": null,
-      "timing": null,
-      "consensus_eps": null,
-      "consensus_revenue": null,
-      "last_quarter_result": null,
-      "last_quarter_surprise": null,
-      "beat_rate_4q": null,
-      "implied_move": null
+      "company": "Intuit Inc.",
+      "date": "2026-05-21",
+      "timing": "AMC",
+      "consensus_eps": 12.55,
+      "consensus_revenue": "$8.53B",
+      "last_quarter_result": "beat",
+      "last_quarter_surprise": 0.47,
+      "beat_rate_4q": "4/4",
+      "implied_move": 19.0
     }
   ]
 }
