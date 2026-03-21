@@ -1,0 +1,30 @@
+{
+  "last_updated": "2026-03-21T01:03:09Z",
+  "total_positions": 2,
+  "earnings_calendar": [
+    {
+      "ticker": "APP",
+      "company": "APP",
+      "date": null,
+      "timing": null,
+      "consensus_eps": null,
+      "consensus_revenue": null,
+      "last_quarter_result": null,
+      "last_quarter_surprise": null,
+      "beat_rate_4q": null,
+      "implied_move": null
+    },
+    {
+      "ticker": "INTU",
+      "company": "INTU",
+      "date": null,
+      "timing": null,
+      "consensus_eps": null,
+      "consensus_revenue": null,
+      "last_quarter_result": null,
+      "last_quarter_surprise": null,
+      "beat_rate_4q": null,
+      "implied_move": null
+    }
+  ]
+}
