@@ -170,52 +170,108 @@ def get_earnings_info(symbol, ticker_obj):
 
 
 def get_implied_move(symbol, ticker_obj, earnings_date_str):
-    """Calculate the implied move from the ATM straddle nearest to earnings."""
+    """
+    Calculate earnings-specific implied move using the two-expiry isolation method.
+    Compares ATM straddle prices across the earnings date to isolate the event premium.
+    Falls back to historical earnings-day average move if options data unavailable.
+    """
     if not earnings_date_str:
         return _historical_earnings_move(symbol, ticker_obj)
 
     try:
         info = ticker_obj.info or {}
         current_price = info.get("regularMarketPrice") or info.get("previousClose")
+
         if not current_price:
             return _historical_earnings_move(symbol, ticker_obj)
 
         earnings_date = datetime.strptime(earnings_date_str, "%Y-%m-%d")
-        expirations = ticker_obj.options
-        target_expiry = None
+        expirations = ticker_obj.options  # List of "YYYY-MM-DD" strings
+
+        if not expirations or len(expirations) < 2:
+            return _historical_earnings_move(symbol, ticker_obj)
+
+        # Find the nearest expiry BEFORE earnings and nearest expiry AFTER earnings
+        pre_expiry = None
+        post_expiry = None
+
         for exp in expirations:
             exp_date = datetime.strptime(exp, "%Y-%m-%d")
-            if exp_date >= earnings_date:
-                target_expiry = exp
-                break
+            if exp_date < earnings_date:
+                pre_expiry = exp  # Keep overwriting — last one before earnings is the closest
+            elif exp_date >= earnings_date and post_expiry is None:
+                post_expiry = exp  # First one on or after earnings
 
-        if not target_expiry:
+        # If we can't find both expiries, fall back to single-expiry method or historical
+        if not pre_expiry or not post_expiry:
+            if post_expiry:
+                # Only have post-earnings expiry — use simple method as rough estimate
+                straddle = get_atm_straddle_price(ticker_obj, post_expiry, current_price)
+                if straddle:
+                    return round(straddle / current_price * 100, 1)
             return _historical_earnings_move(symbol, ticker_obj)
 
-        chain = ticker_obj.option_chain(target_expiry)
+        # Get ATM straddle prices for both expiries
+        pre_straddle = get_atm_straddle_price(ticker_obj, pre_expiry, current_price)
+        post_straddle = get_atm_straddle_price(ticker_obj, post_expiry, current_price)
+
+        if pre_straddle is None or post_straddle is None:
+            return _historical_earnings_move(symbol, ticker_obj)
+
+        # Earnings-implied move = difference in straddle prices / stock price
+        earnings_premium = post_straddle - pre_straddle
+
+        if earnings_premium <= 0:
+            # Negative or zero means the model can't isolate — fall back
+            return _historical_earnings_move(symbol, ticker_obj)
+
+        implied_move = round(earnings_premium / current_price * 100, 1)
+        return implied_move
+
+    except Exception as exc:
+        print(f"  [warn] Options data unavailable for {symbol}: {exc}")
+        return _historical_earnings_move(symbol, ticker_obj)
+
+
+def get_atm_straddle_price(ticker_obj, expiry, current_price):
+    """
+    Get the ATM straddle mid-price for a given expiry.
+    Returns the combined call + put mid-price, or None if unavailable.
+    """
+    try:
+        chain = ticker_obj.option_chain(expiry)
         calls = chain.calls
         puts = chain.puts
-        
+
         if calls.empty or puts.empty:
-            return _historical_earnings_move(symbol, ticker_obj)
-            
+            return None
+
+        # Find ATM strike (closest to current price)
         strikes = calls["strike"].values
         atm_strike = min(strikes, key=lambda x: abs(x - current_price))
 
         atm_call = calls[calls["strike"] == atm_strike]
         atm_put = puts[puts["strike"] == atm_strike]
+
         if atm_call.empty or atm_put.empty:
-            return _historical_earnings_move(symbol, ticker_obj)
+            return None
 
-        call_mid = (atm_call["bid"].values[0] + atm_call["ask"].values[0]) / 2
-        put_mid = (atm_put["bid"].values[0] + atm_put["ask"].values[0]) / 2
-        straddle_pct = round((call_mid + put_mid) / current_price * 100, 1)
-        return straddle_pct
+        call_bid = atm_call["bid"].values[0]
+        call_ask = atm_call["ask"].values[0]
+        put_bid = atm_put["bid"].values[0]
+        put_ask = atm_put["ask"].values[0]
 
-    except Exception as exc:
-        print(f"  [warn] Options unavailable for {symbol}: {exc}")
+        # Use mid prices; skip if bid/ask are zero or nonsensical
+        if call_ask <= 0 or put_ask <= 0:
+            return None
 
-    return _historical_earnings_move(symbol, ticker_obj)
+        call_mid = (call_bid + call_ask) / 2
+        put_mid = (put_bid + put_ask) / 2
+
+        return call_mid + put_mid
+
+    except Exception:
+        return None
 
 
 def _historical_earnings_move(symbol, ticker_obj):
