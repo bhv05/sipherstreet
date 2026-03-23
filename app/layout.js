@@ -2,6 +2,7 @@ import "./globals.css";
 import { ViewTransitions } from "next-view-transitions";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import { Analytics } from "@vercel/analytics/react";
 
 export const metadata = {
   title: {
@@ -32,6 +33,7 @@ export default function RootLayout({ children }) {
           <Navbar />
           <main>{children}</main>
           <Footer />
+          <Analytics />
         </body>
       </html>
     </ViewTransitions>
