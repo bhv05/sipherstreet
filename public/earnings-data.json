@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-03-23T07:03:12Z",
-  "total_positions": 2,
+  "last_updated": "2026-03-23T19:32:03Z",
+  "total_positions": 5,
   "earnings_calendar": [
     {
       "ticker": "APP",
@@ -12,7 +12,19 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.37,
       "beat_rate_4q": "4/4",
-      "implied_move": 11.1
+      "implied_move": 5.7
+    },
+    {
+      "ticker": "U",
+      "company": "Unity Software Inc.",
+      "date": "2026-05-06",
+      "timing": "AMC",
+      "consensus_eps": 0.22,
+      "consensus_revenue": "$489M",
+      "last_quarter_result": "inline",
+      "last_quarter_surprise": 0.0,
+      "beat_rate_4q": "3/4",
+      "implied_move": 6.0
     },
     {
       "ticker": "INTU",
@@ -24,7 +36,33 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.47,
       "beat_rate_4q": "4/4",
+      "implied_move": 4.3
+    },
+    {
+      "ticker": "AVGO",
+      "company": "Broadcom Inc.",
+      "date": "2026-06-03",
+      "timing": "AMC",
+      "consensus_eps": 2.39,
+      "consensus_revenue": "$22.06B",
+      "last_quarter_result": "beat",
+      "last_quarter_surprise": 0.08,
+      "beat_rate_4q": "4/4",
       "implied_move": 5.2
+    },
+    {
+      "ticker": "QQQ",
+      "company": "Invesco QQQ Trust",
+      "is_etf": true,
+      "date": null,
+      "timing": null,
+      "consensus_eps": null,
+      "consensus_revenue": null,
+      "implied_move": null,
+      "last_quarter_result": null,
+      "last_quarter_surprise": null,
+      "beat_rate_4q": null,
+      "note": "ETF, short position"
     }
   ]
 }
