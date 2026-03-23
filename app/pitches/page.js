@@ -19,7 +19,7 @@ const PITCHES = [
     company: "AI/Tech Sector Hedging Strategy",
     decision: "Short",
     isStrategy: true,
-    basket: ["QQQ", "???"],
+    basket: ["QQQ", "U"],
     pitchTeam: "Bhavya Patel, Henish Patel",
     deck: "/pitches/AITECH_ Hedging_ Strategies_ Memo.pdf",
     model: "/pitches/AITECH_Sector_Hedging_Strategies_vf.xlsx",
