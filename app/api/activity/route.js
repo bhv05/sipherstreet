@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 const BASE_URL = "https://paper-api.alpaca.markets";
 const INITIAL_CAPITAL = 100000;
 
