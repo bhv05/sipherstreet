@@ -11,7 +11,7 @@
       "pill_text": "Short",
       "pill_color": "red",
       "title": "Initiated QQQ short position",
-      "description": "Sold short 17 shares of QQQ to hedge against concentrated AI and technology exposure across our long book. With core positions in NVDA, META, AMZN, MSFT, GOOG, and AAPL, the portfolio carries meaningful sector concentration risk. This QQQ short offsets a portion of that directional exposure, reducing net beta to broad tech while preserving upside in our highest-conviction individual names.",
+      "description": "Sold short 17 shares of QQQ to hedge against our current AI and technology exposure in the portfolio. This position offsets a portion of directional risk from our concentrated tech basket, reducing net beta while preserving upside in our highest-conviction individual names.",
       "ticker": "QQQ"
     }
   ],
