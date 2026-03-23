@@ -403,7 +403,7 @@ function PitchCard({ p, index, onOpenDeck }) {
       </div>
       {p.isStrategy ? (
         <div style={{ marginBottom: 14 }}>
-          <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>Strategy Basket</div>
+          <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>Hedging Instruments</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
             {p.basket && p.basket.map(function (ticker) {
               return (
