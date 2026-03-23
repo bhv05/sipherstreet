@@ -18,8 +18,8 @@ const PITCHES = [
     date: "23-Mar-2026",
     company: "AI/Tech Sector Hedging Strategy",
     decision: "Short",
-    targetPrice: "N/A",
-    transactionPrice: "N/A",
+    isStrategy: true,
+    basket: ["QQQ", "???"],
     pitchTeam: "Bhavya Patel, Henish Patel",
     deck: "/pitches/AITECH_ Hedging_ Strategies_ Memo.pdf",
     model: "/pitches/AITECH_Sector_Hedging_Strategies_vf.xlsx",
@@ -28,8 +28,8 @@ const PITCHES = [
     date: "23-Mar-2026",
     company: "Broadcom Inc. (NASDAQ: AVGO)",
     decision: "Buy",
-    targetPrice: "TBD",
-    transactionPrice: "TBD",
+    targetPrice: "$319",
+    transactionPrice: "$452",
     pitchTeam: "Bhavya Patel, Henish Patel",
     deck: "/pitches/Broadcom_memo_vf.pdf",
     model: "/pitches/AVGO_vf.xlsx",
@@ -53,7 +53,7 @@ const PITCHES = [
     pitchTeam: "Bhavya Patel, Henish Patel",
     deck: "/pitches/Applovin_memo_vf.pdf",
     model: "/pitches/APP_vf.xlsx",
-  },  
+  },
 ];
 
 const ZOOM_LEVELS = [50, 75, 100, 125, 150, 200];
@@ -401,16 +401,31 @@ function PitchCard({ p, index, onOpenDeck }) {
           {p.decision}
         </span>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 14, fontSize: 13 }}>
-        <div>
-          <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Target</div>
-          <div style={{ fontWeight: 500, color: "#1a2a44" }}>{p.targetPrice}</div>
+      {p.isStrategy ? (
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>Strategy Basket</div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {p.basket && p.basket.map(function (ticker) {
+              return (
+                <span key={ticker} style={{ padding: "3px 8px", background: "#fff", border: "1px solid #e2e8f0", borderRadius: 4, fontSize: 12, fontWeight: 500, color: "#1a2a44" }}>
+                  {ticker}
+                </span>
+              );
+            })}
+          </div>
         </div>
-        <div>
-          <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Transaction</div>
-          <div style={{ fontWeight: 500, color: "#1a2a44" }}>{p.transactionPrice}</div>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 14, fontSize: 13 }}>
+          <div>
+            <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Target</div>
+            <div style={{ fontWeight: 500, color: "#1a2a44" }}>{p.targetPrice}</div>
+          </div>
+          <div>
+            <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Transaction</div>
+            <div style={{ fontWeight: 500, color: "#1a2a44" }}>{p.transactionPrice}</div>
+          </div>
         </div>
-      </div>
+      )}
       <div style={{ fontSize: 12, color: "#5a6a7e", marginBottom: 14 }}>{p.pitchTeam}</div>
       <div style={{ display: "flex", gap: 20 }}>
         <span onClick={function () { onOpenDeck(index); }} style={linkStyle}>
@@ -444,65 +459,82 @@ export default function Pitches() {
       </div>
 
       <div ref={contentReveal.ref} className={"reveal" + (contentReveal.inView ? " in-view" : "")}>
-      <div className="pitches-desktop">
-        <div style={{ border: "1px solid #e2e8f0", borderRadius: 4, overflow: "auto" }}>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th style={{ textAlign: "left" }}>Date</th>
-                <th style={{ textAlign: "left" }}>Company</th>
-                <th style={{ textAlign: "center" }}>Decision</th>
-                <th style={{ textAlign: "center" }}>Target Price</th>
-                <th style={{ textAlign: "center" }}>Transaction Price</th>
-                <th style={{ textAlign: "left" }}>Pitch Team</th>
-              </tr>
-            </thead>
-            <tbody>
-              {PITCHES.map(function (p, i) {
-                var ds = getDecisionStyle(p.decision);
-                var dt = formatDate(p.date);
-                return (
-                  <tr key={i}>
-                    <td style={{ color: "#1a2a44", lineHeight: 1.4 }}>
-                      <div style={{ fontWeight: 500 }}>{dt.line1}</div>
-                      <div style={{ color: "#5a6a7e", fontSize: 12 }}>{dt.line2}</div>
-                    </td>
-                    <td>
-                      <div style={{ fontWeight: 600, color: "#1a2a44", marginBottom: 8, fontSize: 15 }}>{p.company}</div>
-                      <div style={{ display: "flex", gap: 20, marginTop: 2 }}>
-                        <span
-                          onClick={function (e) { e.stopPropagation(); setOpenDeck(i); }}
-                          style={linkStyleDesktop}
-                        >
-                          <PdfIcon />
-                          Pitch
+        <div className="pitches-desktop">
+          <div style={{ border: "1px solid #e2e8f0", borderRadius: 4, overflow: "auto" }}>
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th style={{ textAlign: "left" }}>Date</th>
+                  <th style={{ textAlign: "left" }}>Company</th>
+                  <th style={{ textAlign: "center" }}>Decision</th>
+                  <th style={{ textAlign: "center" }}>Target Price</th>
+                  <th style={{ textAlign: "center" }}>Transaction Price</th>
+                  <th style={{ textAlign: "left" }}>Pitch Team</th>
+                </tr>
+              </thead>
+              <tbody>
+                {PITCHES.map(function (p, i) {
+                  var ds = getDecisionStyle(p.decision);
+                  var dt = formatDate(p.date);
+                  return (
+                    <tr key={i}>
+                      <td style={{ color: "#1a2a44", lineHeight: 1.4 }}>
+                        <div style={{ fontWeight: 500 }}>{dt.line1}</div>
+                        <div style={{ color: "#5a6a7e", fontSize: 12 }}>{dt.line2}</div>
+                      </td>
+                      <td>
+                        <div style={{ fontWeight: 600, color: "#1a2a44", marginBottom: 8, fontSize: 15 }}>{p.company}</div>
+                        <div style={{ display: "flex", gap: 20, marginTop: 2 }}>
+                          <span
+                            onClick={function (e) { e.stopPropagation(); setOpenDeck(i); }}
+                            style={linkStyleDesktop}
+                          >
+                            <PdfIcon />
+                            Pitch
+                          </span>
+                          <a
+                            href={p.model}
+                            download
+                            onClick={function (e) { e.stopPropagation(); }}
+                            style={linkStyleDesktop}
+                          >
+                            <XlsIcon />
+                            Model
+                          </a>
+                        </div>
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+                        <span style={{ padding: "4px 14px", fontSize: 12, fontWeight: 600, borderRadius: 3, background: ds.background, color: ds.color }}>
+                          {p.decision}
                         </span>
-                        <a
-                          href={p.model}
-                          download
-                          onClick={function (e) { e.stopPropagation(); }}
-                          style={linkStyleDesktop}
-                        >
-                          <XlsIcon />
-                          Model
-                        </a>
-                      </div>
-                    </td>
-                    <td style={{ textAlign: "center" }}>
-                      <span style={{ padding: "4px 14px", fontSize: 12, fontWeight: 600, borderRadius: 3, background: ds.background, color: ds.color }}>
-                        {p.decision}
-                      </span>
-                    </td>
-                    <td style={{ textAlign: "center", fontWeight: 500, color: "#1a2a44" }}>{p.targetPrice}</td>
-                    <td style={{ textAlign: "center", fontWeight: 500, color: "#1a2a44" }}>{p.transactionPrice}</td>
-                    <td style={{ color: "#5a6a7e", fontSize: 13, maxWidth: 280 }}>{p.pitchTeam}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                      </td>
+                      {p.isStrategy ? (
+                      <td colSpan={2} style={{ textAlign: "center", padding: "12px" }}>
+                        <div style={{ fontSize: 10, color: "#8896a6", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>Strategy Basket</div>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center" }}>
+                          {p.basket && p.basket.map(function (ticker) {
+                            return (
+                              <span key={ticker} style={{ padding: "3px 8px", background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 4, fontSize: 12, fontWeight: 500, color: "#1a2a44" }}>
+                                {ticker}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      </td>
+                    ) : (
+                      <>
+                        <td style={{ textAlign: "center", fontWeight: 500, color: "#1a2a44" }}>{p.targetPrice}</td>
+                        <td style={{ textAlign: "center", fontWeight: 500, color: "#1a2a44" }}>{p.transactionPrice}</td>
+                      </>
+                    )}
+                      <td style={{ color: "#5a6a7e", fontSize: 13, maxWidth: 280 }}>{p.pitchTeam}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
       </div>
 
       <div className="pitches-mobile">
