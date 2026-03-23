@@ -11,7 +11,7 @@
       "pill_text": "Short",
       "pill_color": "red",
       "title": "Initiated QQQ short position",
-      "description": "Sold short 17 shares of QQQ at $492.46, representing a tactical hedge against broad Nasdaq-100 exposure. This position reflects our near-term cautious stance on mega-cap tech valuations amid rising rate expectations and stretched multiples, while maintaining structural long exposure to individual high-conviction names.",
+      "description": "Sold short 17 shares of QQQ to hedge against concentrated AI and technology exposure across our long book. With core positions in NVDA, META, AMZN, MSFT, GOOG, and AAPL, the portfolio carries meaningful sector concentration risk. This QQQ short offsets a portion of that directional exposure, reducing net beta to broad tech while preserving upside in our highest-conviction individual names.",
       "ticker": "QQQ"
     }
   ],
