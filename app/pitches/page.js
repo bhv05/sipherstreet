@@ -28,8 +28,8 @@ const PITCHES = [
     date: "23-Mar-2026",
     company: "Broadcom Inc. (NASDAQ: AVGO)",
     decision: "Buy",
-    targetPrice: "$319",
-    transactionPrice: "$452",
+    targetPrice: "$452",
+    transactionPrice: "$319",
     pitchTeam: "Bhavya Patel, Henish Patel",
     deck: "/pitches/Broadcom_memo_vf.pdf",
     model: "/pitches/AVGO_vf.xlsx",
@@ -509,24 +509,27 @@ export default function Pitches() {
                         </span>
                       </td>
                       {p.isStrategy ? (
-                      <td colSpan={2} style={{ textAlign: "center", padding: "12px" }}>
-                        <div style={{ fontSize: 10, color: "#8896a6", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>Strategy Basket</div>
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center" }}>
-                          {p.basket && p.basket.map(function (ticker) {
-                            return (
-                              <span key={ticker} style={{ padding: "3px 8px", background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 4, fontSize: 12, fontWeight: 500, color: "#1a2a44" }}>
-                                {ticker}
-                              </span>
-                            );
-                          })}
-                        </div>
-                      </td>
-                    ) : (
-                      <>
-                        <td style={{ textAlign: "center", fontWeight: 500, color: "#1a2a44" }}>{p.targetPrice}</td>
-                        <td style={{ textAlign: "center", fontWeight: 500, color: "#1a2a44" }}>{p.transactionPrice}</td>
+                        <>
+                        <td style={{ textAlign: "center", color: "#8896a6" }}>-</td>
+                        <td style={{ textAlign: "center", padding: "12px" }}>
+                          <div style={{ fontSize: 10, color: "#8896a6", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>Hedging Instruments</div>
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center" }}>
+                            {p.basket && p.basket.map(function (ticker) {
+                              return (
+                                <span key={ticker} style={{ padding: "3px 8px", background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 4, fontSize: 12, fontWeight: 500, color: "#1a2a44" }}>
+                                  {ticker}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        </td>
                       </>
-                    )}
+                      ) : (
+                        <>
+                          <td style={{ textAlign: "center", fontWeight: 500, color: "#1a2a44" }}>{p.targetPrice}</td>
+                          <td style={{ textAlign: "center", fontWeight: 500, color: "#1a2a44" }}>{p.transactionPrice}</td>
+                        </>
+                      )}
                       <td style={{ color: "#5a6a7e", fontSize: 13, maxWidth: 280 }}>{p.pitchTeam}</td>
                     </tr>
                   );
