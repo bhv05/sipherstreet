@@ -21,7 +21,7 @@ const PITCHES = [
     isStrategy: true,
     basket: ["QQQ", "U"],
     pitchTeam: "Bhavya Patel, Henish Patel",
-    deck: "/pitches/AITECH_ Hedging_ Strategies_ Memo.pdf",
+    deck: "/pitches/AITECH_Hedging_Strategies_Memo.pdf",
     model: "/pitches/AITECH_Sector_Hedging_Strategies_vf.xlsx",
   },
   {
@@ -509,9 +509,7 @@ export default function Pitches() {
                         </span>
                       </td>
                       {p.isStrategy ? (
-                        <>
-                        <td style={{ textAlign: "center", color: "#8896a6" }}>-</td>
-                        <td style={{ textAlign: "center", padding: "12px" }}>
+                        <td colSpan={2} style={{ textAlign: "center", padding: "12px" }}>
                           <div style={{ fontSize: 10, color: "#8896a6", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>Hedging Instruments</div>
                           <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center" }}>
                             {p.basket && p.basket.map(function (ticker) {
@@ -523,7 +521,6 @@ export default function Pitches() {
                             })}
                           </div>
                         </td>
-                      </>
                       ) : (
                         <>
                           <td style={{ textAlign: "center", fontWeight: 500, color: "#1a2a44" }}>{p.targetPrice}</td>
