@@ -15,6 +15,26 @@ import useReveal from "../components/useReveal";
 
 const PITCHES = [
   {
+    date: "23-Mar-2026",
+    company: "AI/Tech Sector Hedging Strategy",
+    decision: "Short",
+    targetPrice: "N/A",
+    transactionPrice: "N/A",
+    pitchTeam: "Bhavya Patel, Henish Patel",
+    deck: "/pitches/AITECH_ Hedging_ Strategies_ Memo.pdf",
+    model: "/pitches/AITECH_Sector_Hedging_Strategies_vf.xlsx",
+  },
+  {
+    date: "23-Mar-2026",
+    company: "Broadcom Inc. (NASDAQ: AVGO)",
+    decision: "Buy",
+    targetPrice: "TBD",
+    transactionPrice: "TBD",
+    pitchTeam: "Bhavya Patel, Henish Patel",
+    deck: "/pitches/Broadcom_memo_vf.pdf",
+    model: "/pitches/AVGO_vf.xlsx",
+  },
+  {
     date: "09-Mar-2026",
     company: "Intuit Inc. (NASDAQ: INTU)",
     decision: "Buy",
