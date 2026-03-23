@@ -3,7 +3,18 @@
   "sharpe_ratio": "TBD",
   "net_exposure_target": 30,
 
-  "manual_entries": [],
+  "manual_entries": [
+    {
+      "date": "2026-03-23",
+      "category": "short",
+      "filter_group": "capital",
+      "pill_text": "Short",
+      "pill_color": "red",
+      "title": "Initiated QQQ short position",
+      "description": "Sold short 17 shares of QQQ at $492.46, representing a tactical hedge against broad Nasdaq-100 exposure. This position reflects our near-term cautious stance on mega-cap tech valuations amid rising rate expectations and stretched multiples, while maintaining structural long exposure to individual high-conviction names.",
+      "ticker": "QQQ"
+    }
+  ],
 
   "earnings_lookup": {
     "NVDA": {

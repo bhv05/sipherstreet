@@ -380,6 +380,16 @@ function ActivityInner() {
         source: "manual",
       });
     });
+
+    /* Remove auto entries that overlap with a manual entry for the same symbol+date */
+    var manualKeys = {};
+    config.manual_entries.forEach(function (m) {
+      if (m.ticker) manualKeys[m.ticker + "|" + m.date] = true;
+    });
+    timelineEntries = timelineEntries.filter(function (e) {
+      if (e.source === "auto" && e.symbol && manualKeys[e.symbol + "|" + e.date]) return false;
+      return true;
+    });
   }
 
   timelineEntries.sort(function (a, b) {
