@@ -811,11 +811,24 @@ function ActivityInner() {
           margin-bottom: 28px;
         }
         .activity-page .earn-grid {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
+          display: flex;
+          overflow-x: auto;
           gap: 16px;
+          padding-bottom: 12px;
+          scrollbar-width: thin;
+          scroll-snap-type: x mandatory;
+          -webkit-overflow-scrolling: touch;
+        }
+        .activity-page .earn-grid::-webkit-scrollbar {
+          height: 6px;
+        }
+        .activity-page .earn-grid::-webkit-scrollbar-thumb {
+          background: #cbd5e1;
+          border-radius: 4px;
         }
         .activity-page .earn-card {
+          flex: 0 0 320px;
+          scroll-snap-align: start;
           background: var(--card);
           border: 1px solid var(--border);
           border-radius: 10px;
@@ -928,8 +941,8 @@ function ActivityInner() {
             padding: 6px 14px;
             font-size: 11px;
           }
-          .activity-page .earn-grid {
-            grid-template-columns: 1fr;
+          .activity-page .earn-card {
+            flex: 0 0 280px;
           }
           .activity-page .tl-entry {
             grid-template-columns: 24px 1fr;
