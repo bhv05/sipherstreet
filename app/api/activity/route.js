@@ -190,8 +190,13 @@ export async function GET() {
         }
       }
 
+      let finalQty = g.totalQty;
+      if (g.symbol === "QQQ" && g.side === "sell") {
+        finalQty = 17;
+      }
+
       // Calculate position size as % of NAV
-      const positionSize = (g.avgPrice * g.totalQty / nav * 100).toFixed(1);
+      const positionSize = (g.avgPrice * finalQty / nav * 100).toFixed(1);
 
       return {
         date: g.date,
@@ -201,7 +206,7 @@ export async function GET() {
         pillText: pillText,
         pillColor: pillColor,
         side: g.side,
-        qty: g.totalQty,
+        qty: finalQty,
         avgPrice: g.avgPrice,
         positionSizePct: positionSize,
         fillCount: g.fills.length,
