@@ -122,7 +122,7 @@ function EarningsCard({ ticker, data, position, nav }) {
   var posData = null;
   if (position) {
     var mv = Math.abs(parseFloat(position.market_value || 0));
-    var side = parseFloat(position.qty || 0) > 0 ? "long" : "short";
+    var side = position.side || "long";
     posData = {
       side: side,
       weight: nav > 0 ? (mv / nav * 100).toFixed(1) : "-",
@@ -251,9 +251,9 @@ function EarningsCard({ ticker, data, position, nav }) {
             {data.last_quarter_result && (
               <div className="earn-row">
                 <span className="earn-label">Last Quarter</span>
-                <span className="earn-val" style={{ color: data.last_quarter_result === "beat" ? "#16a34a" : "#dc2626", fontWeight: 600 }}>
-                  {data.last_quarter_result === "beat" ? "Beat" : "Miss"}
-                  {data.last_quarter_surprise != null ? " · " + (data.last_quarter_surprise >= 0 ? "+" : "") + "$" + Math.abs(data.last_quarter_surprise).toFixed(2) : ""}
+                <span className="earn-val" style={{ color: data.last_quarter_result === "beat" ? "#16a34a" : data.last_quarter_result === "inline" ? "#f59e0b" : "#dc2626", fontWeight: 600 }}>
+                  {data.last_quarter_result === "beat" ? "Beat" : data.last_quarter_result === "miss" ? "Miss" : "Inline"}
+                  {data.last_quarter_surprise != null && data.last_quarter_result !== "inline" ? " · " + (data.last_quarter_surprise > 0 ? "+" : "") + "$" + Math.abs(data.last_quarter_surprise).toFixed(2) : ""}
                 </span>
               </div>
             )}
