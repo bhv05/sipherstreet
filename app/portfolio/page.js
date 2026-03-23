@@ -497,7 +497,7 @@ export default function Portfolio() {
           <table className="data-table">
             <thead>
               <tr>
-                <th style={{ textAlign: "left" }}>Company</th>
+                <th style={{ textAlign: "left" }}>Asset</th>
                 <th style={{ textAlign: "center" }}>Ticker</th>
                 <th style={{ textAlign: "right" }}>Cost Basis</th>
                 <th style={{ textAlign: "right" }}>Last Close</th>
