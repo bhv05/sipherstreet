@@ -465,7 +465,7 @@ export default function Pitches() {
               <thead>
                 <tr>
                   <th style={{ textAlign: "left" }}>Date</th>
-                  <th style={{ textAlign: "left" }}>Company</th>
+                  <th style={{ textAlign: "left" }}>Investment</th>
                   <th style={{ textAlign: "center" }}>Decision</th>
                   <th style={{ textAlign: "center" }}>Target Price</th>
                   <th style={{ textAlign: "center" }}>Transaction Price</th>
