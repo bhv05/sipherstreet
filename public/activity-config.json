@@ -167,6 +167,9 @@
 
   "pitch_links": {
     "INTU": "/pitches",
-    "APP": "/pitches"
+    "APP": "/pitches",
+    "AVGO": "/pitches",
+    "QQQ": "/pitches",
+    "U": "/pitches"
   }
 }
