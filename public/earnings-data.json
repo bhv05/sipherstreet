@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-30T07:20:14Z",
+  "last_updated": "2026-03-31T07:06:04Z",
   "total_positions": 5,
   "earnings_calendar": [
     {
@@ -20,10 +20,10 @@
       "date": "2026-05-06",
       "timing": "AMC",
       "consensus_eps": 0.24,
-      "consensus_revenue": "$501M",
-      "last_quarter_result": "inline",
-      "last_quarter_surprise": 0.0,
-      "beat_rate_4q": "3/4",
+      "consensus_revenue": "$504M",
+      "last_quarter_result": "beat",
+      "last_quarter_surprise": 0.03,
+      "beat_rate_4q": "4/4",
       "implied_move": 4.8
     },
     {
@@ -46,7 +46,7 @@
       "consensus_eps": 2.39,
       "consensus_revenue": "$22.06B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.08,
+      "last_quarter_surprise": 0.03,
       "beat_rate_4q": "4/4",
       "implied_move": 7.7
     },
