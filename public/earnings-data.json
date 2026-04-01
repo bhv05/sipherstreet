@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-03-31T07:06:04Z",
-  "total_positions": 5,
+  "last_updated": "2026-04-01T07:13:16Z",
+  "total_positions": 4,
   "earnings_calendar": [
     {
       "ticker": "APP",
@@ -10,21 +10,9 @@
       "consensus_eps": 3.64,
       "consensus_revenue": "$1.77B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.37,
+      "last_quarter_surprise": 0.3,
       "beat_rate_4q": "4/4",
       "implied_move": 11.1
-    },
-    {
-      "ticker": "U",
-      "company": "Unity Software Inc.",
-      "date": "2026-05-06",
-      "timing": "AMC",
-      "consensus_eps": 0.24,
-      "consensus_revenue": "$504M",
-      "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.03,
-      "beat_rate_4q": "4/4",
-      "implied_move": 4.8
     },
     {
       "ticker": "INTU",
