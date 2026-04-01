@@ -12,9 +12,12 @@ export const metadata = {
   description:
     "A student-managed investment fund deploying long/short equity strategies across global markets.",
   icons: {
-    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
-    shortcut: "/favicon.svg",
-    apple: "/favicon.svg",
+    icon: [
+      { url: "/favicon-light.png", media: "(prefers-color-scheme: light)" },
+      { url: "/favicon-dark.png", media: "(prefers-color-scheme: dark)" },
+    ],
+    shortcut: "/favicon-light.png",
+    apple: "/favicon-light.png",
   },
 };
 
@@ -23,7 +26,6 @@ export default function RootLayout({ children }) {
     <ViewTransitions>
       <html lang="en">
         <head>
-          <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
           <link
             href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap"
             rel="stylesheet"
