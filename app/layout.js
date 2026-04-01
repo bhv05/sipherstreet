@@ -12,12 +12,12 @@ export const metadata = {
   description:
     "A student-managed investment fund deploying long/short equity strategies across global markets.",
   icons: {
-    icon: [
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    shortcut: "/favicon.svg",
+    apple: [
       { url: "/favicon-light.png", media: "(prefers-color-scheme: light)" },
       { url: "/favicon-dark.png", media: "(prefers-color-scheme: dark)" },
     ],
-    shortcut: "/favicon-light.png",
-    apple: "/favicon-light.png",
   },
 };
 
