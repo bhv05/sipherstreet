@@ -1,7 +1,55 @@
 {
-  "last_updated": "2026-04-01T07:13:16Z",
-  "total_positions": 4,
+  "last_updated": "2026-04-02T07:05:45Z",
+  "total_positions": 10,
   "earnings_calendar": [
+    {
+      "ticker": "CACI",
+      "company": "CACI International Inc",
+      "date": "2026-04-22",
+      "timing": "AMC",
+      "consensus_eps": 7.08,
+      "consensus_revenue": "$2.37B",
+      "last_quarter_result": "beat",
+      "last_quarter_surprise": 0.32,
+      "beat_rate_4q": "4/4",
+      "implied_move": 7.3
+    },
+    {
+      "ticker": "CR",
+      "company": "Crane Company",
+      "date": "2026-04-27",
+      "timing": "AMC",
+      "consensus_eps": 1.45,
+      "consensus_revenue": "$672M",
+      "last_quarter_result": "beat",
+      "last_quarter_surprise": 0.12,
+      "beat_rate_4q": "4/4",
+      "implied_move": 5.7
+    },
+    {
+      "ticker": "META",
+      "company": "Meta Platforms, Inc.",
+      "date": "2026-04-29",
+      "timing": "AMC",
+      "consensus_eps": 6.73,
+      "consensus_revenue": "$55.46B",
+      "last_quarter_result": "beat",
+      "last_quarter_surprise": 0.7,
+      "beat_rate_4q": "4/4",
+      "implied_move": 9.3
+    },
+    {
+      "ticker": "OXY",
+      "company": "Occidental Petroleum Corporation",
+      "date": "2026-05-05",
+      "timing": "AMC",
+      "consensus_eps": 0.65,
+      "consensus_revenue": "$5.58B",
+      "last_quarter_result": "beat",
+      "last_quarter_surprise": 0.13,
+      "beat_rate_4q": "4/4",
+      "implied_move": 4.5
+    },
     {
       "ticker": "APP",
       "company": "AppLovin Corporation",
@@ -27,6 +75,18 @@
       "implied_move": 5.2
     },
     {
+      "ticker": "DY",
+      "company": "Dycom Industries, Inc.",
+      "date": "2026-05-27",
+      "timing": "AMC",
+      "consensus_eps": 2.73,
+      "consensus_revenue": "$1.67B",
+      "last_quarter_result": "beat",
+      "last_quarter_surprise": 0.25,
+      "beat_rate_4q": "4/4",
+      "implied_move": 1.7
+    },
+    {
       "ticker": "AVGO",
       "company": "Broadcom Inc.",
       "date": "2026-06-03",
@@ -41,6 +101,20 @@
     {
       "ticker": "QQQ",
       "company": "Invesco QQQ Trust",
+      "is_etf": true,
+      "date": null,
+      "timing": null,
+      "consensus_eps": null,
+      "consensus_revenue": null,
+      "implied_move": null,
+      "last_quarter_result": null,
+      "last_quarter_surprise": null,
+      "beat_rate_4q": null,
+      "note": "ETF, short position"
+    },
+    {
+      "ticker": "XLI",
+      "company": "State Street Industrial Select Sector SPDR ETF",
       "is_etf": true,
       "date": null,
       "timing": null,
