@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-05T06:59:12Z",
+  "last_updated": "2026-04-06T07:22:19Z",
   "total_positions": 10,
   "earnings_calendar": [
     {
@@ -12,7 +12,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.31,
       "beat_rate_4q": "4/4",
-      "implied_move": 6.2
+      "implied_move": 7.3
     },
     {
       "ticker": "CR",
@@ -24,7 +24,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.12,
       "beat_rate_4q": "4/4",
-      "implied_move": 5.4
+      "implied_move": 5.7
     },
     {
       "ticker": "META",
@@ -36,19 +36,19 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.7,
       "beat_rate_4q": "3/4",
-      "implied_move": 3.1
+      "implied_move": 9.3
     },
     {
       "ticker": "OXY",
       "company": "Occidental Petroleum Corporation",
       "date": "2026-05-05",
       "timing": "AMC",
-      "consensus_eps": 0.65,
+      "consensus_eps": 0.68,
       "consensus_revenue": "$5.58B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.13,
       "beat_rate_4q": "4/4",
-      "implied_move": 1.6
+      "implied_move": 4.5
     },
     {
       "ticker": "APP",
@@ -60,7 +60,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.3,
       "beat_rate_4q": "4/4",
-      "implied_move": 5.2
+      "implied_move": 11.1
     },
     {
       "ticker": "INTU",
@@ -72,7 +72,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.47,
       "beat_rate_4q": "4/4",
-      "implied_move": 5.4
+      "implied_move": 5.2
     },
     {
       "ticker": "DY",
@@ -84,7 +84,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.25,
       "beat_rate_4q": "4/4",
-      "implied_move": 6.3
+      "implied_move": 1.7
     },
     {
       "ticker": "AVGO",
@@ -96,7 +96,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.03,
       "beat_rate_4q": "4/4",
-      "implied_move": 5.7
+      "implied_move": 7.7
     },
     {
       "ticker": "QQQ",
