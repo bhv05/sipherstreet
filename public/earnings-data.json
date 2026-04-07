@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-06T07:22:19Z",
+  "last_updated": "2026-04-07T07:09:11Z",
   "total_positions": 10,
   "earnings_calendar": [
     {
@@ -35,7 +35,7 @@
       "consensus_revenue": "$55.47B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.7,
-      "beat_rate_4q": "3/4",
+      "beat_rate_4q": "4/4",
       "implied_move": 9.3
     },
     {
@@ -58,7 +58,7 @@
       "consensus_eps": 3.64,
       "consensus_revenue": "$1.77B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.3,
+      "last_quarter_surprise": 0.37,
       "beat_rate_4q": "4/4",
       "implied_move": 11.1
     },
@@ -94,7 +94,7 @@
       "consensus_eps": 2.39,
       "consensus_revenue": "$22.06B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.03,
+      "last_quarter_surprise": 0.08,
       "beat_rate_4q": "4/4",
       "implied_move": 7.7
     },
