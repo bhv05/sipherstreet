@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-07T07:09:11Z",
+  "last_updated": "2026-04-08T07:11:10Z",
   "total_positions": 10,
   "earnings_calendar": [
     {
@@ -34,8 +34,8 @@
       "consensus_eps": 6.76,
       "consensus_revenue": "$55.47B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.7,
-      "beat_rate_4q": "4/4",
+      "last_quarter_surprise": 0.66,
+      "beat_rate_4q": "3/4",
       "implied_move": 9.3
     },
     {
@@ -43,7 +43,7 @@
       "company": "Occidental Petroleum Corporation",
       "date": "2026-05-05",
       "timing": "AMC",
-      "consensus_eps": 0.68,
+      "consensus_eps": 0.7,
       "consensus_revenue": "$5.58B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.13,
@@ -56,9 +56,9 @@
       "date": "2026-05-06",
       "timing": "AMC",
       "consensus_eps": 3.64,
-      "consensus_revenue": "$1.77B",
+      "consensus_revenue": "$1.78B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.37,
+      "last_quarter_surprise": 0.3,
       "beat_rate_4q": "4/4",
       "implied_move": 11.1
     },
@@ -94,7 +94,7 @@
       "consensus_eps": 2.39,
       "consensus_revenue": "$22.06B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.08,
+      "last_quarter_surprise": 0.03,
       "beat_rate_4q": "4/4",
       "implied_move": 7.7
     },
