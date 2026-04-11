@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-10T07:20:00Z",
+  "last_updated": "2026-04-11T06:55:04Z",
   "total_positions": 10,
   "earnings_calendar": [
     {
@@ -35,8 +35,8 @@
       "consensus_revenue": "$55.48B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.7,
-      "beat_rate_4q": "4/4",
-      "implied_move": 9.3
+      "beat_rate_4q": "3/4",
+      "implied_move": 3.1
     },
     {
       "ticker": "OXY",
@@ -48,7 +48,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.13,
       "beat_rate_4q": "4/4",
-      "implied_move": 4.5
+      "implied_move": 1.9
     },
     {
       "ticker": "APP",
@@ -58,9 +58,9 @@
       "consensus_eps": 3.64,
       "consensus_revenue": "$1.78B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.37,
+      "last_quarter_surprise": 0.3,
       "beat_rate_4q": "4/4",
-      "implied_move": 11.1
+      "implied_move": 6.3
     },
     {
       "ticker": "INTU",
@@ -94,7 +94,7 @@
       "consensus_eps": 2.39,
       "consensus_revenue": "$22.06B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.08,
+      "last_quarter_surprise": 0.03,
       "beat_rate_4q": "4/4",
       "implied_move": 7.7
     },
