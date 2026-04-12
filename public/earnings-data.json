@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-11T06:55:04Z",
+  "last_updated": "2026-04-12T07:07:09Z",
   "total_positions": 10,
   "earnings_calendar": [
     {
@@ -7,7 +7,7 @@
       "company": "CACI International Inc",
       "date": "2026-04-22",
       "timing": "AMC",
-      "consensus_eps": 7.09,
+      "consensus_eps": 7.08,
       "consensus_revenue": "$2.37B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.31,
@@ -31,10 +31,10 @@
       "company": "Meta Platforms, Inc.",
       "date": "2026-04-29",
       "timing": "AMC",
-      "consensus_eps": 6.76,
-      "consensus_revenue": "$55.48B",
+      "consensus_eps": 6.75,
+      "consensus_revenue": "$55.51B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.7,
+      "last_quarter_surprise": 0.66,
       "beat_rate_4q": "3/4",
       "implied_move": 3.1
     },
@@ -43,8 +43,8 @@
       "company": "Occidental Petroleum Corporation",
       "date": "2026-05-05",
       "timing": "AMC",
-      "consensus_eps": 0.75,
-      "consensus_revenue": "$5.71B",
+      "consensus_eps": 0.76,
+      "consensus_revenue": "$5.63B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.13,
       "beat_rate_4q": "4/4",
