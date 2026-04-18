@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-17T07:24:25Z",
+  "last_updated": "2026-04-18T07:00:25Z",
   "total_positions": 10,
   "earnings_calendar": [
     {
@@ -7,12 +7,12 @@
       "company": "CACI International Inc",
       "date": "2026-04-22",
       "timing": "AMC",
-      "consensus_eps": 6.96,
-      "consensus_revenue": "$2.36B",
+      "consensus_eps": 6.95,
+      "consensus_revenue": "$2.35B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.31,
       "beat_rate_4q": "4/4",
-      "implied_move": 7.3
+      "implied_move": 11.1
     },
     {
       "ticker": "CR",
@@ -34,8 +34,8 @@
       "consensus_eps": 6.74,
       "consensus_revenue": "$55.54B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.7,
-      "beat_rate_4q": "4/4",
+      "last_quarter_surprise": 0.66,
+      "beat_rate_4q": "3/4",
       "implied_move": 9.3
     },
     {
@@ -43,12 +43,12 @@
       "company": "Occidental Petroleum Corporation",
       "date": "2026-05-05",
       "timing": "AMC",
-      "consensus_eps": 0.64,
+      "consensus_eps": 0.62,
       "consensus_revenue": "$5.70B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.13,
       "beat_rate_4q": "4/4",
-      "implied_move": 4.5
+      "implied_move": 2.1
     },
     {
       "ticker": "APP",
@@ -58,7 +58,7 @@
       "consensus_eps": 3.64,
       "consensus_revenue": "$1.78B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.37,
+      "last_quarter_surprise": 0.3,
       "beat_rate_4q": "4/4",
       "implied_move": 11.1
     },
@@ -67,12 +67,12 @@
       "company": "Intuit Inc.",
       "date": "2026-05-21",
       "timing": "AMC",
-      "consensus_eps": 12.54,
+      "consensus_eps": 12.52,
       "consensus_revenue": "$8.53B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.47,
       "beat_rate_4q": "4/4",
-      "implied_move": 5.2
+      "implied_move": 1.9
     },
     {
       "ticker": "DY",
@@ -92,11 +92,11 @@
       "date": "2026-06-03",
       "timing": "AMC",
       "consensus_eps": 2.39,
-      "consensus_revenue": "$21.98B",
+      "consensus_revenue": "$22.02B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.03,
+      "last_quarter_surprise": 0.08,
       "beat_rate_4q": "4/4",
-      "implied_move": 7.7
+      "implied_move": 4.2
     },
     {
       "ticker": "QQQ",
