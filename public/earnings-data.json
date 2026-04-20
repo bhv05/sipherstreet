@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-19T07:11:43Z",
+  "last_updated": "2026-04-20T07:57:47Z",
   "total_positions": 10,
   "earnings_calendar": [
     {
@@ -7,12 +7,12 @@
       "company": "CACI International Inc",
       "date": "2026-04-22",
       "timing": "AMC",
-      "consensus_eps": 6.95,
+      "consensus_eps": 6.93,
       "consensus_revenue": "$2.35B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.31,
       "beat_rate_4q": "4/4",
-      "implied_move": 11.1
+      "implied_move": 9.8
     },
     {
       "ticker": "CR",
@@ -34,17 +34,17 @@
       "consensus_eps": 6.74,
       "consensus_revenue": "$55.54B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.66,
-      "beat_rate_4q": "3/4",
-      "implied_move": 9.3
+      "last_quarter_surprise": 0.7,
+      "beat_rate_4q": "4/4",
+      "implied_move": 4.0
     },
     {
       "ticker": "OXY",
       "company": "Occidental Petroleum Corporation",
       "date": "2026-05-05",
       "timing": "AMC",
-      "consensus_eps": 0.62,
-      "consensus_revenue": "$5.70B",
+      "consensus_eps": 0.61,
+      "consensus_revenue": "$5.71B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.13,
       "beat_rate_4q": "4/4",
@@ -60,7 +60,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.3,
       "beat_rate_4q": "4/4",
-      "implied_move": 11.1
+      "implied_move": 7.0
     },
     {
       "ticker": "INTU",
@@ -84,7 +84,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.25,
       "beat_rate_4q": "4/4",
-      "implied_move": 1.7
+      "implied_move": 16.1
     },
     {
       "ticker": "AVGO",
@@ -92,7 +92,7 @@
       "date": "2026-06-03",
       "timing": "AMC",
       "consensus_eps": 2.39,
-      "consensus_revenue": "$22.02B",
+      "consensus_revenue": "$22.06B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.03,
       "beat_rate_4q": "4/4",
