@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-22T07:24:24Z",
+  "last_updated": "2026-04-23T07:28:11Z",
   "total_positions": 10,
   "earnings_calendar": [
     {
@@ -7,12 +7,12 @@
       "company": "CACI International Inc",
       "date": "2026-04-22",
       "timing": "AMC",
-      "consensus_eps": 6.93,
-      "consensus_revenue": "$2.35B",
+      "consensus_eps": 7.82,
+      "consensus_revenue": "$2.68B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.31,
+      "last_quarter_surprise": 0.34,
       "beat_rate_4q": "4/4",
-      "implied_move": 7.3
+      "implied_move": 5.3
     },
     {
       "ticker": "CR",
@@ -34,8 +34,8 @@
       "consensus_eps": 6.74,
       "consensus_revenue": "$55.56B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.66,
-      "beat_rate_4q": "3/4",
+      "last_quarter_surprise": 0.7,
+      "beat_rate_4q": "4/4",
       "implied_move": 9.3
     },
     {
@@ -58,7 +58,7 @@
       "consensus_eps": 3.64,
       "consensus_revenue": "$1.78B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.3,
+      "last_quarter_surprise": 0.37,
       "beat_rate_4q": "4/4",
       "implied_move": 11.1
     },
@@ -94,7 +94,7 @@
       "consensus_eps": 2.39,
       "consensus_revenue": "$22.06B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.03,
+      "last_quarter_surprise": 0.08,
       "beat_rate_4q": "4/4",
       "implied_move": 7.7
     },
