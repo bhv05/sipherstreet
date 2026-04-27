@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-26T07:21:08Z",
+  "last_updated": "2026-04-27T08:12:33Z",
   "total_positions": 10,
   "earnings_calendar": [
     {
@@ -12,7 +12,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.34,
       "beat_rate_4q": "4/4",
-      "implied_move": 7.6
+      "implied_move": 6.0
     },
     {
       "ticker": "CR",
@@ -24,7 +24,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.12,
       "beat_rate_4q": "4/4",
-      "implied_move": 10.8
+      "implied_move": 5.7
     },
     {
       "ticker": "META",
@@ -34,9 +34,9 @@
       "consensus_eps": 6.79,
       "consensus_revenue": "$55.57B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.7,
-      "beat_rate_4q": "4/4",
-      "implied_move": 5.7
+      "last_quarter_surprise": 0.66,
+      "beat_rate_4q": "3/4",
+      "implied_move": 9.3
     },
     {
       "ticker": "OXY",
@@ -48,7 +48,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.13,
       "beat_rate_4q": "4/4",
-      "implied_move": 2.8
+      "implied_move": 4.5
     },
     {
       "ticker": "APP",
@@ -58,9 +58,9 @@
       "consensus_eps": 3.64,
       "consensus_revenue": "$1.78B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.37,
+      "last_quarter_surprise": 0.3,
       "beat_rate_4q": "4/4",
-      "implied_move": 8.9
+      "implied_move": 11.1
     },
     {
       "ticker": "INTU",
@@ -72,7 +72,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.47,
       "beat_rate_4q": "4/4",
-      "implied_move": 2.8
+      "implied_move": 5.2
     },
     {
       "ticker": "DY",
@@ -84,7 +84,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.25,
       "beat_rate_4q": "4/4",
-      "implied_move": 16.3
+      "implied_move": 1.7
     },
     {
       "ticker": "AVGO",
@@ -96,7 +96,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.03,
       "beat_rate_4q": "4/4",
-      "implied_move": 4.3
+      "implied_move": 7.7
     },
     {
       "ticker": "QQQ",
