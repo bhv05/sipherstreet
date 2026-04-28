@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-27T08:12:33Z",
+  "last_updated": "2026-04-28T08:14:18Z",
   "total_positions": 10,
   "earnings_calendar": [
     {
@@ -7,7 +7,7 @@
       "company": "CACI International Inc",
       "date": "2026-04-22",
       "timing": "AMC",
-      "consensus_eps": 7.39,
+      "consensus_eps": 7.29,
       "consensus_revenue": "$2.70B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.34,
@@ -19,20 +19,20 @@
       "company": "Crane Company",
       "date": "2026-04-27",
       "timing": "AMC",
-      "consensus_eps": 1.45,
-      "consensus_revenue": "$673M",
+      "consensus_eps": 1.59,
+      "consensus_revenue": "$698M",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.12,
+      "last_quarter_surprise": 0.2,
       "beat_rate_4q": "4/4",
-      "implied_move": 5.7
+      "implied_move": 4.0
     },
     {
       "ticker": "META",
       "company": "Meta Platforms, Inc.",
       "date": "2026-04-29",
       "timing": "AMC",
-      "consensus_eps": 6.79,
-      "consensus_revenue": "$55.57B",
+      "consensus_eps": 6.82,
+      "consensus_revenue": "$55.56B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.66,
       "beat_rate_4q": "3/4",
@@ -43,7 +43,7 @@
       "company": "Occidental Petroleum Corporation",
       "date": "2026-05-05",
       "timing": "AMC",
-      "consensus_eps": 0.6,
+      "consensus_eps": 0.63,
       "consensus_revenue": "$5.80B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.13,
@@ -94,7 +94,7 @@
       "consensus_eps": 2.39,
       "consensus_revenue": "$22.06B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.03,
+      "last_quarter_surprise": 0.08,
       "beat_rate_4q": "4/4",
       "implied_move": 7.7
     },
