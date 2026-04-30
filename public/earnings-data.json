@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-29T08:06:52Z",
+  "last_updated": "2026-04-30T08:11:01Z",
   "total_positions": 10,
   "earnings_calendar": [
     {
@@ -7,7 +7,7 @@
       "company": "CACI International Inc",
       "date": "2026-04-22",
       "timing": "AMC",
-      "consensus_eps": 7.29,
+      "consensus_eps": 7.32,
       "consensus_revenue": "$2.70B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.34,
@@ -20,19 +20,19 @@
       "date": "2026-04-29",
       "timing": "AMC",
       "consensus_eps": 6.82,
-      "consensus_revenue": "$55.56B",
+      "consensus_revenue": "$55.55B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.7,
+      "last_quarter_surprise": 3.78,
       "beat_rate_4q": "4/4",
-      "implied_move": 9.3
+      "implied_move": 8.2
     },
     {
       "ticker": "OXY",
       "company": "Occidental Petroleum Corporation",
       "date": "2026-05-05",
       "timing": "AMC",
-      "consensus_eps": 0.63,
-      "consensus_revenue": "$5.80B",
+      "consensus_eps": 0.58,
+      "consensus_revenue": "$5.74B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.13,
       "beat_rate_4q": "4/4",
@@ -91,8 +91,8 @@
       "company": "Crane Company",
       "date": "2026-07-27",
       "timing": "AMC",
-      "consensus_eps": 1.59,
-      "consensus_revenue": "$698M",
+      "consensus_eps": 1.63,
+      "consensus_revenue": "$701M",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.2,
       "beat_rate_4q": "4/4",
