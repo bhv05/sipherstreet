@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-08T07:21:53Z",
+  "last_updated": "2026-05-09T07:49:05Z",
   "total_positions": 10,
   "earnings_calendar": [
     {
@@ -12,7 +12,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.34,
       "beat_rate_4q": "4/4",
-      "implied_move": 6.0
+      "implied_move": 4.7
     },
     {
       "ticker": "INTU",
@@ -24,7 +24,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.47,
       "beat_rate_4q": "4/4",
-      "implied_move": 5.2
+      "implied_move": 5.4
     },
     {
       "ticker": "DY",
@@ -36,7 +36,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.25,
       "beat_rate_4q": "4/4",
-      "implied_move": 1.7
+      "implied_move": 11.0
     },
     {
       "ticker": "AVGO",
@@ -48,7 +48,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.03,
       "beat_rate_4q": "4/4",
-      "implied_move": 7.7
+      "implied_move": 3.4
     },
     {
       "ticker": "CR",
@@ -70,9 +70,9 @@
       "consensus_eps": 7.48,
       "consensus_revenue": "$60.20B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 3.78,
-      "beat_rate_4q": "3/4",
-      "implied_move": 10.4
+      "last_quarter_surprise": 0.49,
+      "beat_rate_4q": "4/4",
+      "implied_move": 4.5
     },
     {
       "ticker": "APP",
@@ -82,9 +82,9 @@
       "consensus_eps": 3.97,
       "consensus_revenue": "$1.94B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.12,
+      "last_quarter_surprise": 0.1,
       "beat_rate_4q": "4/4",
-      "implied_move": 9.7
+      "implied_move": 7.3
     },
     {
       "ticker": "OXY",
@@ -96,7 +96,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.47,
       "beat_rate_4q": "4/4",
-      "implied_move": 4.8
+      "implied_move": 3.4
     },
     {
       "ticker": "QQQ",
