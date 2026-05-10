@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-09T07:49:05Z",
+  "last_updated": "2026-05-10T08:01:41Z",
   "total_positions": 10,
   "earnings_calendar": [
     {
@@ -70,8 +70,8 @@
       "consensus_eps": 7.48,
       "consensus_revenue": "$60.20B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.49,
-      "beat_rate_4q": "4/4",
+      "last_quarter_surprise": 3.78,
+      "beat_rate_4q": "3/4",
       "implied_move": 4.5
     },
     {
@@ -79,7 +79,7 @@
       "company": "AppLovin Corporation",
       "date": "2026-08-05",
       "timing": "AMC",
-      "consensus_eps": 3.97,
+      "consensus_eps": 4.09,
       "consensus_revenue": "$1.94B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.1,
@@ -91,8 +91,8 @@
       "company": "Occidental Petroleum Corporation",
       "date": "2026-08-05",
       "timing": "AMC",
-      "consensus_eps": 1.42,
-      "consensus_revenue": "$6.51B",
+      "consensus_eps": 1.5,
+      "consensus_revenue": "$7.15B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.47,
       "beat_rate_4q": "4/4",
