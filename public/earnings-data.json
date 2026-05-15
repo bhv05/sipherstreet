@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-14T08:31:31Z",
+  "last_updated": "2026-05-15T08:42:33Z",
   "total_positions": 10,
   "earnings_calendar": [
     {
@@ -19,8 +19,8 @@
       "company": "Intuit Inc.",
       "date": "2026-05-20",
       "timing": "AMC",
-      "consensus_eps": 12.52,
-      "consensus_revenue": "$8.53B",
+      "consensus_eps": 12.57,
+      "consensus_revenue": "$8.54B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.47,
       "beat_rate_4q": "4/4",
@@ -46,7 +46,7 @@
       "consensus_eps": 2.39,
       "consensus_revenue": "$22.06B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.03,
+      "last_quarter_surprise": 0.08,
       "beat_rate_4q": "4/4",
       "implied_move": 7.7
     },
@@ -70,8 +70,8 @@
       "consensus_eps": 7.48,
       "consensus_revenue": "$60.20B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 3.78,
-      "beat_rate_4q": "3/4",
+      "last_quarter_surprise": 0.49,
+      "beat_rate_4q": "4/4",
       "implied_move": 10.4
     },
     {
@@ -91,8 +91,8 @@
       "company": "Occidental Petroleum Corporation",
       "date": "2026-08-05",
       "timing": "AMC",
-      "consensus_eps": 1.67,
-      "consensus_revenue": "$7.03B",
+      "consensus_eps": 1.69,
+      "consensus_revenue": "$6.92B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.47,
       "beat_rate_4q": "4/4",
