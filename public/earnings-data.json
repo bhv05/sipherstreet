@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-19T09:32:59Z",
+  "last_updated": "2026-05-20T08:57:53Z",
   "total_positions": 10,
   "earnings_calendar": [
     {
@@ -71,7 +71,7 @@
       "consensus_revenue": "$60.22B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 3.78,
-      "beat_rate_4q": "4/4",
+      "beat_rate_4q": "3/4",
       "implied_move": 10.4
     },
     {
