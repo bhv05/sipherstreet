@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-22T08:53:10Z",
+  "last_updated": "2026-05-23T08:10:43Z",
   "total_positions": 10,
   "earnings_calendar": [
     {
@@ -12,19 +12,19 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.34,
       "beat_rate_4q": "4/4",
-      "implied_move": 6.0
+      "implied_move": 7.9
     },
     {
       "ticker": "DY",
       "company": "Dycom Industries, Inc.",
       "date": "2026-05-27",
       "timing": "AMC",
-      "consensus_eps": 2.73,
+      "consensus_eps": 2.72,
       "consensus_revenue": "$1.67B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.25,
       "beat_rate_4q": "4/4",
-      "implied_move": 1.7
+      "implied_move": 15.2
     },
     {
       "ticker": "AVGO",
@@ -36,7 +36,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.03,
       "beat_rate_4q": "4/4",
-      "implied_move": 7.7
+      "implied_move": 5.1
     },
     {
       "ticker": "CR",
@@ -55,12 +55,12 @@
       "company": "Meta Platforms, Inc.",
       "date": "2026-07-29",
       "timing": "AMC",
-      "consensus_eps": 7.51,
-      "consensus_revenue": "$60.22B",
+      "consensus_eps": 7.53,
+      "consensus_revenue": "$60.21B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.49,
-      "beat_rate_4q": "4/4",
-      "implied_move": 10.4
+      "beat_rate_4q": "3/4",
+      "implied_move": 4.8
     },
     {
       "ticker": "APP",
@@ -72,31 +72,31 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.12,
       "beat_rate_4q": "4/4",
-      "implied_move": 9.7
+      "implied_move": 7.8
     },
     {
       "ticker": "OXY",
       "company": "Occidental Petroleum Corporation",
       "date": "2026-08-05",
       "timing": "AMC",
-      "consensus_eps": 1.58,
+      "consensus_eps": 1.66,
       "consensus_revenue": "$6.91B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.47,
       "beat_rate_4q": "4/4",
-      "implied_move": 4.8
+      "implied_move": 3.7
     },
     {
       "ticker": "INTU",
       "company": "Intuit Inc.",
       "date": "2026-08-20",
       "timing": "AMC",
-      "consensus_eps": 3.22,
-      "consensus_revenue": "$4.15B",
+      "consensus_eps": 3.54,
+      "consensus_revenue": "$4.24B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.23,
       "beat_rate_4q": "4/4",
-      "implied_move": 8.2
+      "implied_move": 8.8
     },
     {
       "ticker": "QQQ",
