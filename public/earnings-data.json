@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-27T09:35:57Z",
+  "last_updated": "2026-05-28T09:52:32Z",
   "total_positions": 10,
   "earnings_calendar": [
     {
@@ -22,7 +22,7 @@
       "consensus_eps": 2.72,
       "consensus_revenue": "$1.67B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.25,
+      "last_quarter_surprise": 1.7,
       "beat_rate_4q": "4/4",
       "implied_move": 1.7
     },
@@ -34,7 +34,7 @@
       "consensus_eps": 2.39,
       "consensus_revenue": "$22.08B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.03,
+      "last_quarter_surprise": 0.08,
       "beat_rate_4q": "4/4",
       "implied_move": 7.7
     },
@@ -75,6 +75,18 @@
       "implied_move": 9.7
     },
     {
+      "ticker": "OXY",
+      "company": "Occidental Petroleum Corporation",
+      "date": "2026-08-05",
+      "timing": "AMC",
+      "consensus_eps": 1.69,
+      "consensus_revenue": "$6.91B",
+      "last_quarter_result": "beat",
+      "last_quarter_surprise": 0.47,
+      "beat_rate_4q": "4/4",
+      "implied_move": 4.8
+    },
+    {
       "ticker": "INTU",
       "company": "Intuit Inc.",
       "date": "2026-08-20",
@@ -85,18 +97,6 @@
       "last_quarter_surprise": 0.23,
       "beat_rate_4q": "4/4",
       "implied_move": 8.2
-    },
-    {
-      "ticker": "OXY",
-      "company": "Occidental Petroleum Corporation",
-      "date": null,
-      "timing": null,
-      "consensus_eps": null,
-      "consensus_revenue": null,
-      "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.47,
-      "beat_rate_4q": "4/4",
-      "implied_move": 4.8
     },
     {
       "ticker": "QQQ",
