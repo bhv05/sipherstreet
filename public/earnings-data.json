@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-28T09:52:32Z",
+  "last_updated": "2026-05-29T09:42:37Z",
   "total_positions": 10,
   "earnings_calendar": [
     {
@@ -15,26 +15,14 @@
       "implied_move": 6.0
     },
     {
-      "ticker": "DY",
-      "company": "Dycom Industries, Inc.",
-      "date": "2026-05-27",
-      "timing": "AMC",
-      "consensus_eps": 2.72,
-      "consensus_revenue": "$1.67B",
-      "last_quarter_result": "beat",
-      "last_quarter_surprise": 1.7,
-      "beat_rate_4q": "4/4",
-      "implied_move": 1.7
-    },
-    {
       "ticker": "AVGO",
       "company": "Broadcom Inc.",
       "date": "2026-06-03",
       "timing": "AMC",
-      "consensus_eps": 2.39,
-      "consensus_revenue": "$22.08B",
+      "consensus_eps": 2.4,
+      "consensus_revenue": "$22.11B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.08,
+      "last_quarter_surprise": 0.03,
       "beat_rate_4q": "4/4",
       "implied_move": 7.7
     },
@@ -58,7 +46,7 @@
       "consensus_eps": 7.51,
       "consensus_revenue": "$60.21B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.49,
+      "last_quarter_surprise": 3.78,
       "beat_rate_4q": "3/4",
       "implied_move": 10.4
     },
@@ -79,8 +67,8 @@
       "company": "Occidental Petroleum Corporation",
       "date": "2026-08-05",
       "timing": "AMC",
-      "consensus_eps": 1.69,
-      "consensus_revenue": "$6.91B",
+      "consensus_eps": 1.89,
+      "consensus_revenue": "$7.41B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.47,
       "beat_rate_4q": "4/4",
@@ -91,12 +79,24 @@
       "company": "Intuit Inc.",
       "date": "2026-08-20",
       "timing": "AMC",
-      "consensus_eps": 3.59,
-      "consensus_revenue": "$4.27B",
+      "consensus_eps": 3.57,
+      "consensus_revenue": "$4.26B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.23,
       "beat_rate_4q": "4/4",
       "implied_move": 8.2
+    },
+    {
+      "ticker": "DY",
+      "company": "Dycom Industries, Inc.",
+      "date": "2026-08-26",
+      "timing": "AMC",
+      "consensus_eps": 4.59,
+      "consensus_revenue": "$1.93B",
+      "last_quarter_result": "beat",
+      "last_quarter_surprise": 1.7,
+      "beat_rate_4q": "4/4",
+      "implied_move": 2.0
     },
     {
       "ticker": "QQQ",
