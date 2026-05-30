@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-05-29T09:42:37Z",
-  "total_positions": 10,
+  "last_updated": "2026-05-30T08:21:44Z",
+  "total_positions": 8,
   "earnings_calendar": [
     {
       "ticker": "CACI",
@@ -12,7 +12,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.34,
       "beat_rate_4q": "4/4",
-      "implied_move": 6.0
+      "implied_move": 7.0
     },
     {
       "ticker": "AVGO",
@@ -47,20 +47,8 @@
       "consensus_revenue": "$60.21B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 3.78,
-      "beat_rate_4q": "3/4",
-      "implied_move": 10.4
-    },
-    {
-      "ticker": "APP",
-      "company": "AppLovin Corporation",
-      "date": "2026-08-05",
-      "timing": "AMC",
-      "consensus_eps": 4.09,
-      "consensus_revenue": "$1.94B",
-      "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.12,
       "beat_rate_4q": "4/4",
-      "implied_move": 9.7
+      "implied_move": 5.0
     },
     {
       "ticker": "OXY",
@@ -72,7 +60,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.47,
       "beat_rate_4q": "4/4",
-      "implied_move": 4.8
+      "implied_move": 3.6
     },
     {
       "ticker": "INTU",
@@ -84,19 +72,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.23,
       "beat_rate_4q": "4/4",
-      "implied_move": 8.2
-    },
-    {
-      "ticker": "DY",
-      "company": "Dycom Industries, Inc.",
-      "date": "2026-08-26",
-      "timing": "AMC",
-      "consensus_eps": 4.59,
-      "consensus_revenue": "$1.93B",
-      "last_quarter_result": "beat",
-      "last_quarter_surprise": 1.7,
-      "beat_rate_4q": "4/4",
-      "implied_move": 2.0
+      "implied_move": 9.3
     },
     {
       "ticker": "QQQ",
