@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-30T08:21:44Z",
+  "last_updated": "2026-05-31T08:37:44Z",
   "total_positions": 8,
   "earnings_calendar": [
     {
@@ -20,7 +20,7 @@
       "date": "2026-06-03",
       "timing": "AMC",
       "consensus_eps": 2.4,
-      "consensus_revenue": "$22.11B",
+      "consensus_revenue": "$22.12B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.03,
       "beat_rate_4q": "4/4",
@@ -46,7 +46,7 @@
       "consensus_eps": 7.51,
       "consensus_revenue": "$60.21B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 3.78,
+      "last_quarter_surprise": 0.49,
       "beat_rate_4q": "4/4",
       "implied_move": 5.0
     },
@@ -67,8 +67,8 @@
       "company": "Intuit Inc.",
       "date": "2026-08-20",
       "timing": "AMC",
-      "consensus_eps": 3.57,
-      "consensus_revenue": "$4.26B",
+      "consensus_eps": 3.59,
+      "consensus_revenue": "$4.27B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.23,
       "beat_rate_4q": "4/4",
