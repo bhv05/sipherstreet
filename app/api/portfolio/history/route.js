@@ -1,3 +1,6 @@
+import { readFileSync } from "fs";
+import { join } from "path";
+
 const BASE_URL = "https://paper-api.alpaca.markets";
 const DATA_URL = "https://data.alpaca.markets";
 const INITIAL_CAPITAL = 100000;
@@ -52,31 +55,13 @@ export async function GET() {
     return Response.json({ error: "Portfolio history: " + error.message, portfolio: [], benchmark: [] });
   }
 
-  /* Fetch SPY benchmark - use iex feed (free tier compatible) */
+  /* Load benchmark from local benchmark-history.json file */
   try {
-    var startDate = portfolioSeries[0].date;
-    var endDate = portfolioSeries[portfolioSeries.length - 1].date;
-
-    var endDateObj = new Date(endDate);
-    endDateObj.setDate(endDateObj.getDate() + 1);
-    var endDateBuffer = endDateObj.toISOString().split("T")[0];
-
-    var spyUrl = DATA_URL + "/v2/stocks/SPY/bars?timeframe=1Day&start=" + startDate + "&end=" + endDateBuffer + "&adjustment=split&feed=iex&limit=1000";
-
-    var spyData = await fetchWithHeaders(spyUrl, headers);
-    var spyBars = spyData.bars || [];
-
-    if (spyBars.length > 0) {
-      var firstSpyClose = spyBars[0].c;
-      for (var j = 0; j < spyBars.length; j++) {
-        var spyDate = spyBars[j].t.split("T")[0];
-        var spyRebased = (spyBars[j].c / firstSpyClose) * INITIAL_CAPITAL;
-        benchmarkSeries.push({ date: spyDate, value: Math.round(spyRebased * 100) / 100 });
-      }
-    }
-  } catch (spyError) {
-    /* SPY fetch failed - still return portfolio data without benchmark */
-    console.error("SPY fetch failed:", spyError.message);
+    const filePath = join(process.cwd(), "public", "benchmark-history.json");
+    const raw = readFileSync(filePath, "utf-8");
+    benchmarkSeries = JSON.parse(raw);
+  } catch (benchError) {
+    console.error("Local benchmark load failed:", benchError.message);
   }
 
   return Response.json({

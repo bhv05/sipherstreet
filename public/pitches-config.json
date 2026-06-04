@@ -1,0 +1,43 @@
+{
+  "manualPitches": [
+    {
+      "date": "23-Mar-2026",
+      "company": "AI/Tech Sector Hedging Strategy",
+      "decision": "Short",
+      "isStrategy": true,
+      "basket": ["QQQ", "U"],
+      "pitchTeam": "Bhavya Patel, Henish Patel",
+      "deck": "/pitches/AITECH_Hedging_Strategies_Memo.pdf",
+      "model": "/pitches/AITECH_Sector_Hedging_Strategies_vf.xlsx"
+    }
+  ],
+
+  "symbolOverrides": {
+    "AVGO": {
+      "targetPrice": "$452",
+      "deck": "/pitches/Broadcom_memo_vf.pdf",
+      "model": "/pitches/AVGO_vf.xlsx",
+      "pitchTeam": "Bhavya Patel, Henish Patel"
+    },
+    "INTU": {
+      "targetPrice": "$604",
+      "deck": "/pitches/Intuit_memo_vf.pdf",
+      "model": "/pitches/INTU_vf.xlsx",
+      "pitchTeam": "Bhavya Patel, Henish Patel"
+    },
+    "APP": {
+      "deck": "/pitches/Applovin_memo_vf.pdf",
+      "model": "/pitches/APP_vf.xlsx",
+      "pitchTeam": "Bhavya Patel, Henish Patel"
+    },
+    "U": {
+      "deck": "/pitches/AITECH_Hedging_Strategies_Memo.pdf",
+      "model": "/pitches/AITECH_Sector_Hedging_Strategies_vf.xlsx",
+      "pitchTeam": "Bhavya Patel, Henish Patel"
+    }
+  },
+
+  "hedgeSymbols": ["QQQ", "XLI", "XLU", "SPY", "IWM", "TLT", "GLD", "VXX", "SQQQ", "SH"],
+
+  "defaultPitchTeam": "Bhavya Patel, Henish Patel"
+}

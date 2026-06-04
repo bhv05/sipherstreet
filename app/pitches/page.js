@@ -3,58 +3,16 @@ import { useState, useEffect, useRef } from "react";
 import useReveal from "../components/useReveal";
 
 /*
-  HOW TO ADD A NEW PITCH:
-  1. Put the PDF in public/pitches/ (e.g. public/pitches/wbi-deck.pdf)
-  2. Put the Excel model in public/pitches/ (e.g. public/pitches/wbi-model.xlsx)
-  3. Add a new entry below
-  4. Push to GitHub and Vercel will auto-deploy
+  PITCHES PAGE — Dynamic from Alpaca
+  ===================================
+  Active pitches are sourced from current Alpaca positions.
+  Archived pitches are derived from fully-closed fill history.
+  Manual overrides (deck, model, target price) come from
+  public/pitches-config.json — edit that file to add materials.
 
-  Decision options: "Buy" (green), "Short" (red), "Pass" (grey)
-  Date format: "3-Feb-2026", will auto-split into two lines
+  Strategy-type pitches (e.g. hedging) are defined as
+  "manualPitches" in the config and rendered separately.
 */
-
-const PITCHES = [
-  {
-    date: "23-Mar-2026",
-    company: "AI/Tech Sector Hedging Strategy",
-    decision: "Short",
-    isStrategy: true,
-    basket: ["QQQ", "U"],
-    pitchTeam: "Bhavya Patel, Henish Patel",
-    deck: "/pitches/AITECH_Hedging_Strategies_Memo.pdf",
-    model: "/pitches/AITECH_Sector_Hedging_Strategies_vf.xlsx",
-  },
-  {
-    date: "23-Mar-2026",
-    company: "Broadcom Inc. (NASDAQ: AVGO)",
-    decision: "Buy",
-    targetPrice: "$452",
-    transactionPrice: "$319",
-    pitchTeam: "Bhavya Patel, Henish Patel",
-    deck: "/pitches/Broadcom_memo_vf.pdf",
-    model: "/pitches/AVGO_vf.xlsx",
-  },
-  {
-    date: "09-Mar-2026",
-    company: "Intuit Inc. (NASDAQ: INTU)",
-    decision: "Buy",
-    targetPrice: "$604",
-    transactionPrice: "$474",
-    pitchTeam: "Bhavya Patel, Henish Patel",
-    deck: "/pitches/Intuit_memo_vf.pdf",
-    model: "/pitches/INTU_vf.xlsx",
-  },
-  {
-    date: "02-Mar-2026",
-    company: "Applovin Corp. (NASDAQ: APP)",
-    decision: "Buy",
-    targetPrice: "$590",
-    transactionPrice: "$434",
-    pitchTeam: "Bhavya Patel, Henish Patel",
-    deck: "/pitches/Applovin_memo_vf.pdf",
-    model: "/pitches/APP_vf.xlsx",
-  },
-];
 
 const ZOOM_LEVELS = [50, 75, 100, 125, 150, 200];
 
@@ -76,6 +34,7 @@ var QUALITY_BOOST = 2;
 var MINIMUM_SCALE = 3;
 
 function formatDate(dateStr) {
+  if (!dateStr) return { line1: "—", line2: "" };
   var parts = dateStr.split("-");
   if (parts.length === 3) {
     return { line1: parts[0] + "-" + parts[1], line2: parts[2] };
@@ -142,6 +101,44 @@ function XlsIconSmall() {
   );
 }
 
+/* Greyed-out placeholder icons for missing deck/model */
+function PdfIconDisabled() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" opacity="0.3">
+      <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6z" fill="#94a3b8" />
+      <path d="M14 2v6h6" fill="#cbd5e1" />
+      <text x="12" y="17.5" textAnchor="middle" fontSize="6.5" fontWeight="bold" fill="white" fontFamily="Arial">PDF</text>
+    </svg>
+  );
+}
+function XlsIconDisabled() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" opacity="0.3">
+      <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6z" fill="#94a3b8" />
+      <path d="M14 2v6h6" fill="#cbd5e1" />
+      <text x="12" y="17.5" textAnchor="middle" fontSize="5.5" fontWeight="bold" fill="white" fontFamily="Arial">XLS</text>
+    </svg>
+  );
+}
+function PdfIconSmallDisabled() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" opacity="0.3">
+      <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6z" fill="#94a3b8" />
+      <path d="M14 2v6h6" fill="#cbd5e1" />
+      <text x="12" y="17.5" textAnchor="middle" fontSize="6.5" fontWeight="bold" fill="white" fontFamily="Arial">PDF</text>
+    </svg>
+  );
+}
+function XlsIconSmallDisabled() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" opacity="0.3">
+      <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6z" fill="#94a3b8" />
+      <path d="M14 2v6h6" fill="#cbd5e1" />
+      <text x="12" y="17.5" textAnchor="middle" fontSize="5.5" fontWeight="bold" fill="white" fontFamily="Arial">XLS</text>
+    </svg>
+  );
+}
+
 function PdfViewer({ pdf, company, onClose }) {
   var pdfDocRef = useRef(null);
   var canvasRefs = useRef([]);
@@ -188,18 +185,6 @@ function PdfViewer({ pdf, company, onClose }) {
     return function () { cancelled = true; };
   }, [pdf]);
 
-  /*
-    Render pipeline:
-    1. Calculate display width from baseWidth * zoom%
-    2. Calculate render scale = (displayWidth / nativePageWidth) * DPR * QUALITY_BOOST
-    3. Enforce MINIMUM_SCALE floor so low zoom still looks sharp
-    4. Render canvas at that scale, then set CSS size to displayWidth
-    5. Browser downscales the oversized canvas = super-crisp output
-
-    This means at 100% zoom on a 2x retina Mac with QUALITY_BOOST=2,
-    the canvas is rendered at ~4x display pixels. Charts, logos, bold
-    text, and small labels all come out razor-sharp.
-  */
   useEffect(function () {
     var doc = pdfDocRef.current;
     if (!doc || numPages === 0) return;
@@ -217,7 +202,6 @@ function PdfViewer({ pdf, company, onClose }) {
         var page = await doc.getPage(i);
         var nativeViewport = page.getViewport({ scale: 1 });
 
-        /* The key formula: display scale * DPR * quality boost, with a minimum floor */
         var calculatedScale = (displayWidth / nativeViewport.width) * dpr * QUALITY_BOOST;
         var renderScale = Math.max(calculatedScale, MINIMUM_SCALE);
         var viewport = page.getViewport({ scale: renderScale });
@@ -228,7 +212,6 @@ function PdfViewer({ pdf, company, onClose }) {
         canvas.width = viewport.width;
         canvas.height = viewport.height;
 
-        /* CSS size = what the user actually sees */
         canvas.style.width = displayWidth + "px";
         canvas.style.height = Math.round(displayWidth * (nativeViewport.height / nativeViewport.width)) + "px";
 
@@ -387,7 +370,55 @@ var linkStyleDesktop = {
   cursor: "pointer", fontWeight: 600, display: "flex", alignItems: "center", gap: 6,
 };
 
-function PitchCard({ p, index, onOpenDeck }) {
+var disabledLinkStyle = {
+  fontSize: 14, color: "#b0bec5", textDecoration: "none",
+  cursor: "default", fontWeight: 500, display: "flex", alignItems: "center", gap: 6,
+  opacity: 0.5,
+};
+
+var disabledLinkStyleDesktop = {
+  fontSize: 15, color: "#b0bec5", textDecoration: "none",
+  cursor: "default", fontWeight: 500, display: "flex", alignItems: "center", gap: 6,
+  opacity: 0.5,
+};
+
+/* ──────── Pitch links with placeholder fallback ──────── */
+function PitchLink({ deck, onClick, size }) {
+  if (deck) {
+    return (
+      <span onClick={onClick} style={size === "small" ? linkStyle : linkStyleDesktop}>
+        {size === "small" ? <PdfIconSmall /> : <PdfIcon />}
+        Pitch
+      </span>
+    );
+  }
+  return (
+    <span style={size === "small" ? disabledLinkStyle : disabledLinkStyleDesktop} title="Pitch deck pending">
+      {size === "small" ? <PdfIconSmallDisabled /> : <PdfIconDisabled />}
+      Pending
+    </span>
+  );
+}
+
+function ModelLink({ model, size }) {
+  if (model) {
+    return (
+      <a href={model} download style={size === "small" ? linkStyle : linkStyleDesktop}>
+        {size === "small" ? <XlsIconSmall /> : <XlsIcon />}
+        Model
+      </a>
+    );
+  }
+  return (
+    <span style={size === "small" ? disabledLinkStyle : disabledLinkStyleDesktop} title="Model pending">
+      {size === "small" ? <XlsIconSmallDisabled /> : <XlsIconDisabled />}
+      Pending
+    </span>
+  );
+}
+
+/* ──────── Mobile card for active pitches ──────── */
+function PitchCard({ p, onOpenDeck }) {
   var ds = getDecisionStyle(p.decision);
   var dt = formatDate(p.date);
   return (
@@ -418,7 +449,7 @@ function PitchCard({ p, index, onOpenDeck }) {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 14, fontSize: 13 }}>
           <div>
             <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Target</div>
-            <div style={{ fontWeight: 500, color: "#1a2a44" }}>{p.targetPrice}</div>
+            <div style={{ fontWeight: 500, color: p.targetPrice ? "#1a2a44" : "#b0bec5" }}>{p.targetPrice || "—"}</div>
           </div>
           <div>
             <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Transaction</div>
@@ -428,29 +459,272 @@ function PitchCard({ p, index, onOpenDeck }) {
       )}
       <div style={{ fontSize: 12, color: "#5a6a7e", marginBottom: 14 }}>{p.pitchTeam}</div>
       <div style={{ display: "flex", gap: 20 }}>
-        <span onClick={function () { onOpenDeck(index); }} style={linkStyle}>
-          <PdfIconSmall />
-          Pitch
-        </span>
-        <a href={p.model} download style={linkStyle}>
-          <XlsIconSmall />
-          Model
-        </a>
+        <PitchLink deck={p.deck} onClick={function () { onOpenDeck({ deck: p.deck, company: p.company }); }} size="small" />
+        <ModelLink model={p.model} size="small" />
       </div>
     </div>
   );
 }
 
+/* ──────── Mobile card for archived pitches ──────── */
+function ArchivedPitchCard({ p, onOpenDeck }) {
+  var dtPitched = formatDate(p.datePitched);
+  var dtSold = formatDate(p.dateSold);
+  var isPositive = p.profitPct.startsWith("+");
+  var pctColor = isPositive ? "#16a34a" : "#dc2626";
+  return (
+    <div style={{ padding: 20, background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 6 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+        <div>
+          <div style={{ fontWeight: 600, color: "#1a2a44", fontSize: 15, marginBottom: 4 }}>{p.company}</div>
+          <div style={{ fontSize: 11, color: "#5a6a7e" }}>Pitched {dtPitched.line1} {dtPitched.line2}</div>
+          <div style={{ fontSize: 11, color: "#5a6a7e" }}>Closed {dtSold.line1} {dtSold.line2}</div>
+        </div>
+        <span style={{
+          padding: "4px 12px", fontSize: 11, fontWeight: 600, borderRadius: 3,
+          background: "rgba(30, 58, 95, 0.08)", color: "#5a6a7e", flexShrink: 0,
+        }}>
+          CLOSED
+        </span>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 14, fontSize: 13 }}>
+        <div>
+          <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Entry</div>
+          <div style={{ fontWeight: 500, color: "#1a2a44" }}>{p.transactionPrice}</div>
+        </div>
+        <div>
+          <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Exit</div>
+          <div style={{ fontWeight: 500, color: "#1a2a44" }}>{p.sellPrice}</div>
+        </div>
+        <div>
+          <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Return</div>
+          <div style={{ fontWeight: 600, color: pctColor }}>{p.profitPct}</div>
+        </div>
+      </div>
+      <div style={{ fontSize: 12, color: "#5a6a7e", marginBottom: 14 }}>{p.pitchTeam}</div>
+      <div style={{ display: "flex", gap: 20 }}>
+        <PitchLink deck={p.deck} onClick={function () { onOpenDeck({ deck: p.deck, company: p.company }); }} size="small" />
+        <ModelLink model={p.model} size="small" />
+      </div>
+    </div>
+  );
+}
+
+/* ──────── Custom links for hedges (hides deck/model if missing) ──────── */
+function HedgeLink({ deck, model, onClick }) {
+  if (!deck && !model) return null;
+  return (
+    <div style={{ display: "flex", gap: 20, marginTop: 6 }}>
+      {deck && (
+        <span onClick={onClick} style={linkStyleDesktop}>
+          <PdfIcon /> Pitch
+        </span>
+      )}
+      {model && (
+        <a href={model} download style={linkStyleDesktop}>
+          <XlsIcon /> Model
+        </a>
+      )}
+    </div>
+  );
+}
+
+function HedgeLinkSmall({ deck, model, onClick }) {
+  if (!deck && !model) return null;
+  return (
+    <div style={{ display: "flex", gap: 20, marginTop: 14 }}>
+      {deck && (
+        <span onClick={onClick} style={linkStyle}>
+          <PdfIconSmall /> Pitch
+        </span>
+      )}
+      {model && (
+        <a href={model} download style={linkStyle}>
+          <XlsIconSmall /> Model
+        </a>
+      )}
+    </div>
+  );
+}
+
+/* ──────── Mobile card for active hedges ──────── */
+function HedgeCard({ p, onOpenDeck }) {
+  var ds = getDecisionStyle(p.decision);
+  var dt = formatDate(p.date);
+  return (
+    <div style={{ padding: 20, background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 6 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+        <div>
+          <div style={{ fontWeight: 600, color: "#1a2a44", fontSize: 15, marginBottom: 4 }}>{p.company}</div>
+          <div style={{ fontSize: 12, color: "#5a6a7e" }}>{dt.line1} {dt.line2}</div>
+        </div>
+        <span style={{ padding: "4px 12px", fontSize: 11, fontWeight: 600, borderRadius: 3, background: ds.background, color: ds.color, flexShrink: 0 }}>
+          {p.decision}
+        </span>
+      </div>
+      
+      {p.isStrategy ? (
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>Hedging Instruments</div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {p.basket && p.basket.map(function (ticker) {
+              return (
+                <span key={ticker} style={{ padding: "3px 8px", background: "#fff", border: "1px solid #e2e8f0", borderRadius: 4, fontSize: 12, fontWeight: 500, color: "#1a2a44" }}>
+                  {ticker}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+      ) : (
+        <div style={{ marginBottom: 14, fontSize: 13 }}>
+          <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Type</div>
+          <div style={{ fontWeight: 500, color: "#1a2a44" }}>Index Hedge</div>
+        </div>
+      )}
+      
+      <div style={{ fontSize: 12, color: "#5a6a7e" }}>{p.pitchTeam}</div>
+      <HedgeLinkSmall deck={p.deck} model={p.model} onClick={function () { onOpenDeck({ deck: p.deck, company: p.company }); }} />
+    </div>
+  );
+}
+
+/* ──────── Mobile card for archived hedges ──────── */
+function ArchivedHedgeCard({ p, onOpenDeck }) {
+  var dtPitched = formatDate(p.datePitched);
+  var dtSold = formatDate(p.dateSold);
+  var isPositive = p.profitPct.startsWith("+");
+  var pctColor = isPositive ? "#16a34a" : "#dc2626";
+  return (
+    <div style={{ padding: 20, background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 6 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+        <div>
+          <div style={{ fontWeight: 600, color: "#1a2a44", fontSize: 15, marginBottom: 4 }}>{p.company}</div>
+          <div style={{ fontSize: 11, color: "#5a6a7e" }}>Pitched {dtPitched.line1} {dtPitched.line2}</div>
+          <div style={{ fontSize: 11, color: "#5a6a7e" }}>Closed {dtSold.line1} {dtSold.line2}</div>
+        </div>
+        <span style={{
+          padding: "4px 12px", fontSize: 11, fontWeight: 600, borderRadius: 3,
+          background: "rgba(30, 58, 95, 0.08)", color: "#5a6a7e", flexShrink: 0,
+        }}>
+          CLOSED
+        </span>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 14, fontSize: 13 }}>
+        <div>
+          <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Entry</div>
+          <div style={{ fontWeight: 500, color: "#1a2a44" }}>{p.transactionPrice}</div>
+        </div>
+        <div>
+          <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Exit</div>
+          <div style={{ fontWeight: 500, color: "#1a2a44" }}>{p.sellPrice}</div>
+        </div>
+        <div>
+          <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Return</div>
+          <div style={{ fontWeight: 600, color: pctColor }}>{p.profitPct}</div>
+        </div>
+      </div>
+      <div style={{ fontSize: 12, color: "#5a6a7e" }}>{p.pitchTeam}</div>
+      <HedgeLinkSmall deck={p.deck} model={p.model} onClick={function () { onOpenDeck({ deck: p.deck, company: p.company }); }} />
+    </div>
+  );
+}
+
+/* ──────── Main Page Component ──────── */
 export default function Pitches() {
   var openDeck = useState(null);
   var openDeckValue = openDeck[0];
   var setOpenDeck = openDeck[1];
 
+  var stateData = useState(null);
+  var data = stateData[0];
+  var setData = stateData[1];
+
+  var stateLoading = useState(true);
+  var loading = stateLoading[0];
+  var setLoading = stateLoading[1];
+
+  var stateError = useState(null);
+  var error = stateError[0];
+  var setError = stateError[1];
+
   var headerReveal = useReveal();
   var contentReveal = useReveal();
+  var hedgesHeaderReveal = useReveal();
+  var hedgesContentReveal = useReveal();
+  var archivedHeaderReveal = useReveal();
+  var archivedContentReveal = useReveal();
+
+  /* Fetch pitches data from API on mount */
+  useEffect(function () {
+    fetch("/api/pitches")
+      .then(function (res) { return res.json(); })
+      .then(function (d) {
+        setData(d);
+      })
+      .catch(function (e) { setError(e.message); })
+      .finally(function () { setLoading(false); });
+  }, []);
+
+  /* ──────── Loading state ──────── */
+  if (loading) {
+    return (
+      <div className="page-section" style={{ maxWidth: 1100, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontSize: 14, color: "#5a6a7e", letterSpacing: "0.1em" }}>LOADING PITCHES...</div>
+          <div style={{ fontSize: 12, color: "#8896a6", marginTop: 8 }}>Fetching from Alpaca Portfolio</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="page-section" style={{ maxWidth: 1100, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ textAlign: "center", padding: 40, border: "1px solid #fecaca", background: "#fef2f2", borderRadius: 4 }}>
+          <div style={{ fontSize: 16, color: "#dc2626", marginBottom: 8 }}>Unable to load pitches</div>
+          <div style={{ fontSize: 13, color: "#5a6a7e" }}>{error}</div>
+        </div>
+      </div>
+    );
+  }
+
+  function parseDateStr(s) {
+    if (!s) return 0;
+    var months = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+    var p = s.split("-");
+    if (p.length !== 3) return 0;
+    return new Date(parseInt(p[2]), months[p[1]], parseInt(p[0])).getTime();
+  }
+
+  /* ──────── Merge manual strategy pitches into the active list ──────── */
+  var manualPitches = (data && data.manualPitches) || [];
+  var activeManual = manualPitches.filter(function (p) { return !p.isStrategy; });
+  var hedgeManual = manualPitches.filter(function (p) { return p.isStrategy; });
+
+  var activePitches = activeManual.concat((data && data.activePitches) || []);
+  activePitches.sort(function (a, b) { return parseDateStr(b.date) - parseDateStr(a.date); });
+
+  var archivedPitches = (data && data.archivedPitches) || [];
+  archivedPitches.sort(function (a, b) { return parseDateStr(b.dateSold) - parseDateStr(a.dateSold); });
+
+  var activeHedges = hedgeManual.concat((data && data.hedges) || []);
+  activeHedges.sort(function (a, b) { return parseDateStr(b.date) - parseDateStr(a.date); });
+
+  var archivedHedges = (data && data.archivedHedges) || [];
+  archivedHedges.sort(function (a, b) { return parseDateStr(b.dateSold) - parseDateStr(a.dateSold); });
+
+  function getProfitStyle(pct) {
+    var isPositive = pct.startsWith("+");
+    return {
+      color: isPositive ? "#16a34a" : "#dc2626",
+      background: isPositive ? "rgba(22, 163, 74, 0.1)" : "rgba(220, 38, 38, 0.1)",
+    };
+  }
 
   return (
     <div className="page-section" style={{ maxWidth: 1100 }}>
+      {/* ──────────── ACTIVE PITCHES ──────────── */}
       <div ref={headerReveal.ref} className={"reveal" + (headerReveal.inView ? " in-view" : "")}>
         <p className="section-label">Investment Theses</p>
         <h2 className="section-title">
@@ -473,11 +747,11 @@ export default function Pitches() {
                 </tr>
               </thead>
               <tbody>
-                {PITCHES.map(function (p, i) {
+                {activePitches.map(function (p, i) {
                   var ds = getDecisionStyle(p.decision);
                   var dt = formatDate(p.date);
                   return (
-                    <tr key={i}>
+                    <tr key={p.symbol || ("manual-" + i)}>
                       <td style={{ color: "#1a2a44", lineHeight: 1.4 }}>
                         <div style={{ fontWeight: 500 }}>{dt.line1}</div>
                         <div style={{ color: "#5a6a7e", fontSize: 12 }}>{dt.line2}</div>
@@ -485,22 +759,12 @@ export default function Pitches() {
                       <td>
                         <div style={{ fontWeight: 600, color: "#1a2a44", marginBottom: 8, fontSize: 15 }}>{p.company}</div>
                         <div style={{ display: "flex", gap: 20, marginTop: 2 }}>
-                          <span
-                            onClick={function (e) { e.stopPropagation(); setOpenDeck(i); }}
-                            style={linkStyleDesktop}
-                          >
-                            <PdfIcon />
-                            Pitch
-                          </span>
-                          <a
-                            href={p.model}
-                            download
-                            onClick={function (e) { e.stopPropagation(); }}
-                            style={linkStyleDesktop}
-                          >
-                            <XlsIcon />
-                            Model
-                          </a>
+                          <PitchLink
+                            deck={p.deck}
+                            onClick={function (e) { e.stopPropagation(); setOpenDeck({ deck: p.deck, company: p.company }); }}
+                            size="large"
+                          />
+                          <ModelLink model={p.model} size="large" />
                         </div>
                       </td>
                       <td style={{ textAlign: "center" }}>
@@ -523,7 +787,9 @@ export default function Pitches() {
                         </td>
                       ) : (
                         <>
-                          <td style={{ textAlign: "center", fontWeight: 500, color: "#1a2a44" }}>{p.targetPrice}</td>
+                          <td style={{ textAlign: "center", fontWeight: 500, color: p.targetPrice ? "#1a2a44" : "#b0bec5" }}>
+                            {p.targetPrice || "—"}
+                          </td>
                           <td style={{ textAlign: "center", fontWeight: 500, color: "#1a2a44" }}>{p.transactionPrice}</td>
                         </>
                       )}
@@ -539,16 +805,279 @@ export default function Pitches() {
 
       <div className="pitches-mobile">
         <div style={{ display: "grid", gap: 16 }}>
-          {PITCHES.map(function (p, i) {
-            return <PitchCard key={i} p={p} index={i} onOpenDeck={setOpenDeck} />;
+          {activePitches.map(function (p, i) {
+            return <PitchCard key={p.symbol || ("manual-" + i)} p={p} onOpenDeck={setOpenDeck} />;
           })}
         </div>
       </div>
 
-      {openDeckValue !== null && (
+      {/* ──────────── PORTFOLIO HEDGES ──────────── */}
+      {(activeHedges.length > 0 || archivedHedges.length > 0) && (
+        <div style={{ marginTop: 80 }}>
+          <div ref={hedgesHeaderReveal.ref} className={"reveal" + (hedgesHeaderReveal.inView ? " in-view" : "")}>
+            <p className="section-label">Risk Management</p>
+            <h2 className="section-title">
+              Portfolio <span>Hedges</span>
+            </h2>
+          </div>
+
+          <div ref={hedgesContentReveal.ref} className={"reveal" + (hedgesContentReveal.inView ? " in-view" : "")}>
+            {activeHedges.length > 0 && (
+              <>
+                <h3 style={{ fontSize: 16, fontWeight: 600, color: "#1a2a44", marginBottom: 16 }}>Active Hedges</h3>
+                <div className="pitches-desktop">
+                  <div style={{ border: "1px solid #e2e8f0", borderRadius: 4, overflow: "auto", marginBottom: 32 }}>
+                    <table className="data-table">
+                      <thead>
+                        <tr>
+                          <th style={{ textAlign: "left" }}>Date</th>
+                          <th style={{ textAlign: "left" }}>Hedge Strategy / Instrument</th>
+                          <th style={{ textAlign: "center" }}>Decision</th>
+                          <th style={{ textAlign: "left" }}>Details</th>
+                          <th style={{ textAlign: "left" }}>Pitch Team</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {activeHedges.map(function (p, i) {
+                          var ds = getDecisionStyle(p.decision);
+                          var dt = formatDate(p.date);
+                          return (
+                            <tr key={p.symbol || ("hedge-" + i)}>
+                              <td style={{ color: "#1a2a44", lineHeight: 1.4 }}>
+                                <div style={{ fontWeight: 500 }}>{dt.line1}</div>
+                                <div style={{ color: "#5a6a7e", fontSize: 12 }}>{dt.line2}</div>
+                              </td>
+                              <td>
+                                <div style={{ fontWeight: 600, color: "#1a2a44", fontSize: 15 }}>{p.company}</div>
+                                <HedgeLink deck={p.deck} model={p.model} onClick={function (e) { e.stopPropagation(); setOpenDeck({ deck: p.deck, company: p.company }); }} />
+                              </td>
+                              <td style={{ textAlign: "center" }}>
+                                <span style={{ padding: "4px 14px", fontSize: 12, fontWeight: 600, borderRadius: 3, background: ds.background, color: ds.color }}>
+                                  {p.decision}
+                                </span>
+                              </td>
+                              <td>
+                                {p.isStrategy ? (
+                                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                                    {p.basket && p.basket.map(function (ticker) {
+                                      return (
+                                        <span key={ticker} style={{ padding: "3px 8px", background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 4, fontSize: 12, fontWeight: 500, color: "#1a2a44" }}>
+                                          {ticker}
+                                        </span>
+                                      );
+                                    })}
+                                  </div>
+                                ) : (
+                                  <span style={{ color: "#5a6a7e", fontSize: 13 }}>Index/ETF Hedge</span>
+                                )}
+                              </td>
+                              <td style={{ color: "#5a6a7e", fontSize: 13, maxWidth: 280 }}>{p.pitchTeam}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div className="pitches-mobile" style={{ marginBottom: 32 }}>
+                  <div style={{ display: "grid", gap: 16 }}>
+                    {activeHedges.map(function (p, i) {
+                      return <HedgeCard key={p.symbol || ("hedge-" + i)} p={p} onOpenDeck={setOpenDeck} />;
+                    })}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {archivedHedges.length > 0 && (
+              <>
+                <h3 style={{ fontSize: 16, fontWeight: 600, color: "#1a2a44", marginBottom: 16, marginTop: 32 }}>Closed Hedges</h3>
+                <div className="pitches-desktop">
+                  <div style={{ border: "1px solid #e2e8f0", borderRadius: 4, overflow: "auto" }}>
+                    <table className="data-table">
+                      <thead>
+                        <tr>
+                          <th style={{ textAlign: "left" }}>Pitched</th>
+                          <th style={{ textAlign: "left" }}>Hedge Strategy / Instrument</th>
+                          <th style={{ textAlign: "center" }}>Entry Price</th>
+                          <th style={{ textAlign: "center" }}>Exit Price</th>
+                          <th style={{ textAlign: "center" }}>Return</th>
+                          <th style={{ textAlign: "center" }}>Date Sold</th>
+                          <th style={{ textAlign: "left" }}>Pitch Team</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {archivedHedges.map(function (p, i) {
+                          var dtPitched = formatDate(p.datePitched);
+                          var dtSold = formatDate(p.dateSold);
+                          var profitStyle = getProfitStyle(p.profitPct);
+                          return (
+                            <tr key={p.symbol || ("archived-hedge-" + i)}>
+                              <td style={{ color: "#1a2a44", lineHeight: 1.4 }}>
+                                <div style={{ fontWeight: 500 }}>{dtPitched.line1}</div>
+                                <div style={{ color: "#5a6a7e", fontSize: 12 }}>{dtPitched.line2}</div>
+                              </td>
+                              <td>
+                                <div style={{ fontWeight: 600, color: "#1a2a44", fontSize: 15 }}>{p.company}</div>
+                                <HedgeLink deck={p.deck} model={p.model} onClick={function (e) { e.stopPropagation(); setOpenDeck({ deck: p.deck, company: p.company }); }} />
+                              </td>
+                              <td style={{ textAlign: "center", fontWeight: 500, color: "#1a2a44" }}>{p.transactionPrice}</td>
+                              <td style={{ textAlign: "center", fontWeight: 500, color: "#1a2a44" }}>{p.sellPrice}</td>
+                              <td style={{ textAlign: "center" }}>
+                                <span style={{
+                                  padding: "4px 14px", fontSize: 12, fontWeight: 700, borderRadius: 3,
+                                  background: profitStyle.background, color: profitStyle.color,
+                                }}>
+                                  {p.profitPct}
+                                </span>
+                              </td>
+                              <td style={{ textAlign: "center", color: "#1a2a44", lineHeight: 1.4 }}>
+                                <div style={{ fontWeight: 500 }}>{dtSold.line1}</div>
+                                <div style={{ color: "#5a6a7e", fontSize: 12 }}>{dtSold.line2}</div>
+                              </td>
+                              <td style={{ color: "#5a6a7e", fontSize: 13, maxWidth: 280 }}>{p.pitchTeam}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div className="pitches-mobile">
+                  <div style={{ display: "grid", gap: 16 }}>
+                    {archivedHedges.map(function (p, i) {
+                      return <ArchivedHedgeCard key={p.symbol || ("archived-hedge-" + i)} p={p} onOpenDeck={setOpenDeck} />;
+                    })}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ──────────── ARCHIVED / CLOSED POSITIONS ──────────── */}
+      {archivedPitches.length > 0 && (
+        <div style={{ marginTop: 80 }}>
+          <div ref={archivedHeaderReveal.ref} className={"reveal" + (archivedHeaderReveal.inView ? " in-view" : "")}>
+            <p className="section-label">Closed Positions</p>
+            <h2 className="section-title">
+              Archived <span>Pitches</span>
+            </h2>
+
+            {/* Summary strip — aggregate performance banner */}
+            <div style={{
+              display: "flex", flexWrap: "wrap", gap: 24, padding: "16px 24px",
+              background: "linear-gradient(135deg, #0f1c30 0%, #1a2a44 100%)",
+              borderRadius: 6, marginBottom: 32, alignItems: "center",
+            }}>
+              <div>
+                <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>
+                  Positions Closed
+                </div>
+                <div style={{ fontSize: 22, fontWeight: 600, color: "#ffffff" }}>
+                  {archivedPitches.length}
+                </div>
+              </div>
+              <div style={{ width: 1, height: 36, background: "rgba(255,255,255,0.12)" }} />
+              <div>
+                <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>
+                  Avg. Realised Return
+                </div>
+                <div style={{ fontSize: 22, fontWeight: 600, color: "#34d399" }}>
+                  {(function () {
+                    var sum = 0;
+                    archivedPitches.forEach(function (p) {
+                      sum += parseFloat(p.profitPct.replace("+", ""));
+                    });
+                    var avg = sum / archivedPitches.length;
+                    return (avg >= 0 ? "+" : "") + avg.toFixed(1) + "%";
+                  })()}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div ref={archivedContentReveal.ref} className={"reveal" + (archivedContentReveal.inView ? " in-view" : "")}>
+            {/* Desktop table */}
+            <div className="pitches-desktop">
+              <div style={{ border: "1px solid #e2e8f0", borderRadius: 4, overflow: "auto" }}>
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th style={{ textAlign: "left" }}>Pitched</th>
+                      <th style={{ textAlign: "left" }}>Investment</th>
+                      <th style={{ textAlign: "center" }}>Entry Price</th>
+                      <th style={{ textAlign: "center" }}>Exit Price</th>
+                      <th style={{ textAlign: "center" }}>Return</th>
+                      <th style={{ textAlign: "center" }}>Date Sold</th>
+                      <th style={{ textAlign: "left" }}>Pitch Team</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {archivedPitches.map(function (p, i) {
+                      var dtPitched = formatDate(p.datePitched);
+                      var dtSold = formatDate(p.dateSold);
+                      var profitStyle = getProfitStyle(p.profitPct);
+                      return (
+                        <tr key={p.symbol || ("archived-" + i)}>
+                          <td style={{ color: "#1a2a44", lineHeight: 1.4 }}>
+                            <div style={{ fontWeight: 500 }}>{dtPitched.line1}</div>
+                            <div style={{ color: "#5a6a7e", fontSize: 12 }}>{dtPitched.line2}</div>
+                          </td>
+                          <td>
+                            <div style={{ fontWeight: 600, color: "#1a2a44", marginBottom: 8, fontSize: 15 }}>{p.company}</div>
+                            <div style={{ display: "flex", gap: 20, marginTop: 2 }}>
+                              <PitchLink
+                                deck={p.deck}
+                                onClick={function (e) { e.stopPropagation(); setOpenDeck({ deck: p.deck, company: p.company }); }}
+                                size="large"
+                              />
+                              <ModelLink model={p.model} size="large" />
+                            </div>
+                          </td>
+                          <td style={{ textAlign: "center", fontWeight: 500, color: "#1a2a44" }}>{p.transactionPrice}</td>
+                          <td style={{ textAlign: "center", fontWeight: 500, color: "#1a2a44" }}>{p.sellPrice}</td>
+                          <td style={{ textAlign: "center" }}>
+                            <span style={{
+                              padding: "4px 14px", fontSize: 12, fontWeight: 700, borderRadius: 3,
+                              background: profitStyle.background, color: profitStyle.color,
+                            }}>
+                              {p.profitPct}
+                            </span>
+                          </td>
+                          <td style={{ textAlign: "center", color: "#1a2a44", lineHeight: 1.4 }}>
+                            <div style={{ fontWeight: 500 }}>{dtSold.line1}</div>
+                            <div style={{ color: "#5a6a7e", fontSize: 12 }}>{dtSold.line2}</div>
+                          </td>
+                          <td style={{ color: "#5a6a7e", fontSize: 13, maxWidth: 280 }}>{p.pitchTeam}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Mobile cards */}
+            <div className="pitches-mobile">
+              <div style={{ display: "grid", gap: 16 }}>
+                {archivedPitches.map(function (p, i) {
+                  return <ArchivedPitchCard key={p.symbol || ("archived-" + i)} p={p} onOpenDeck={setOpenDeck} />;
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ──────────── PDF VIEWER (handles both active + archived) ──────────── */}
+      {openDeckValue !== null && openDeckValue.deck && (
         <PdfViewer
-          pdf={PITCHES[openDeckValue].deck}
-          company={PITCHES[openDeckValue].company}
+          pdf={openDeckValue.deck}
+          company={openDeckValue.company}
           onClose={function () { setOpenDeck(null); }}
         />
       )}

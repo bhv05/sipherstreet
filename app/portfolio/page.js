@@ -111,7 +111,7 @@ function PositionCard({ pos }) {
 
 /*
   SVG-based performance chart.
-  Renders portfolio vs S&P 500 as two lines, both rebased to $100,000.
+  Renders portfolio vs Directional L/S Hedge Fund Average as two lines, both rebased to $100,000.
   Includes hover tooltip, y-axis labels, x-axis date labels, and legend.
   No external dependencies required.
 */
@@ -325,7 +325,7 @@ function PerformanceChart({ portfolio, benchmark }) {
           <path d={areaPath} fill="rgba(30, 58, 95, 0.06)" />
         )}
 
-        {/* Benchmark line (S&P 500) */}
+        {/* Benchmark line (Directional L/S Hedge Fund Average) */}
         {benchmarkPath && (
           <path d={benchmarkPath} fill="none" stroke="#64748b" strokeWidth="2" strokeDasharray="5,5" />
         )}
@@ -383,7 +383,7 @@ function PerformanceChart({ portfolio, benchmark }) {
           </div>
           {merged[hover].benchmark != null && (
             <div style={{ display: "flex", justifyContent: "space-between", gap: 16 }}>
-              <span style={{ color: "#5a6a7e" }}>S&P 500</span>
+              <span style={{ color: "#5a6a7e" }}>Directional L/S Hedge Fund Average</span>
               <span style={{ fontWeight: 600, color: "#94a3b8" }}>{"$" + fmt(merged[hover].benchmark, 0)}</span>
             </div>
           )}
@@ -573,7 +573,7 @@ export default function Portfolio() {
             <div>
               <p className="section-label" style={{ marginBottom: 4 }}>Performance</p>
               <h3 style={{ fontSize: 22, fontWeight: 200, color: "#1a2a44" }}>
-                Portfolio vs <span style={{ fontWeight: 600 }}>S&P 500</span>
+                Portfolio vs <span style={{ fontWeight: 600 }}>Directional L/S Hedge Fund Average</span>
               </h3>
               <p style={{ fontSize: 11, color: "#8896a6", marginTop: 4, letterSpacing: "0.05em" }}>
                 Since inception · Rebased to $100,000
@@ -597,7 +597,7 @@ export default function Portfolio() {
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <div style={{ width: 20, height: 0, borderTop: "2px dashed #64748b" }} />
-                <span style={{ fontSize: 12, color: "#5a6a7e" }}>S&P 500</span>
+                <span style={{ fontSize: 12, color: "#5a6a7e" }}>Directional L/S Hedge Fund Average</span>
                 {chartBenchReturn !== null && (
                   <span style={{
                     fontSize: 12,
