@@ -332,11 +332,11 @@ export default function BookFactsheet() {
     setMounted(true);
   }, []);
 
-  // Prevent background scrolling when expanded modal is active & set default zoom to 125%
+  // Prevent background scrolling when expanded modal is active & set default zoom
   useEffect(() => {
     if (isExpanded) {
       document.body.style.overflow = "hidden";
-      setZoomIndex(1); // Default to 125% zoom when expanded
+      setZoomIndex(isMobile ? 0 : 1); // 100% on mobile, 125% on desktop
     } else {
       document.body.style.overflow = "";
       setZoomIndex(0); // Reset to 100% zoom
@@ -344,7 +344,7 @@ export default function BookFactsheet() {
     return () => {
       document.body.style.overflow = "";
     };
-  }, [isExpanded]);
+  }, [isExpanded, isMobile]);
 
   // Resize listener to detect mobile & compute book scale factor
   useEffect(() => {
@@ -428,25 +428,29 @@ export default function BookFactsheet() {
     <MockPhilosophy key="p4" />,
   ];
 
-  // Render normal (inline) size pages (360x500 each)
+  // Render normal (inline) size pages — mobile uses smaller dimensions to fit container
+  const inlinePageW = isMobile ? 320 : 360;
+  const inlinePageH = isMobile ? 452 : 500;
   const normalPagesRendered = Array.from({ length: pdfPageCount }, (_, i) => (
     <PDFPageCanvas
-      key={`normal-pdf-page-${i}`}
+      key={`normal-pdf-page-${i}-${isMobile ? 'm' : 'd'}`}
       pdfDoc={pdfDoc}
       pageNumber={i + 1}
-      width={360}
-      height={500}
+      width={inlinePageW}
+      height={inlinePageH}
     />
   ));
 
-  // Render portal (expanded) size pages (550 * zoomFactor x 760 * zoomFactor each)
+  // Render portal (expanded) size pages — mobile uses viewport-aware dimensions
+  const portalBaseW = isMobile ? 280 : 550;
+  const portalBaseH = isMobile ? 396 : 760;
   const portalPagesRendered = Array.from({ length: pdfPageCount }, (_, i) => (
     <PDFPageCanvas
-      key={`portal-pdf-page-${i}`}
+      key={`portal-pdf-page-${i}-${isMobile ? 'm' : 'd'}-z${zoomIndex}`}
       pdfDoc={pdfDoc}
       pageNumber={i + 1}
-      width={550 * zoomFactor}
-      height={760 * zoomFactor}
+      width={Math.round(portalBaseW * zoomFactor)}
+      height={Math.round(portalBaseH * zoomFactor)}
     />
   ));
 
@@ -1147,10 +1151,13 @@ export default function BookFactsheet() {
 
         .mobile-page-holder {
           width: 320px;
-          height: 440px;
+          height: 452px;
           background: #ffffff;
           border-radius: 6px;
           overflow: hidden;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
         .shadow-premium {
@@ -1294,6 +1301,7 @@ export default function BookFactsheet() {
           .book-perspective {
             margin: 0;
             width: 100%;
+            overflow: visible;
           }
 
           .nav-controls-left,
@@ -1791,39 +1799,62 @@ export default function BookFactsheet() {
         /* RESPONSIVE PORTAL STYLES */
         @media (max-width: 768px) {
           .factsheet-module-portal-overlay {
-            padding: 24px 16px;
+            padding: 0;
           }
           .portal-nav-arrow-fixed {
-            width: 44px;
-            height: 44px;
+            width: 40px;
+            height: 40px;
+          }
+          .portal-nav-arrow-fixed svg {
+            width: 18px;
+            height: 18px;
           }
           .portal-nav-arrow-fixed.left-arrow {
-            left: 12px;
+            left: 8px;
           }
           .portal-nav-arrow-fixed.right-arrow {
-            right: 12px;
+            right: 8px;
+          }
+          .portal-book-scroll-wrapper {
+            padding: 20px 56px;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
           }
           .portal-toolbar-fixed {
             left: 50%;
             transform: translateX(-50%);
             right: auto;
-            bottom: 24px;
+            bottom: 16px;
             width: max-content;
+            max-width: calc(100vw - 24px);
           }
           .portal-toolbar-inner {
-            padding: 4px 12px;
-            gap: 8px;
+            padding: 4px 10px;
+            gap: 6px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
           }
           .portal-toolbar-btn {
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
+            flex-shrink: 0;
           }
           .portal-page-num {
-            font-size: 11px;
+            font-size: 10px;
+            flex-shrink: 0;
+          }
+          .portal-zoom-val {
+            font-size: 10px;
+            min-width: 32px;
+            flex-shrink: 0;
           }
           .portal-mobile-book {
-            width: 300px;
-            height: 410px;
+            width: auto;
+            height: auto;
+            max-width: calc(100vw - 56px);
+            max-height: calc(100vh - 100px);
+            overflow: visible;
           }
         }
       `}</style>
