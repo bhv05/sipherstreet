@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import useReveal from "../components/useReveal";
+import BookFactsheet from "../components/BookFactsheet";
 
 const STEPS = [
   {
@@ -46,14 +47,14 @@ export default function About() {
   var valuesReveal = useReveal();
 
   return (
-    <div className="page-section" style={{ maxWidth: 800 }}>
-      <p className="section-label">Who We Are</p>
-      <h2 className="section-title">
-        About <span>Us</span>
-      </h2>
-
-      <div style={{ display: "grid", gap: 40 }}>
-        {/* Our Story */}
+    <div className="page-section" style={{ maxWidth: 1100 }}>
+      {/* Our Story (Restored to clean, readable width) */}
+      <div style={{ maxWidth: 800, marginBottom: 64 }}>
+        <p className="section-label">Who We Are</p>
+        <h2 className="section-title">
+          About <span>Us</span>
+        </h2>
+        
         <div
           ref={storyReveal.ref}
           className={"reveal" + (storyReveal.inView ? " in-view" : "")}
@@ -69,6 +70,59 @@ export default function About() {
             portfolio using real-time data and institutional-grade analysis.
           </p>
         </div>
+      </div>
+
+      {/* Dedicated Document Showcase Section (Hedge Fund / Institutional Style) */}
+      <div className="showcase-grid reveal in-view">
+        <div className="showcase-info-card">
+          <div>
+            <p className="section-label" style={{ color: "#8896a6", marginBottom: 0 }}>Materials</p>
+            <h3 className="showcase-title">Discover our fund factsheet</h3>
+            <p className="showcase-desc">
+              Review our Q1 2026 factsheet to explore our long/short equity strategy, active portfolio exposures, monthly performance metrics, and risk management parameters.
+            </p>
+            
+            <div className="showcase-actions">
+              <a
+                href="/factsheet.pdf"
+                download="sipherstreet_factsheet.pdf"
+                className="showcase-download-btn"
+              >
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2.5" fill="none" style={{ marginRight: 8 }}>
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                </svg>
+                Download Factsheet
+              </a>
+            </div>
+          </div>
+
+          {/* Share buttons similar to Pictet */}
+          <div className="showcase-share-box">
+            <span className="share-label">Share</span>
+            <div className="share-icons">
+              {/* LinkedIn */}
+              <a href="https://www.linkedin.com/company/sipherstreet/" target="_blank" rel="noreferrer" title="Sipher Street LinkedIn">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                </svg>
+              </a>
+              {/* Email */}
+              <a href="mailto:?subject=Sipher Street Factsheet" title="Share via Email">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                  <polyline points="22,6 12,13 2,6" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div className="showcase-book-card">
+          <BookFactsheet />
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gap: 40 }}>
 
         {/* Our Approach */}
         <div
@@ -251,6 +305,140 @@ export default function About() {
       </div>
 
       <style jsx>{`
+        .showcase-grid {
+          display: grid;
+          grid-template-columns: 1.25fr 1fr;
+          gap: 0;
+          margin-bottom: 64px;
+          align-items: stretch;
+        }
+        .showcase-info-card {
+          background: #fcfbfa;
+          border: 1px solid rgba(26, 42, 68, 0.08);
+          border-radius: 8px 0 0 8px;
+          padding: 40px 36px;
+          box-shadow: 0 4px 24px rgba(26, 42, 68, 0.03);
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          justify-content: space-between;
+          text-align: left;
+          min-height: 500px;
+        }
+        .showcase-title {
+          font-size: clamp(20px, 4vw, 26px);
+          font-weight: 200;
+          color: #1a2a44;
+          margin-top: 8px;
+          margin-bottom: 16px;
+          line-height: 1.3;
+        }
+        .showcase-desc {
+          font-size: 14px;
+          color: #5a6a7e;
+          line-height: 1.7;
+          margin-bottom: 24px;
+        }
+        .showcase-actions {
+          display: flex;
+          gap: 16px;
+          margin-bottom: 32px;
+        }
+        .showcase-download-btn {
+          display: inline-flex;
+          align-items: center;
+          padding: 10px 20px;
+          background: #1a2a44;
+          color: #ffffff;
+          font-size: 13px;
+          font-weight: 600;
+          letter-spacing: 0.05em;
+          border-radius: 4px;
+          transition: background 0.2s ease, transform 0.15s ease;
+          box-shadow: 0 2px 4px rgba(26, 42, 68, 0.08);
+        }
+        .showcase-download-btn:hover {
+          background: #2c3e5a;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 8px rgba(26, 42, 68, 0.15);
+        }
+        .showcase-download-btn:active {
+          transform: translateY(0);
+        }
+        .showcase-share-box {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          border-top: 1px solid #cbd5e1;
+          padding-top: 20px;
+          width: 100%;
+        }
+        .share-label {
+          font-size: 11px;
+          font-weight: 600;
+          color: #8896a6;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+        }
+        .share-icons {
+          display: flex;
+          gap: 12px;
+        }
+        .share-icons a {
+          color: #5a6a7e;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          border: 1px solid #e2e8f0;
+          transition: all 0.25s ease;
+          background: #ffffff;
+        }
+        .share-icons a:hover {
+          color: #1a2a44;
+          border-color: #1a2a44;
+          background: rgba(26, 42, 68, 0.02);
+          transform: scale(1.05);
+        }
+        .showcase-book-card {
+          width: 100%;
+          background: #f0eeeb;
+          border: 1px solid rgba(26, 42, 68, 0.08);
+          border-left: none;
+          border-radius: 0 8px 8px 0;
+          padding: 24px;
+          box-shadow: 0 4px 24px rgba(26, 42, 68, 0.03);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 500px;
+        }
+
+        @media (max-width: 992px) {
+          .showcase-grid {
+            grid-template-columns: 1fr;
+            gap: 0;
+            align-items: stretch;
+          }
+          .showcase-info-card {
+            padding: 32px 24px;
+            align-items: center;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            min-height: auto;
+          }
+          .showcase-book-card {
+            border-radius: 0 0 8px 8px;
+            border-left: 1px solid rgba(26, 42, 68, 0.08);
+            border-top: none;
+            min-height: auto;
+          }
+          .showcase-share-box {
+            justify-content: center;
+          }
+        }
         .approach-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
