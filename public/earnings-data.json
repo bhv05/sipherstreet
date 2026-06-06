@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-06-05T09:36:30Z",
+  "last_updated": "2026-06-06T08:27:28Z",
   "total_positions": 8,
   "earnings_calendar": [
     {
@@ -36,19 +36,19 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.49,
       "beat_rate_4q": "4/4",
-      "implied_move": 10.4
+      "implied_move": 5.1
     },
     {
       "ticker": "OXY",
       "company": "Occidental Petroleum Corporation",
       "date": "2026-08-05",
       "timing": "AMC",
-      "consensus_eps": 1.89,
-      "consensus_revenue": "$7.41B",
+      "consensus_eps": 1.88,
+      "consensus_revenue": "$7.31B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.47,
       "beat_rate_4q": "4/4",
-      "implied_move": 4.8
+      "implied_move": 4.0
     },
     {
       "ticker": "INTU",
@@ -60,19 +60,19 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.23,
       "beat_rate_4q": "4/4",
-      "implied_move": 8.2
+      "implied_move": 6.5
     },
     {
       "ticker": "AVGO",
       "company": "Broadcom Inc.",
       "date": "2026-09-03",
       "timing": "AMC",
-      "consensus_eps": 3.18,
-      "consensus_revenue": "$28.47B",
+      "consensus_eps": 3.24,
+      "consensus_revenue": "$29.44B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.04,
       "beat_rate_4q": "4/4",
-      "implied_move": 9.6
+      "implied_move": 4.3
     },
     {
       "ticker": "QQQ",
