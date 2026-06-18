@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-06-17T10:44:28Z",
-  "total_positions": 8,
+  "last_updated": "2026-06-18T10:12:23Z",
+  "total_positions": 7,
   "earnings_calendar": [
     {
       "ticker": "CACI",
@@ -37,18 +37,6 @@
       "last_quarter_surprise": 3.78,
       "beat_rate_4q": "3/4",
       "implied_move": 10.4
-    },
-    {
-      "ticker": "OXY",
-      "company": "Occidental Petroleum Corporation",
-      "date": "2026-08-05",
-      "timing": "AMC",
-      "consensus_eps": 1.88,
-      "consensus_revenue": "$7.31B",
-      "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.47,
-      "beat_rate_4q": "4/4",
-      "implied_move": 4.8
     },
     {
       "ticker": "INTU",
