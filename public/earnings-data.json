@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-06-27T08:29:23Z",
+  "last_updated": "2026-06-28T08:44:12Z",
   "total_positions": 7,
   "earnings_calendar": [
     {
@@ -19,7 +19,7 @@
       "company": "Crane Company",
       "date": "2026-07-27",
       "timing": "AMC",
-      "consensus_eps": 1.65,
+      "consensus_eps": 1.66,
       "consensus_revenue": "$703M",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.2,
