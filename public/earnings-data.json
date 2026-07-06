@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-07-05T08:45:22Z",
+  "last_updated": "2026-07-06T10:04:29Z",
   "total_positions": 7,
   "earnings_calendar": [
     {
@@ -36,7 +36,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 3.78,
       "beat_rate_4q": "3/4",
-      "implied_move": 3.4
+      "implied_move": 10.4
     },
     {
       "ticker": "INTU",
@@ -48,7 +48,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.23,
       "beat_rate_4q": "4/4",
-      "implied_move": 3.3
+      "implied_move": 8.2
     },
     {
       "ticker": "AVGO",
@@ -60,7 +60,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.04,
       "beat_rate_4q": "4/4",
-      "implied_move": 4.9
+      "implied_move": 9.6
     },
     {
       "ticker": "QQQ",
