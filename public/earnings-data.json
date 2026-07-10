@@ -1,19 +1,7 @@
 {
-  "last_updated": "2026-07-09T09:32:35Z",
+  "last_updated": "2026-07-10T09:23:55Z",
   "total_positions": 7,
   "earnings_calendar": [
-    {
-      "ticker": "CACI",
-      "company": "CACI International Inc",
-      "date": "2026-04-22",
-      "timing": "AMC",
-      "consensus_eps": 7.33,
-      "consensus_revenue": "$2.70B",
-      "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.34,
-      "beat_rate_4q": "4/4",
-      "implied_move": 6.0
-    },
     {
       "ticker": "CR",
       "company": "Crane Company",
@@ -31,12 +19,24 @@
       "company": "Meta Platforms, Inc.",
       "date": "2026-07-29",
       "timing": "AMC",
-      "consensus_eps": 7.51,
+      "consensus_eps": 7.49,
       "consensus_revenue": "$60.22B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.49,
-      "beat_rate_4q": "4/4",
+      "last_quarter_surprise": 3.78,
+      "beat_rate_4q": "3/4",
       "implied_move": 10.4
+    },
+    {
+      "ticker": "CACI",
+      "company": "CACI International Inc",
+      "date": "2026-08-05",
+      "timing": "AMC",
+      "consensus_eps": 7.33,
+      "consensus_revenue": "$2.70B",
+      "last_quarter_result": "beat",
+      "last_quarter_surprise": 0.34,
+      "beat_rate_4q": "4/4",
+      "implied_move": 6.0
     },
     {
       "ticker": "INTU",
