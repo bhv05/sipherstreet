@@ -1,10 +1,10 @@
 {
-  "last_updated": "2026-07-16T08:02:00Z",
+  "last_updated": "2026-07-17T07:58:43Z",
   "total_positions": 7,
   "earnings_calendar": [
     {
       "ticker": "CR",
-      "company": "Crane Company",
+      "company": "CR",
       "date": "2026-07-28",
       "timing": "AMC",
       "consensus_eps": 1.66,
