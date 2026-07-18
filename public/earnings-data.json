@@ -1,10 +1,10 @@
 {
-  "last_updated": "2026-07-17T07:58:43Z",
+  "last_updated": "2026-07-18T07:39:51Z",
   "total_positions": 7,
   "earnings_calendar": [
     {
       "ticker": "CR",
-      "company": "CR",
+      "company": "Crane Company",
       "date": "2026-07-28",
       "timing": "AMC",
       "consensus_eps": 1.66,
@@ -12,7 +12,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.2,
       "beat_rate_4q": "4/4",
-      "implied_move": 4.7
+      "implied_move": 10.9
     },
     {
       "ticker": "META",
@@ -22,9 +22,9 @@
       "consensus_eps": 7.49,
       "consensus_revenue": "$60.24B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.49,
-      "beat_rate_4q": "4/4",
-      "implied_move": 10.4
+      "last_quarter_surprise": 3.78,
+      "beat_rate_4q": "3/4",
+      "implied_move": 4.8
     },
     {
       "ticker": "CACI",
@@ -36,7 +36,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.34,
       "beat_rate_4q": "4/4",
-      "implied_move": 6.0
+      "implied_move": 11.0
     },
     {
       "ticker": "INTU",
@@ -48,7 +48,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.23,
       "beat_rate_4q": "4/4",
-      "implied_move": 8.2
+      "implied_move": 2.4
     },
     {
       "ticker": "AVGO",
@@ -60,7 +60,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.04,
       "beat_rate_4q": "4/4",
-      "implied_move": 9.6
+      "implied_move": 4.2
     },
     {
       "ticker": "QQQ",
