@@ -1,17 +1,29 @@
 {
-  "last_updated": "2026-07-20T08:47:18Z",
+  "last_updated": "2026-07-21T08:14:43Z",
   "total_positions": 7,
   "earnings_calendar": [
+    {
+      "ticker": "CR",
+      "company": "Crane Company",
+      "date": "2026-07-28",
+      "timing": "AMC",
+      "consensus_eps": 1.67,
+      "consensus_revenue": "$706M",
+      "last_quarter_result": "beat",
+      "last_quarter_surprise": 0.2,
+      "beat_rate_4q": "4/4",
+      "implied_move": 4.7
+    },
     {
       "ticker": "META",
       "company": "Meta Platforms, Inc.",
       "date": "2026-07-29",
       "timing": "AMC",
       "consensus_eps": 7.39,
-      "consensus_revenue": "$60.25B",
+      "consensus_revenue": "$60.26B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.49,
-      "beat_rate_4q": "4/4",
+      "last_quarter_surprise": 3.78,
+      "beat_rate_4q": "3/4",
       "implied_move": 10.4
     },
     {
@@ -49,18 +61,6 @@
       "last_quarter_surprise": 0.04,
       "beat_rate_4q": "4/4",
       "implied_move": 9.6
-    },
-    {
-      "ticker": "CR",
-      "company": "Crane Company",
-      "date": null,
-      "timing": null,
-      "consensus_eps": 1.66,
-      "consensus_revenue": "$705M",
-      "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.2,
-      "beat_rate_4q": "4/4",
-      "implied_move": 4.7
     },
     {
       "ticker": "QQQ",
