@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-07-22T08:15:11Z",
+  "last_updated": "2026-07-23T08:19:49Z",
   "total_positions": 7,
   "earnings_calendar": [
     {
@@ -19,8 +19,8 @@
       "company": "CACI International Inc",
       "date": "2026-08-05",
       "timing": "AMC",
-      "consensus_eps": 7.33,
-      "consensus_revenue": "$2.70B",
+      "consensus_eps": 7.23,
+      "consensus_revenue": "$2.69B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.34,
       "beat_rate_4q": "4/4",
