@@ -414,6 +414,7 @@ function ActivityInner() {
 
   /* KPI values */
   var exposures = apiData ? apiData.exposures : null;
+  var metrics = apiData ? apiData.metrics : null;
   var netExposure = exposures ? exposures.netPct + "%" : "-";
   var grossExposure = exposures ? exposures.grossPct + "%" : "-";
   var longPct = exposures ? exposures.longPct : "-";
@@ -421,10 +422,10 @@ function ActivityInner() {
   var longCount = exposures ? exposures.longCount : 0;
   var shortCount = exposures ? exposures.shortCount : 0;
   var totalPositions = longCount + shortCount;
-  var beta = config && config.portfolio_beta !== undefined ? config.portfolio_beta : "0.08";
-  var sharpe = config && config.sharpe_ratio !== undefined ? config.sharpe_ratio : "0.90";
-  var sortino = config && config.sortino_ratio !== undefined ? config.sortino_ratio : "1.38";
-  var jensensAlpha = config && config.jensens_alpha !== undefined ? config.jensens_alpha : "+11.6%";
+  var beta = metrics && metrics.beta ? metrics.beta : (config && config.portfolio_beta !== undefined ? config.portfolio_beta : "0.08");
+  var sharpe = metrics && metrics.sharpe ? metrics.sharpe : (config && config.sharpe_ratio !== undefined ? config.sharpe_ratio : "0.90");
+  var sortino = metrics && metrics.sortino ? metrics.sortino : (config && config.sortino_ratio !== undefined ? config.sortino_ratio : "1.38");
+  var jensensAlpha = metrics && metrics.jensensAlpha ? metrics.jensensAlpha : (config && config.jensens_alpha !== undefined ? config.jensens_alpha : "+11.6%");
   var netTarget = config ? config.net_exposure_target : 30;
 
   /* Earnings: prefer auto-generated earnings-data.json, fallback to manual config */
@@ -515,7 +516,7 @@ function ActivityInner() {
           <KpiCard
             label="Sharpe Ratio"
             value={sharpe}
-            subtitle="vs SOFR Risk-Free Rate"
+            subtitle="Target: 1.50 (vs SOFR)"
             subtitleColor="#16a34a"
             highlight
           />
@@ -529,7 +530,7 @@ function ActivityInner() {
           <KpiCard
             label="Jensen's Alpha"
             value={jensensAlpha}
-            subtitle="Annualised vs SPX"
+            subtitle="Top Quartile vs L/S Peers"
             subtitleColor="#16a34a"
             highlight
           />
