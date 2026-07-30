@@ -1,30 +1,30 @@
 {
-  "last_updated": "2026-07-29T08:29:03Z",
-  "total_positions": 7,
+  "last_updated": "2026-07-30T08:13:10Z",
+  "total_positions": 8,
   "earnings_calendar": [
-    {
-      "ticker": "CR",
-      "company": "Crane Company",
-      "date": "2026-07-28",
-      "timing": "AMC",
-      "consensus_eps": 1.76,
-      "consensus_revenue": "$735M",
-      "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.11,
-      "beat_rate_4q": "4/4",
-      "implied_move": NaN
-    },
     {
       "ticker": "META",
       "company": "Meta Platforms, Inc.",
       "date": "2026-07-29",
       "timing": "AMC",
-      "consensus_eps": 7.4,
-      "consensus_revenue": "$60.29B",
-      "last_quarter_result": "beat",
-      "last_quarter_surprise": 3.78,
+      "consensus_eps": 7.36,
+      "consensus_revenue": "$63.24B",
+      "last_quarter_result": "miss",
+      "last_quarter_surprise": -1.04,
       "beat_rate_4q": "3/4",
-      "implied_move": 10.4
+      "implied_move": 7.6
+    },
+    {
+      "ticker": "VRT",
+      "company": "Vertiv Holdings Co",
+      "date": "2026-07-29",
+      "timing": "AMC",
+      "consensus_eps": 1.78,
+      "consensus_revenue": "$3.71B",
+      "last_quarter_result": "beat",
+      "last_quarter_surprise": 0.09,
+      "beat_rate_4q": "4/4",
+      "implied_move": 4.3
     },
     {
       "ticker": "CACI",
@@ -61,6 +61,18 @@
       "last_quarter_surprise": 0.04,
       "beat_rate_4q": "4/4",
       "implied_move": 9.6
+    },
+    {
+      "ticker": "CR",
+      "company": "Crane Company",
+      "date": "2026-10-26",
+      "timing": "AMC",
+      "consensus_eps": 1.76,
+      "consensus_revenue": "$735M",
+      "last_quarter_result": "beat",
+      "last_quarter_surprise": 0.11,
+      "beat_rate_4q": "4/4",
+      "implied_move": 5.7
     },
     {
       "ticker": "QQQ",
