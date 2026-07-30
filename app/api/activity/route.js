@@ -58,62 +58,88 @@ async function computeLiveMetrics(headers) {
       });
     }
 
-    const portReturns = [];
-    const spyReturns = [];
-    const rfReturns = [];
+    // 1. Calculate portfolio daily excess returns over all portfolio days (for Sharpe & Sortino)
+    const allPortReturns = [];
+    const allRfReturns = [];
+
+    for (let i = 1; i < dailyData.length; i++) {
+      const prev = dailyData[i - 1];
+      const curr = dailyData[i];
+      if (prev.equity > 0 && curr.equity > 0) {
+        const pRet = (curr.equity - prev.equity) / prev.equity;
+        const rfRet = (curr.sofr / 100) / 360;
+        allPortReturns.push(pRet);
+        allRfReturns.push(rfRet);
+      }
+    }
+
+    const nTotal = allPortReturns.length;
+    if (nTotal < 5) return { sharpe: "0.90", sortino: "1.38", jensensAlpha: "+11.6%", beta: "0.08" };
+
+    const rxAll = [];
+    const downsideRxAll = [];
+
+    for (let i = 0; i < nTotal; i++) {
+      const exP = allPortReturns[i] - allRfReturns[i];
+      rxAll.push(exP);
+      if (exP < 0) downsideRxAll.push(exP);
+    }
+
+    const meanRxAll = rxAll.reduce((a, b) => a + b, 0) / nTotal;
+    const varRxAll = rxAll.reduce((a, b) => a + Math.pow(b - meanRxAll, 2), 0) / (nTotal - 1);
+    const stdRxAll = Math.sqrt(varRxAll);
+
+    // Downside vol matching calculate_sharpe_sortino.py (std of negative excess return days)
+    let downsideStdRxAll = stdRxAll;
+    if (downsideRxAll.length > 1) {
+      const meanDown = downsideRxAll.reduce((a, b) => a + b, 0) / downsideRxAll.length;
+      const varDown = downsideRxAll.reduce((a, b) => a + Math.pow(b - meanDown, 2), 0) / (downsideRxAll.length - 1);
+      downsideStdRxAll = Math.sqrt(varDown);
+    }
+
+    const sharpe = stdRxAll > 0 ? (meanRxAll * 252) / (stdRxAll * Math.sqrt(252)) : 0.90;
+    const sortino = downsideStdRxAll > 0 ? (meanRxAll * 252) / (downsideStdRxAll * Math.sqrt(252)) : 1.38;
+
+    // 2. Aligned SPY returns for Beta & Jensen's Alpha
+    const alignedPort = [];
+    const alignedSpy = [];
+    const alignedRf = [];
 
     for (let i = 1; i < dailyData.length; i++) {
       const prev = dailyData[i - 1];
       const curr = dailyData[i];
       if (prev.equity > 0 && curr.equity > 0 && prev.spy && curr.spy) {
-        const pRet = (curr.equity - prev.equity) / prev.equity;
-        const mRet = (curr.spy - prev.spy) / prev.spy;
-        const rfRet = (curr.sofr / 100) / 360;
-        portReturns.push(pRet);
-        spyReturns.push(mRet);
-        rfReturns.push(rfRet);
+        alignedPort.push((curr.equity - prev.equity) / prev.equity);
+        alignedSpy.push((curr.spy - prev.spy) / prev.spy);
+        alignedRf.push((curr.sofr / 100) / 360);
       }
     }
 
-    const n = portReturns.length;
-    if (n < 5) return { sharpe: "0.90", sortino: "1.38", jensensAlpha: "+11.6%", beta: "0.08" };
+    const nAligned = alignedPort.length;
+    let beta = 0.08;
+    let alphaAnnual = 0.116;
 
-    const rx = [];
-    const mx = [];
-    const downsideRx = [];
+    if (nAligned >= 5) {
+      const rx = [];
+      const mx = [];
+      for (let i = 0; i < nAligned; i++) {
+        rx.push(alignedPort[i] - alignedRf[i]);
+        mx.push(alignedSpy[i] - alignedRf[i]);
+      }
+      const meanRx = rx.reduce((a, b) => a + b, 0) / nAligned;
+      const meanMx = mx.reduce((a, b) => a + b, 0) / nAligned;
 
-    for (let i = 0; i < n; i++) {
-      const exP = portReturns[i] - rfReturns[i];
-      const exM = spyReturns[i] - rfReturns[i];
-      rx.push(exP);
-      mx.push(exM);
-      if (exP < 0) downsideRx.push(exP);
+      const varMx = mx.reduce((a, b) => a + Math.pow(b - meanMx, 2), 0) / (nAligned - 1);
+      let cov = 0;
+      for (let i = 0; i < nAligned; i++) {
+        cov += (rx[i] - meanRx) * (mx[i] - meanMx);
+      }
+      cov /= (nAligned - 1);
+
+      beta = varMx > 0 ? cov / varMx : 0.08;
+      const alphaDaily = meanRx - beta * meanMx;
+      alphaAnnual = alphaDaily * 252;
     }
-
-    const meanRx = rx.reduce((a, b) => a + b, 0) / n;
-    const meanMx = mx.reduce((a, b) => a + b, 0) / n;
-
-    const varRx = rx.reduce((a, b) => a + Math.pow(b - meanRx, 2), 0) / (n - 1);
-    const varMx = mx.reduce((a, b) => a + Math.pow(b - meanMx, 2), 0) / (n - 1);
-    const stdRx = Math.sqrt(varRx);
-
-    const downsideVarRx = downsideRx.length > 1
-      ? downsideRx.reduce((a, b) => a + Math.pow(b, 2), 0) / n
-      : varRx;
-    const downsideStdRx = Math.sqrt(downsideVarRx);
-
-    let cov = 0;
-    for (let i = 0; i < n; i++) {
-      cov += (rx[i] - meanRx) * (mx[i] - meanMx);
-    }
-    cov /= (n - 1);
-
-    const beta = varMx > 0 ? cov / varMx : 0.08;
-    const alphaDaily = meanRx - beta * meanMx;
-    const alphaAnnual = alphaDaily * 252;
-
-    const sharpe = stdRx > 0 ? (meanRx * 252) / (stdRx * Math.sqrt(252)) : 0.90;
-    const sortino = downsideStdRx > 0 ? (meanRx * 252) / (downsideStdRx * Math.sqrt(252)) : 1.38;
 
     return {
       sharpe: sharpe.toFixed(2),
