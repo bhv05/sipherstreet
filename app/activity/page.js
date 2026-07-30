@@ -517,7 +517,7 @@ function ActivityInner() {
       <div ref={kpiReveal.ref} className={"reveal" + (kpiReveal.inView ? " in-view" : "")} style={{ marginBottom: 36 }}>
         <div className="kpi-grid">
           <KpiCard
-            label="Excess Return vs SOFR"
+            label="Jensen's Alpha"
             value={excessReturn}
             subtitle={"over " + tradingDays + " trading days"}
             subtitleColor="#16a34a"
@@ -540,7 +540,7 @@ function ActivityInner() {
           <KpiCard
             label="Portfolio Beta"
             value={beta}
-            subtitle={"t = " + tStatBeta + " vs SPX · daily, since inception"}
+            subtitle="vs SPX · daily, since inception"
             subtitleColor="#1e3a5f"
             highlight
           />
