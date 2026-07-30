@@ -71,48 +71,13 @@ function getReturnBadgeStyle(value) {
   }
 }
 
-function SideBadge({ side }) {
-  if (side === "LONG") {
-    return (
-      <span className="side-badge badge-long">
-        <span className="badge-dot" />
-        LONG
-      </span>
-    );
-  } else if (side === "SHORT") {
-    return (
-      <span className="side-badge badge-short">
-        <span className="badge-dot" />
-        SHORT
-      </span>
-    );
-  } else if (side === "TREASURY") {
-    return (
-      <span className="side-badge badge-treasury">
-        <span className="badge-dot" />
-        TREASURY
-      </span>
-    );
-  } else {
-    return (
-      <span className="side-badge badge-cash">
-        <span className="badge-dot" />
-        CASH
-      </span>
-    );
-  }
-}
-
 function PositionCard({ pos }) {
   var badgeStyle = pos.totalReturn != null ? getReturnBadgeStyle(pos.totalReturn) : {};
   return (
     <div style={{ padding: 20, background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 6 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
         <div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
-            <span style={{ fontWeight: 600, color: "#1a2a44", fontSize: 15 }}>{pos.company}</span>
-            <SideBadge side={pos.side} />
-          </div>
+          <div style={{ fontWeight: 600, color: "#1a2a44", fontSize: 15, marginBottom: 4 }}>{pos.company}</div>
           <div style={{ fontSize: 12, color: "#5a6a7e" }}>
             {pos.symbol !== "CASH" ? (
               <>
@@ -543,12 +508,7 @@ export default function Portfolio() {
     var returnStyle = pos.totalReturn != null ? getReturnStyle(pos.totalReturn) : {};
     return (
       <tr key={pos.symbol + "-" + pos.side}>
-        <td style={{ fontWeight: 500 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span>{pos.company}</span>
-            <SideBadge side={pos.side} />
-          </div>
-        </td>
+        <td style={{ fontWeight: 500 }}>{pos.company}</td>
         <td style={{ textAlign: "center", color: "#5a6a7e" }}>
           {pos.symbol !== "CASH" ? (
             <>
@@ -614,16 +574,9 @@ export default function Portfolio() {
               {/* Group 1: Longs */}
               {longPositions.length > 0 && (
                 <>
-                  <tr className="group-header-row long-group">
+                  <tr className="group-header-row">
                     <td colSpan={7}>
-                      <div className="group-header-content">
-                        <span style={{ fontWeight: 700, color: "#16a34a", fontSize: 11, letterSpacing: "0.08em" }}>
-                          ▲ LONG POSITIONS ({longPositions.length})
-                        </span>
-                        <span style={{ fontSize: 11, color: "#8896a6", fontWeight: 500 }}>
-                          Combined Allocation: {fmt(longAllocSum, 1)}% of NAV
-                        </span>
-                      </div>
+                      <span className="group-header-title">Long Positions</span>
                     </td>
                   </tr>
                   {longPositions.map(function (pos) { return renderTableRow(pos); })}
@@ -633,35 +586,21 @@ export default function Portfolio() {
               {/* Group 2: Shorts */}
               {shortPositions.length > 0 && (
                 <>
-                  <tr className="group-header-row short-group">
+                  <tr className="group-header-row">
                     <td colSpan={7}>
-                      <div className="group-header-content">
-                        <span style={{ fontWeight: 700, color: "#dc2626", fontSize: 11, letterSpacing: "0.08em" }}>
-                          ▼ SHORT POSITIONS ({shortPositions.length})
-                        </span>
-                        <span style={{ fontSize: 11, color: "#8896a6", fontWeight: 500 }}>
-                          Combined Allocation: {fmt(shortAllocSum, 1)}% of NAV
-                        </span>
-                      </div>
+                      <span className="group-header-title">Short Positions</span>
                     </td>
                   </tr>
                   {shortPositions.map(function (pos) { return renderTableRow(pos); })}
                 </>
               )}
 
-              {/* Group 3: Cash & Treasury Tracker */}
+              {/* Group 3: Cash & Treasury */}
               {cashItems.length > 0 && (
                 <>
-                  <tr className="group-header-row cash-group">
+                  <tr className="group-header-row">
                     <td colSpan={7}>
-                      <div className="group-header-content">
-                        <span style={{ fontWeight: 700, color: "#1e3a5f", fontSize: 11, letterSpacing: "0.08em" }}>
-                          ■ CASH & TREASURY TRACKER ({cashItems.length})
-                        </span>
-                        <span style={{ fontSize: 11, color: "#8896a6", fontWeight: 500 }}>
-                          Combined Allocation: {fmt(cashAllocSum, 1)}% of NAV
-                        </span>
-                      </div>
+                      <span className="group-header-title">Cash & Treasury</span>
                     </td>
                   </tr>
                   {cashItems.map(function (pos) { return renderTableRow(pos); })}
@@ -670,7 +609,7 @@ export default function Portfolio() {
 
               {/* Total Row */}
               <tr style={{ background: "#f1f5f9", fontWeight: 700 }}>
-                <td style={{ fontWeight: 700 }}>Total Portfolio Equity</td>
+                <td style={{ fontWeight: 700 }}>Total</td>
                 <td></td><td></td><td></td>
                 <td style={{ textAlign: "right", fontWeight: 700 }}>{"$" + fmt(d.totalValue, 0)}</td>
                 <td style={{ textAlign: "center", fontWeight: 700 }}>100.0%</td>
@@ -687,9 +626,8 @@ export default function Portfolio() {
           {/* Longs */}
           {longPositions.length > 0 && (
             <div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "#16a34a", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12, display: "flex", justifyContent: "space-between" }}>
-                <span>Long Positions ({longPositions.length})</span>
-                <span>{fmt(longAllocSum, 1)}% NAV</span>
+              <div style={{ fontSize: 11, fontWeight: 600, color: "#5a6a7e", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>
+                Long Positions
               </div>
               <div style={{ display: "grid", gap: 12 }}>
                 {longPositions.map(function (pos) {
@@ -702,9 +640,8 @@ export default function Portfolio() {
           {/* Shorts */}
           {shortPositions.length > 0 && (
             <div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "#dc2626", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12, display: "flex", justifyContent: "space-between" }}>
-                <span>Short Positions ({shortPositions.length})</span>
-                <span>{fmt(shortAllocSum, 1)}% NAV</span>
+              <div style={{ fontSize: 11, fontWeight: 600, color: "#5a6a7e", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>
+                Short Positions
               </div>
               <div style={{ display: "grid", gap: 12 }}>
                 {shortPositions.map(function (pos) {
@@ -714,12 +651,11 @@ export default function Portfolio() {
             </div>
           )}
 
-          {/* Cash & Treasury Tracker */}
+          {/* Cash & Treasury */}
           {cashItems.length > 0 && (
             <div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "#1e3a5f", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12, display: "flex", justifyContent: "space-between" }}>
-                <span>Cash & Treasury Tracker ({cashItems.length})</span>
-                <span>{fmt(cashAllocSum, 1)}% NAV</span>
+              <div style={{ fontSize: 11, fontWeight: 600, color: "#5a6a7e", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>
+                Cash & Treasury
               </div>
               <div style={{ display: "grid", gap: 12 }}>
                 {cashItems.map(function (pos) {
@@ -731,7 +667,7 @@ export default function Portfolio() {
 
           {/* Total Card */}
           <div style={{ padding: 20, background: "#1a2a44", borderRadius: 6, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div style={{ fontWeight: 700, color: "#ffffff", fontSize: 15 }}>Total Portfolio</div>
+            <div style={{ fontWeight: 700, color: "#ffffff", fontSize: 15 }}>Total</div>
             <div style={{ textAlign: "right" }}>
               <div style={{ fontWeight: 700, color: "#ffffff", fontSize: 16 }}>{"$" + fmt(d.totalValue, 0)}</div>
               <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 2 }}>100.0% allocation</div>
@@ -799,67 +735,18 @@ export default function Portfolio() {
       )}
 
       <style jsx global>{`
-        .side-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 5px;
-          padding: 2px 7px;
-          border-radius: 4px;
-          font-size: 10px;
-          font-weight: 700;
-          letter-spacing: 0.05em;
-          text-transform: uppercase;
-          line-height: 1;
-          flex-shrink: 0;
-        }
-        .side-badge .badge-dot {
-          width: 5px;
-          height: 5px;
-          border-radius: 50%;
-        }
-        .side-badge.badge-long {
-          background: rgba(22, 163, 74, 0.08);
-          color: #16a34a;
-          border: 1px solid rgba(22, 163, 74, 0.22);
-        }
-        .side-badge.badge-long .badge-dot {
-          background: #16a34a;
-        }
-        .side-badge.badge-short {
-          background: rgba(220, 38, 38, 0.08);
-          color: #dc2626;
-          border: 1px solid rgba(220, 38, 38, 0.22);
-        }
-        .side-badge.badge-short .badge-dot {
-          background: #dc2626;
-        }
-        .side-badge.badge-treasury {
-          background: rgba(13, 148, 136, 0.08);
-          color: #0d9488;
-          border: 1px solid rgba(13, 148, 136, 0.22);
-        }
-        .side-badge.badge-treasury .badge-dot {
-          background: #0d9488;
-        }
-        .side-badge.badge-cash {
-          background: rgba(30, 58, 95, 0.08);
-          color: #1e3a5f;
-          border: 1px solid rgba(30, 58, 95, 0.18);
-        }
-        .side-badge.badge-cash .badge-dot {
-          background: #1e3a5f;
-        }
-
         .group-header-row td {
           background: #f8fafc;
-          border-top: 2px solid #e2e8f0;
+          border-top: 1px solid #e2e8f0;
           border-bottom: 1px solid #e2e8f0;
-          padding: 10px 16px !important;
+          padding: 8px 16px !important;
         }
-        .group-header-content {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
+        .group-header-title {
+          font-size: 11px;
+          font-weight: 600;
+          color: #5a6a7e;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
         }
 
         .portfolio-mobile {
