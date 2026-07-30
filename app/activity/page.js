@@ -422,7 +422,7 @@ function ActivityInner() {
   var longCount = exposures ? exposures.longCount : 0;
   var shortCount = exposures ? exposures.shortCount : 0;
   var totalPositions = longCount + shortCount;
-  var excessReturn = metrics && metrics.excessReturnPct ? metrics.excessReturnPct : "+4.04%";
+  var jensensAlphaAnn = metrics && metrics.jensensAlphaAnn ? metrics.jensensAlphaAnn : "+6.87%";
   var tradingDays = metrics && metrics.tradingDays ? metrics.tradingDays : 105;
   var beta = metrics && metrics.beta ? metrics.beta : (config && config.portfolio_beta !== undefined ? config.portfolio_beta : "0.271");
   var tStatBeta = metrics && metrics.tStatBeta ? metrics.tStatBeta : "4.51";
@@ -517,21 +517,21 @@ function ActivityInner() {
       <div ref={kpiReveal.ref} className={"reveal" + (kpiReveal.inView ? " in-view" : "")} style={{ marginBottom: 36 }}>
         <div className="kpi-grid">
           <KpiCard
-            label="Jensen's Alpha"
-            value={excessReturn}
-            subtitle={"over " + tradingDays + " trading days"}
+            label="Jensen's Alpha (Ann.)"
+            value={jensensAlphaAnn}
+            subtitle="vs SPX · 252 days/yr"
             subtitleColor="#16a34a"
             highlight
           />
           <KpiCard
-            label="Sharpe Ratio"
+            label="Sharpe Ratio (Ann.)"
             value={sharpe}
             subtitle="vs SOFR Risk-Free Rate"
             subtitleColor="#16a34a"
             highlight
           />
           <KpiCard
-            label="Sortino Ratio"
+            label="Sortino Ratio (Ann.)"
             value={sortino}
             subtitle={"Max Drawdown: " + maxDrawdown}
             subtitleColor="#16a34a"
