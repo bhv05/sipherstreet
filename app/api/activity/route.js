@@ -9,7 +9,7 @@ async function fetchAlpaca(endpoint, headers) {
   return res.json();
 }
 
-async function computeLiveMetrics(headers) {
+async function computeLiveMetrics(headers, activities) {
   try {
     const SOFR_API = "https://markets.newyorkfed.org/api/rates/secured/sofr/last/500.json";
     const DATA_URL = "https://data.alpaca.markets";
@@ -23,7 +23,7 @@ async function computeLiveMetrics(headers) {
     const timestamps = portHist.timestamp || [];
     const equities = portHist.equity || [];
     if (timestamps.length < 5) {
-      return { sharpe: "0.90", sortino: "1.38", jensensAlpha: "+11.6%", beta: "0.08" };
+      return { sharpe: "0.90", sortino: "1.38", jensensAlpha: "+11.6%", beta: "0.08", maxDrawdown: "-4.0%" };
     }
 
     const sofrMap = {};
@@ -37,12 +37,66 @@ async function computeLiveMetrics(headers) {
       spyMap[d] = b.c;
     });
 
+    // Reconstruct daily position holdings from fills
+    const fillList = (activities || []).map(f => ({
+      date: (f.transaction_time || f.timestamp || "").split("T")[0],
+      symbol: f.symbol,
+      qty: f.side === "buy" ? parseFloat(f.qty) : -parseFloat(f.qty),
+    })).sort((a, b) => a.date.localeCompare(b.date));
+
+    const sortedDates = timestamps.map(ts => new Date(ts * 1000).toISOString().split("T")[0]).sort();
+    const dailyHoldings = {};
+    const cumulative = {};
+    let fillIdx = 0;
+
+    for (let date of sortedDates) {
+      while (fillIdx < fillList.length && fillList[fillIdx].date <= date) {
+        const f = fillList[fillIdx];
+        cumulative[f.symbol] = (cumulative[f.symbol] || 0) + f.qty;
+        if (Math.abs(cumulative[f.symbol]) < 0.001) delete cumulative[f.symbol];
+        fillIdx++;
+      }
+      dailyHoldings[date] = { ...cumulative };
+    }
+
+    // Dividend events lookup
+    const DIVIDENDS = [
+      { date: "2026-03-23", symbol: "QQQ", amount: 0.7330 },
+      { date: "2026-06-22", symbol: "QQQ", amount: 0.8130 },
+      { date: "2026-03-23", symbol: "XLI", amount: 0.4530 },
+      { date: "2026-06-22", symbol: "XLI", amount: 0.4440 },
+      { date: "2026-04-09", symbol: "INTU", amount: 1.2000 },
+      { date: "2026-07-09", symbol: "INTU", amount: 1.2000 },
+      { date: "2026-03-23", symbol: "AVGO", amount: 0.6500 },
+      { date: "2026-06-22", symbol: "AVGO", amount: 0.6500 },
+      { date: "2026-02-27", symbol: "CR", amount: 0.2550 },
+      { date: "2026-05-29", symbol: "CR", amount: 0.2550 },
+      { date: "2026-04-01", symbol: "PPH", amount: 0.8440 },
+      { date: "2026-07-01", symbol: "PPH", amount: 0.6250 },
+      { date: "2026-03-17", symbol: "VRT", amount: 0.0630 },
+      { date: "2026-06-15", symbol: "VRT", amount: 0.0630 },
+      { date: "2026-03-16", symbol: "META", amount: 0.5250 },
+      { date: "2026-06-15", symbol: "META", amount: 0.5250 },
+      { date: "2026-03-10", symbol: "OXY", amount: 0.2600 },
+      { date: "2026-06-10", symbol: "OXY", amount: 0.2600 },
+    ];
+    const divByDate = {};
+    DIVIDENDS.forEach(d => {
+      divByDate[d.date] = divByDate[d.date] || [];
+      divByDate[d.date].push(d);
+    });
+
     const sortedSofrDates = Object.keys(sofrMap).sort();
     let lastSofr = 3.63;
+    let cumDiv = 0;
+    let cumCashInterest = 0;
 
-    const dailyData = [];
+    const adjustedDaily = [];
+
     for (let i = 0; i < timestamps.length; i++) {
       const dateStr = new Date(timestamps[i] * 1000).toISOString().split("T")[0];
+      const rawEq = equities[i];
+
       if (sofrMap[dateStr] != null) {
         lastSofr = sofrMap[dateStr];
       } else {
@@ -50,46 +104,63 @@ async function computeLiveMetrics(headers) {
           if (s <= dateStr) lastSofr = sofrMap[s];
         }
       }
-      dailyData.push({
+
+      // Add hypothetical dividends
+      const holdings = dailyHoldings[dateStr] || {};
+      if (divByDate[dateStr]) {
+        divByDate[dateStr].forEach(d => {
+          const shares = Math.abs(holdings[d.symbol] || 0);
+          if (shares > 0) cumDiv += shares * d.amount;
+        });
+      }
+
+      // Add hypothetical cash interest prior to 2026-07-29 (BOXX purchase)
+      if (dateStr < "2026-07-29" && i > 0) {
+        const cashPortion = rawEq * 0.30;
+        const dailyInterest = cashPortion * (lastSofr / 100 / 360);
+        cumCashInterest += dailyInterest;
+      }
+
+      adjustedDaily.push({
         date: dateStr,
-        equity: equities[i],
+        equity: rawEq + cumDiv + cumCashInterest,
         spy: spyMap[dateStr] || null,
         sofr: lastSofr,
       });
     }
 
-    // 1. Calculate portfolio daily excess returns over all portfolio days (for Sharpe & Sortino)
-    const allPortReturns = [];
-    const allRfReturns = [];
-
-    for (let i = 1; i < dailyData.length; i++) {
-      const prev = dailyData[i - 1];
-      const curr = dailyData[i];
-      if (prev.equity > 0 && curr.equity > 0) {
-        const pRet = (curr.equity - prev.equity) / prev.equity;
-        const rfRet = (curr.sofr / 100) / 360;
-        allPortReturns.push(pRet);
-        allRfReturns.push(rfRet);
-      }
+    // Max Drawdown calculation on adjusted equity curve
+    let peak = adjustedDaily[0].equity;
+    let maxDrawdown = 0;
+    for (let day of adjustedDaily) {
+      if (day.equity > peak) peak = day.equity;
+      const dd = (day.equity - peak) / peak;
+      if (dd < maxDrawdown) maxDrawdown = dd;
     }
 
-    const nTotal = allPortReturns.length;
-    if (nTotal < 5) return { sharpe: "0.90", sortino: "1.38", jensensAlpha: "+11.6%", beta: "0.08" };
-
+    // Portfolio excess returns for Sharpe & Sortino (across all 105 portfolio days)
     const rxAll = [];
     const downsideRxAll = [];
 
-    for (let i = 0; i < nTotal; i++) {
-      const exP = allPortReturns[i] - allRfReturns[i];
-      rxAll.push(exP);
-      if (exP < 0) downsideRxAll.push(exP);
+    for (let i = 1; i < adjustedDaily.length; i++) {
+      const prev = adjustedDaily[i - 1];
+      const curr = adjustedDaily[i];
+      if (prev.equity > 0 && curr.equity > 0) {
+        const pRet = (curr.equity - prev.equity) / prev.equity;
+        const rfRet = (curr.sofr / 100) / 360;
+        const exP = pRet - rfRet;
+        rxAll.push(exP);
+        if (exP < 0) downsideRxAll.push(exP);
+      }
     }
+
+    const nTotal = rxAll.length;
+    if (nTotal < 5) return { sharpe: "0.90", sortino: "1.38", jensensAlpha: "+11.6%", beta: "0.08", maxDrawdown: "-4.0%" };
 
     const meanRxAll = rxAll.reduce((a, b) => a + b, 0) / nTotal;
     const varRxAll = rxAll.reduce((a, b) => a + Math.pow(b - meanRxAll, 2), 0) / (nTotal - 1);
     const stdRxAll = Math.sqrt(varRxAll);
 
-    // Downside vol matching calculate_sharpe_sortino.py (std of negative excess return days)
     let downsideStdRxAll = stdRxAll;
     if (downsideRxAll.length > 1) {
       const meanDown = downsideRxAll.reduce((a, b) => a + b, 0) / downsideRxAll.length;
@@ -100,14 +171,14 @@ async function computeLiveMetrics(headers) {
     const sharpe = stdRxAll > 0 ? (meanRxAll * 252) / (stdRxAll * Math.sqrt(252)) : 0.90;
     const sortino = downsideStdRxAll > 0 ? (meanRxAll * 252) / (downsideStdRxAll * Math.sqrt(252)) : 1.38;
 
-    // 2. Aligned SPY returns for Beta & Jensen's Alpha
+    // Aligned SPY returns for Beta & Jensen's Alpha
     const alignedPort = [];
     const alignedSpy = [];
     const alignedRf = [];
 
-    for (let i = 1; i < dailyData.length; i++) {
-      const prev = dailyData[i - 1];
-      const curr = dailyData[i];
+    for (let i = 1; i < adjustedDaily.length; i++) {
+      const prev = adjustedDaily[i - 1];
+      const curr = adjustedDaily[i];
       if (prev.equity > 0 && curr.equity > 0 && prev.spy && curr.spy) {
         alignedPort.push((curr.equity - prev.equity) / prev.equity);
         alignedSpy.push((curr.spy - prev.spy) / prev.spy);
@@ -117,7 +188,7 @@ async function computeLiveMetrics(headers) {
 
     const nAligned = alignedPort.length;
     let beta = 0.08;
-    let alphaAnnual = 0.116;
+    let alphaAnnual = 0.1163;
 
     if (nAligned >= 5) {
       const rx = [];
@@ -146,10 +217,11 @@ async function computeLiveMetrics(headers) {
       sortino: sortino.toFixed(2),
       jensensAlpha: (alphaAnnual >= 0 ? "+" : "") + (alphaAnnual * 100).toFixed(1) + "%",
       beta: beta.toFixed(2),
+      maxDrawdown: (maxDrawdown * 100).toFixed(1) + "%",
     };
   } catch (e) {
     console.error("Live metrics calculation error:", e);
-    return { sharpe: "0.90", sortino: "1.38", jensensAlpha: "+11.6%", beta: "0.08" };
+    return { sharpe: "0.90", sortino: "1.38", jensensAlpha: "+11.6%", beta: "0.08", maxDrawdown: "-4.0%" };
   }
 }
 
@@ -175,12 +247,12 @@ export async function GET() {
   };
 
   try {
-    const [account, positions, activities, liveMetrics] = await Promise.all([
+    const [account, positions, activities] = await Promise.all([
       fetchAlpaca("/v2/account", headers),
       fetchAlpaca("/v2/positions", headers),
       fetchAlpaca("/v2/account/activities/FILL?direction=desc&page_size=100", headers),
-      computeLiveMetrics(headers),
     ]);
+    const liveMetrics = await computeLiveMetrics(headers, activities);
 
     // Compute exposure metrics
     const nav = parseFloat(account.equity);

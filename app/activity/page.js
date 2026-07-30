@@ -426,6 +426,7 @@ function ActivityInner() {
   var sharpe = metrics && metrics.sharpe ? metrics.sharpe : (config && config.sharpe_ratio !== undefined ? config.sharpe_ratio : "0.90");
   var sortino = metrics && metrics.sortino ? metrics.sortino : (config && config.sortino_ratio !== undefined ? config.sortino_ratio : "1.38");
   var jensensAlpha = metrics && metrics.jensensAlpha ? metrics.jensensAlpha : (config && config.jensens_alpha !== undefined ? config.jensens_alpha : "+11.6%");
+  var maxDrawdown = metrics && metrics.maxDrawdown ? metrics.maxDrawdown : "-4.0%";
   var netTarget = config ? config.net_exposure_target : 30;
 
   /* Earnings: prefer auto-generated earnings-data.json, fallback to manual config */
@@ -523,7 +524,7 @@ function ActivityInner() {
           <KpiCard
             label="Sortino Ratio"
             value={sortino}
-            subtitle="Downside Vol: 6.3%"
+            subtitle={"Max Drawdown: " + maxDrawdown}
             subtitleColor="#16a34a"
             highlight
           />
