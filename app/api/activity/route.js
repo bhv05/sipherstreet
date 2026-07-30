@@ -171,45 +171,51 @@ async function computeLiveMetrics(headers, activities) {
     const sharpe = stdRxAll > 0 ? (meanRxAll * 252) / (stdRxAll * Math.sqrt(252)) : 0.90;
     const sortino = downsideStdRxAll > 0 ? (meanRxAll * 252) / (downsideStdRxAll * Math.sqrt(252)) : 1.38;
 
-    // Aligned SPY returns for Beta & Jensen's Alpha
-    const alignedPort = [];
-    const alignedSpy = [];
-    const alignedRf = [];
+    // Aligned SPY market trading days for Beta & Jensen's Alpha
+    const adjustedEquitiesByDate = {};
+    adjustedDaily.forEach(d => {
+      adjustedEquitiesByDate[d.date] = d.equity;
+    });
 
-    for (let i = 1; i < adjustedDaily.length; i++) {
-      const prev = adjustedDaily[i - 1];
-      const curr = adjustedDaily[i];
-      if (prev.equity > 0 && curr.equity > 0 && prev.spy && curr.spy) {
-        alignedPort.push((curr.equity - prev.equity) / prev.equity);
-        alignedSpy.push((curr.spy - prev.spy) / prev.spy);
-        alignedRf.push((curr.sofr / 100) / 360);
-      }
-    }
+    const commonTradingDates = Object.keys(adjustedEquitiesByDate)
+      .filter(d => spyMap[d] != null)
+      .sort();
 
-    const nAligned = alignedPort.length;
     let beta = 0.08;
-    let alphaAnnual = 0.1163;
+    let alphaAnnual = 0.116;
 
-    if (nAligned >= 5) {
+    if (commonTradingDates.length >= 5) {
       const rx = [];
       const mx = [];
-      for (let i = 0; i < nAligned; i++) {
-        rx.push(alignedPort[i] - alignedRf[i]);
-        mx.push(alignedSpy[i] - alignedRf[i]);
-      }
-      const meanRx = rx.reduce((a, b) => a + b, 0) / nAligned;
-      const meanMx = mx.reduce((a, b) => a + b, 0) / nAligned;
 
-      const varMx = mx.reduce((a, b) => a + Math.pow(b - meanMx, 2), 0) / (nAligned - 1);
-      let cov = 0;
-      for (let i = 0; i < nAligned; i++) {
-        cov += (rx[i] - meanRx) * (mx[i] - meanMx);
-      }
-      cov /= (nAligned - 1);
+      for (let i = 1; i < commonTradingDates.length; i++) {
+        const prevD = commonTradingDates[i - 1];
+        const currD = commonTradingDates[i];
 
-      beta = varMx > 0 ? cov / varMx : 0.08;
-      const alphaDaily = meanRx - beta * meanMx;
-      alphaAnnual = alphaDaily * 252;
+        const pRet = (adjustedEquitiesByDate[currD] - adjustedEquitiesByDate[prevD]) / adjustedEquitiesByDate[prevD];
+        const mRet = (spyMap[currD] - spyMap[prevD]) / spyMap[prevD];
+        const rfRet = ((sofrMap[currD] || lastSofr) / 100) / 360;
+
+        rx.push(pRet - rfRet);
+        mx.push(mRet - rfRet);
+      }
+
+      const nAligned = rx.length;
+      if (nAligned >= 5) {
+        const meanRx = rx.reduce((a, b) => a + b, 0) / nAligned;
+        const meanMx = mx.reduce((a, b) => a + b, 0) / nAligned;
+
+        const varMx = mx.reduce((a, b) => a + Math.pow(b - meanMx, 2), 0) / (nAligned - 1);
+        let cov = 0;
+        for (let i = 0; i < nAligned; i++) {
+          cov += (rx[i] - meanRx) * (mx[i] - meanMx);
+        }
+        cov /= (nAligned - 1);
+
+        beta = varMx > 0 ? cov / varMx : 0.08;
+        const alphaDaily = meanRx - beta * meanMx;
+        alphaAnnual = alphaDaily * 252;
+      }
     }
 
     return {
