@@ -72,9 +72,10 @@ export async function GET() {
       let marketValue = parseFloat(p.market_value);
       const costBasis = parseFloat(p.cost_basis);
       let pl = parseFloat(p.unrealized_pl);
+      const isTreasury = p.symbol === "BOXX";
 
       // Add cumulative pro-forma interest & dividends onto BOXX (Short-Term Treasury Yield ETF) position size
-      if (p.symbol === "BOXX") {
+      if (isTreasury) {
         marketValue = marketValue + proFormaAdjustment;
         pl = pl + proFormaAdjustment;
       }
@@ -85,7 +86,7 @@ export async function GET() {
         company: DISPLAY_NAME_OVERRIDES[p.symbol] || assets[i]?.name || p.symbol,
         symbol: p.symbol,
         qty: parseFloat(p.qty),
-        side: parseFloat(p.qty) > 0 ? "LONG" : "SHORT",
+        side: isTreasury ? "TREASURY" : parseFloat(p.qty) > 0 ? "LONG" : "SHORT",
         costBasis: parseFloat(p.avg_entry_price),
         currentPrice: parseFloat(p.current_price),
         positionSize: Math.abs(marketValue),
@@ -93,10 +94,47 @@ export async function GET() {
         totalReturn: totalReturn,
         pl: pl,
         changeToday: parseFloat(p.change_today) * 100 || 0,
+        isTreasury: isTreasury,
       };
     });
 
-    formattedPositions.sort((a, b) => b.allocation - a.allocation);
+    const longPositions = formattedPositions
+      .filter((p) => p.side === "LONG")
+      .sort((a, b) => b.positionSize - a.positionSize);
+
+    const shortPositions = formattedPositions
+      .filter((p) => p.side === "SHORT")
+      .sort((a, b) => b.positionSize - a.positionSize);
+
+    const cashItems = [];
+
+    // Treasury Tracker (BOXX)
+    const boxxPos = formattedPositions.find((p) => p.isTreasury);
+    if (boxxPos) {
+      cashItems.push(boxxPos);
+    }
+
+    // Uninvested Cash
+    cashItems.push({
+      company: "Uninvested Cash",
+      symbol: "CASH",
+      qty: null,
+      side: "CASH",
+      costBasis: null,
+      currentPrice: null,
+      positionSize: rawCash,
+      allocation: (rawCash / adjTotalValue) * 100,
+      totalReturn: null,
+      pl: null,
+      changeToday: 0,
+      isRawCash: true,
+    });
+
+    // Sort cash items by position size descending
+    cashItems.sort((a, b) => b.positionSize - a.positionSize);
+
+    // Combined positions array maintaining Longs top, Shorts middle, Cash bottom
+    const sortedPositions = [...longPositions, ...shortPositions, ...cashItems];
 
     const data = {
       equity: adjEquity,
@@ -104,7 +142,10 @@ export async function GET() {
       totalValue: adjTotalValue,
       initialCapital: INITIAL_CAPITAL,
       totalReturnPct: totalReturnPct,
-      positions: formattedPositions,
+      positions: sortedPositions,
+      longPositions: longPositions,
+      shortPositions: shortPositions,
+      cashItems: cashItems,
       lastUpdated: new Date().toISOString(),
     };
 

@@ -71,38 +71,81 @@ function getReturnBadgeStyle(value) {
   }
 }
 
+function SideBadge({ side }) {
+  if (side === "LONG") {
+    return (
+      <span className="side-badge badge-long">
+        <span className="badge-dot" />
+        LONG
+      </span>
+    );
+  } else if (side === "SHORT") {
+    return (
+      <span className="side-badge badge-short">
+        <span className="badge-dot" />
+        SHORT
+      </span>
+    );
+  } else if (side === "TREASURY") {
+    return (
+      <span className="side-badge badge-treasury">
+        <span className="badge-dot" />
+        TREASURY
+      </span>
+    );
+  } else {
+    return (
+      <span className="side-badge badge-cash">
+        <span className="badge-dot" />
+        CASH
+      </span>
+    );
+  }
+}
+
 function PositionCard({ pos }) {
-  var badgeStyle = getReturnBadgeStyle(pos.totalReturn);
+  var badgeStyle = pos.totalReturn != null ? getReturnBadgeStyle(pos.totalReturn) : {};
   return (
     <div style={{ padding: 20, background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 6 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
         <div>
-          <div style={{ fontWeight: 600, color: "#1a2a44", fontSize: 15, marginBottom: 4 }}>{pos.company}</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
+            <span style={{ fontWeight: 600, color: "#1a2a44", fontSize: 15 }}>{pos.company}</span>
+            <SideBadge side={pos.side} />
+          </div>
           <div style={{ fontSize: 12, color: "#5a6a7e" }}>
-            {pos.symbol}
-            <Link href={"/activity?ticker=" + pos.symbol} style={{ marginLeft: 6, fontSize: 11, color: "#1e3a5f", fontWeight: 500, opacity: 0.7 }} title="View activity">↗</Link>
+            {pos.symbol !== "CASH" ? (
+              <>
+                {pos.symbol}
+                <Link href={"/activity?ticker=" + pos.symbol} style={{ marginLeft: 6, fontSize: 11, color: "#1e3a5f", fontWeight: 500, opacity: 0.7 }} title="View activity">↗</Link>
+              </>
+            ) : (
+              "Cash & Liquidity"
+            )}
           </div>
         </div>
-        <span style={{ padding: "4px 12px", fontSize: 12, fontWeight: 600, borderRadius: 3, flexShrink: 0, ...badgeStyle }}>
-          {fmtReturn(pos.totalReturn)}
-        </span>
+        {pos.totalReturn != null && (
+          <span style={{ padding: "4px 12px", fontSize: 12, fontWeight: 600, borderRadius: 3, flexShrink: 0, ...badgeStyle }}>
+            {fmtReturn(pos.totalReturn)}
+          </span>
+        )}
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, fontSize: 13 }}>
         <div>
           <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Cost Basis</div>
-          <div style={{ fontWeight: 500, color: "#1a2a44" }}>${fmt(pos.costBasis)}</div>
+          <div style={{ fontWeight: 500, color: "#1a2a44" }}>{pos.costBasis != null ? "$" + fmt(pos.costBasis) : "-"}</div>
         </div>
         <div>
           <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Last Close</div>
-          <div style={{ fontWeight: 500, color: "#1a2a44" }}>${fmt(pos.currentPrice)}</div>
+          <div style={{ fontWeight: 500, color: "#1a2a44" }}>{pos.currentPrice != null ? "$" + fmt(pos.currentPrice) : "-"}</div>
         </div>
         <div>
           <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Position Size</div>
-          <div style={{ fontWeight: 500, color: "#1a2a44" }}>${fmt(pos.positionSize, 0)}</div>
+          <div style={{ fontWeight: 600, color: "#1a2a44" }}>${fmt(pos.positionSize, 0)}</div>
         </div>
         <div>
           <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Allocation</div>
-          <div style={{ fontWeight: 500, color: "#1a2a44" }}>{fmt(pos.allocation, 1)}%</div>
+          <div style={{ fontWeight: 600, color: "#1a2a44" }}>{fmt(pos.allocation, 1)}%</div>
         </div>
       </div>
     </div>
@@ -462,7 +505,68 @@ export default function Portfolio() {
   }
 
   var d = data;
-  var cashAllocation = (d.cash / d.totalValue) * 100;
+
+  // Categorize positions: Longs top, Shorts middle, Cash & Treasury bottom
+  var longPositions = d.longPositions || d.positions.filter(function (p) { return p.side === "LONG" && !p.isTreasury && p.symbol !== "BOXX"; });
+  var shortPositions = d.shortPositions || d.positions.filter(function (p) { return p.side === "SHORT"; });
+  var cashItems = d.cashItems || [];
+
+  if (!d.cashItems) {
+    var boxx = d.positions.find(function (p) { return p.symbol === "BOXX" || p.isTreasury; });
+    if (boxx) {
+      cashItems.push(Object.assign({}, boxx, { side: "TREASURY" }));
+    }
+    cashItems.push({
+      company: "Uninvested Cash",
+      symbol: "CASH",
+      qty: null,
+      side: "CASH",
+      costBasis: null,
+      currentPrice: null,
+      positionSize: d.cash,
+      allocation: (d.cash / d.totalValue) * 100,
+      totalReturn: null,
+      pl: null,
+    });
+  }
+
+  // Ensure each group is ordered by position size descending
+  longPositions.sort(function (a, b) { return b.positionSize - a.positionSize; });
+  shortPositions.sort(function (a, b) { return b.positionSize - a.positionSize; });
+  cashItems.sort(function (a, b) { return b.positionSize - a.positionSize; });
+
+  var longAllocSum = longPositions.reduce(function (acc, p) { return acc + (p.allocation || 0); }, 0);
+  var shortAllocSum = shortPositions.reduce(function (acc, p) { return acc + (p.allocation || 0); }, 0);
+  var cashAllocSum = cashItems.reduce(function (acc, p) { return acc + (p.allocation || 0); }, 0);
+
+  function renderTableRow(pos) {
+    var returnStyle = pos.totalReturn != null ? getReturnStyle(pos.totalReturn) : {};
+    return (
+      <tr key={pos.symbol + "-" + pos.side}>
+        <td style={{ fontWeight: 500 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span>{pos.company}</span>
+            <SideBadge side={pos.side} />
+          </div>
+        </td>
+        <td style={{ textAlign: "center", color: "#5a6a7e" }}>
+          {pos.symbol !== "CASH" ? (
+            <>
+              {pos.symbol}
+              <Link href={"/activity?ticker=" + pos.symbol} style={{ marginLeft: 6, fontSize: 11, color: "#1e3a5f", fontWeight: 500, opacity: 0.7 }} title="View activity">↗</Link>
+            </>
+          ) : (
+            <span style={{ color: "#8896a6", fontStyle: "italic" }}>-</span>
+          )}
+        </td>
+        <td style={{ textAlign: "right" }}>{pos.costBasis != null ? "$" + fmt(pos.costBasis) : "-"}</td>
+        <td style={{ textAlign: "right" }}>{pos.currentPrice != null ? "$" + fmt(pos.currentPrice) : "-"}</td>
+        <td style={{ textAlign: "right", fontWeight: 600 }}>{"$" + fmt(pos.positionSize, 0)}</td>
+        <td style={{ textAlign: "center", fontWeight: 600 }}>{fmt(pos.allocation, 1) + "%"}</td>
+        <td style={returnStyle}>{pos.totalReturn != null ? fmtReturn(pos.totalReturn) : "-"}</td>
+      </tr>
+    );
+  }
 
   /* Chart legend return values */
   var chartPortfolioReturn = null;
@@ -507,32 +611,66 @@ export default function Portfolio() {
               </tr>
             </thead>
             <tbody>
-              {d.positions.map(function (pos) {
-                var returnStyle = getReturnStyle(pos.totalReturn);
-                return (
-                  <tr key={pos.symbol}>
-                    <td style={{ fontWeight: 500 }}>{pos.company}</td>
-                    <td style={{ textAlign: "center", color: "#5a6a7e" }}>
-                      {pos.symbol}
-                      <Link href={"/activity?ticker=" + pos.symbol} style={{ marginLeft: 6, fontSize: 11, color: "#1e3a5f", fontWeight: 500, opacity: 0.7 }} title="View activity">↗</Link>
+              {/* Group 1: Longs */}
+              {longPositions.length > 0 && (
+                <>
+                  <tr className="group-header-row long-group">
+                    <td colSpan={7}>
+                      <div className="group-header-content">
+                        <span style={{ fontWeight: 700, color: "#16a34a", fontSize: 11, letterSpacing: "0.08em" }}>
+                          ▲ LONG POSITIONS ({longPositions.length})
+                        </span>
+                        <span style={{ fontSize: 11, color: "#8896a6", fontWeight: 500 }}>
+                          Combined Allocation: {fmt(longAllocSum, 1)}% of NAV
+                        </span>
+                      </div>
                     </td>
-                    <td style={{ textAlign: "right" }}>{"$" + fmt(pos.costBasis)}</td>
-                    <td style={{ textAlign: "right" }}>{"$" + fmt(pos.currentPrice)}</td>
-                    <td style={{ textAlign: "right" }}>{"$" + fmt(pos.positionSize, 0)}</td>
-                    <td style={{ textAlign: "center" }}>{fmt(pos.allocation, 1) + "%"}</td>
-                    <td style={returnStyle}>{fmtReturn(pos.totalReturn)}</td>
                   </tr>
-                );
-              })}
-              <tr>
-                <td style={{ fontWeight: 500 }}>Cash</td>
-                <td></td><td></td><td></td>
-                <td style={{ textAlign: "right" }}>{"$" + fmt(d.cash, 2)}</td>
-                <td style={{ textAlign: "center" }}>{fmt(cashAllocation, 1) + "%"}</td>
-                <td></td>
-              </tr>
+                  {longPositions.map(function (pos) { return renderTableRow(pos); })}
+                </>
+              )}
+
+              {/* Group 2: Shorts */}
+              {shortPositions.length > 0 && (
+                <>
+                  <tr className="group-header-row short-group">
+                    <td colSpan={7}>
+                      <div className="group-header-content">
+                        <span style={{ fontWeight: 700, color: "#dc2626", fontSize: 11, letterSpacing: "0.08em" }}>
+                          ▼ SHORT POSITIONS ({shortPositions.length})
+                        </span>
+                        <span style={{ fontSize: 11, color: "#8896a6", fontWeight: 500 }}>
+                          Combined Allocation: {fmt(shortAllocSum, 1)}% of NAV
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                  {shortPositions.map(function (pos) { return renderTableRow(pos); })}
+                </>
+              )}
+
+              {/* Group 3: Cash & Treasury Tracker */}
+              {cashItems.length > 0 && (
+                <>
+                  <tr className="group-header-row cash-group">
+                    <td colSpan={7}>
+                      <div className="group-header-content">
+                        <span style={{ fontWeight: 700, color: "#1e3a5f", fontSize: 11, letterSpacing: "0.08em" }}>
+                          ■ CASH & TREASURY TRACKER ({cashItems.length})
+                        </span>
+                        <span style={{ fontSize: 11, color: "#8896a6", fontWeight: 500 }}>
+                          Combined Allocation: {fmt(cashAllocSum, 1)}% of NAV
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                  {cashItems.map(function (pos) { return renderTableRow(pos); })}
+                </>
+              )}
+
+              {/* Total Row */}
               <tr style={{ background: "#f1f5f9", fontWeight: 700 }}>
-                <td style={{ fontWeight: 700 }}>Total</td>
+                <td style={{ fontWeight: 700 }}>Total Portfolio Equity</td>
                 <td></td><td></td><td></td>
                 <td style={{ textAlign: "right", fontWeight: 700 }}>{"$" + fmt(d.totalValue, 0)}</td>
                 <td style={{ textAlign: "center", fontWeight: 700 }}>100.0%</td>
@@ -545,19 +683,55 @@ export default function Portfolio() {
 
       {/* Mobile Cards */}
       <div className="portfolio-mobile">
-        <div style={{ display: "grid", gap: 16 }}>
-          {d.positions.map(function (pos) {
-            return <PositionCard key={pos.symbol} pos={pos} />;
-          })}
-          <div style={{ padding: 20, background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 6, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div style={{ fontWeight: 600, color: "#1a2a44", fontSize: 15 }}>Cash</div>
-            <div style={{ textAlign: "right" }}>
-              <div style={{ fontWeight: 500, color: "#1a2a44", fontSize: 14 }}>{"$" + fmt(d.cash, 2)}</div>
-              <div style={{ fontSize: 11, color: "#8896a6", marginTop: 2 }}>{fmt(cashAllocation, 1) + "% allocation"}</div>
+        <div style={{ display: "grid", gap: 24 }}>
+          {/* Longs */}
+          {longPositions.length > 0 && (
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#16a34a", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12, display: "flex", justifyContent: "space-between" }}>
+                <span>Long Positions ({longPositions.length})</span>
+                <span>{fmt(longAllocSum, 1)}% NAV</span>
+              </div>
+              <div style={{ display: "grid", gap: 12 }}>
+                {longPositions.map(function (pos) {
+                  return <PositionCard key={pos.symbol + "-" + pos.side} pos={pos} />;
+                })}
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Shorts */}
+          {shortPositions.length > 0 && (
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#dc2626", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12, display: "flex", justifyContent: "space-between" }}>
+                <span>Short Positions ({shortPositions.length})</span>
+                <span>{fmt(shortAllocSum, 1)}% NAV</span>
+              </div>
+              <div style={{ display: "grid", gap: 12 }}>
+                {shortPositions.map(function (pos) {
+                  return <PositionCard key={pos.symbol + "-" + pos.side} pos={pos} />;
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Cash & Treasury Tracker */}
+          {cashItems.length > 0 && (
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#1e3a5f", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12, display: "flex", justifyContent: "space-between" }}>
+                <span>Cash & Treasury Tracker ({cashItems.length})</span>
+                <span>{fmt(cashAllocSum, 1)}% NAV</span>
+              </div>
+              <div style={{ display: "grid", gap: 12 }}>
+                {cashItems.map(function (pos) {
+                  return <PositionCard key={pos.symbol + "-" + pos.side} pos={pos} />;
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Total Card */}
           <div style={{ padding: 20, background: "#1a2a44", borderRadius: 6, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div style={{ fontWeight: 700, color: "#ffffff", fontSize: 15 }}>Total</div>
+            <div style={{ fontWeight: 700, color: "#ffffff", fontSize: 15 }}>Total Portfolio</div>
             <div style={{ textAlign: "right" }}>
               <div style={{ fontWeight: 700, color: "#ffffff", fontSize: 16 }}>{"$" + fmt(d.totalValue, 0)}</div>
               <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 2 }}>100.0% allocation</div>
@@ -624,7 +798,70 @@ export default function Portfolio() {
         </div>
       )}
 
-      <style jsx>{`
+      <style jsx global>{`
+        .side-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          padding: 2px 7px;
+          border-radius: 4px;
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+          line-height: 1;
+          flex-shrink: 0;
+        }
+        .side-badge .badge-dot {
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+        }
+        .side-badge.badge-long {
+          background: rgba(22, 163, 74, 0.08);
+          color: #16a34a;
+          border: 1px solid rgba(22, 163, 74, 0.22);
+        }
+        .side-badge.badge-long .badge-dot {
+          background: #16a34a;
+        }
+        .side-badge.badge-short {
+          background: rgba(220, 38, 38, 0.08);
+          color: #dc2626;
+          border: 1px solid rgba(220, 38, 38, 0.22);
+        }
+        .side-badge.badge-short .badge-dot {
+          background: #dc2626;
+        }
+        .side-badge.badge-treasury {
+          background: rgba(13, 148, 136, 0.08);
+          color: #0d9488;
+          border: 1px solid rgba(13, 148, 136, 0.22);
+        }
+        .side-badge.badge-treasury .badge-dot {
+          background: #0d9488;
+        }
+        .side-badge.badge-cash {
+          background: rgba(30, 58, 95, 0.08);
+          color: #1e3a5f;
+          border: 1px solid rgba(30, 58, 95, 0.18);
+        }
+        .side-badge.badge-cash .badge-dot {
+          background: #1e3a5f;
+        }
+
+        .group-header-row td {
+          background: #f8fafc;
+          border-top: 2px solid #e2e8f0;
+          border-bottom: 1px solid #e2e8f0;
+          padding: 10px 16px !important;
+        }
+        .group-header-content {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+
         .portfolio-mobile {
           display: none;
         }
