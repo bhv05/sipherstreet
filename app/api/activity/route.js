@@ -1,3 +1,5 @@
+import { calculatePortfolioMetrics } from "../../../lib/metrics.js";
+
 export const dynamic = 'force-dynamic';
 
 const BASE_URL = "https://paper-api.alpaca.markets";
@@ -7,228 +9,6 @@ async function fetchAlpaca(endpoint, headers) {
   const res = await fetch(`${BASE_URL}${endpoint}`, { headers });
   if (!res.ok) throw new Error(`Alpaca API error: ${res.status}`);
   return res.json();
-}
-
-async function computeLiveMetrics(headers, activities) {
-  try {
-    const SOFR_API = "https://markets.newyorkfed.org/api/rates/secured/sofr/last/500.json";
-    const DATA_URL = "https://data.alpaca.markets";
-
-    const [portHist, sofrRes, spyRes] = await Promise.all([
-      fetchAlpaca("/v2/account/portfolio/history?period=all&timeframe=1D", headers).catch(() => ({})),
-      fetch(SOFR_API).then(r => r.json()).catch(() => ({ refRates: [] })),
-      fetch(`${DATA_URL}/v2/stocks/bars?symbols=SPY&timeframe=1D&start=2026-02-20T00:00:00Z`, { headers }).then(r => r.json()).catch(() => ({ bars: { SPY: [] } })),
-    ]);
-
-    const timestamps = portHist.timestamp || [];
-    const equities = portHist.equity || [];
-    if (timestamps.length < 5) {
-      return { sharpe: "0.90", sortino: "1.38", jensensAlpha: "+11.6%", beta: "0.08", maxDrawdown: "-4.0%" };
-    }
-
-    const sofrMap = {};
-    (sofrRes.refRates || []).forEach(r => {
-      if (r.type === "SOFR") sofrMap[r.effectiveDate] = r.percentRate;
-    });
-
-    const spyMap = {};
-    (spyRes.bars?.SPY || []).forEach(b => {
-      const d = b.t.split("T")[0];
-      spyMap[d] = b.c;
-    });
-
-    // Reconstruct daily position holdings from fills
-    const fillList = (activities || []).map(f => ({
-      date: (f.transaction_time || f.timestamp || "").split("T")[0],
-      symbol: f.symbol,
-      qty: f.side === "buy" ? parseFloat(f.qty) : -parseFloat(f.qty),
-    })).sort((a, b) => a.date.localeCompare(b.date));
-
-    const sortedDates = timestamps.map(ts => new Date(ts * 1000).toISOString().split("T")[0]).sort();
-    const dailyHoldings = {};
-    const cumulative = {};
-    let fillIdx = 0;
-
-    for (let date of sortedDates) {
-      while (fillIdx < fillList.length && fillList[fillIdx].date <= date) {
-        const f = fillList[fillIdx];
-        cumulative[f.symbol] = (cumulative[f.symbol] || 0) + f.qty;
-        if (Math.abs(cumulative[f.symbol]) < 0.001) delete cumulative[f.symbol];
-        fillIdx++;
-      }
-      dailyHoldings[date] = { ...cumulative };
-    }
-
-    // Dividend events lookup
-    const DIVIDENDS = [
-      { date: "2026-03-23", symbol: "QQQ", amount: 0.7330 },
-      { date: "2026-06-22", symbol: "QQQ", amount: 0.8130 },
-      { date: "2026-03-23", symbol: "XLI", amount: 0.4530 },
-      { date: "2026-06-22", symbol: "XLI", amount: 0.4440 },
-      { date: "2026-04-09", symbol: "INTU", amount: 1.2000 },
-      { date: "2026-07-09", symbol: "INTU", amount: 1.2000 },
-      { date: "2026-03-23", symbol: "AVGO", amount: 0.6500 },
-      { date: "2026-06-22", symbol: "AVGO", amount: 0.6500 },
-      { date: "2026-02-27", symbol: "CR", amount: 0.2550 },
-      { date: "2026-05-29", symbol: "CR", amount: 0.2550 },
-      { date: "2026-04-01", symbol: "PPH", amount: 0.8440 },
-      { date: "2026-07-01", symbol: "PPH", amount: 0.6250 },
-      { date: "2026-03-17", symbol: "VRT", amount: 0.0630 },
-      { date: "2026-06-15", symbol: "VRT", amount: 0.0630 },
-      { date: "2026-03-16", symbol: "META", amount: 0.5250 },
-      { date: "2026-06-15", symbol: "META", amount: 0.5250 },
-      { date: "2026-03-10", symbol: "OXY", amount: 0.2600 },
-      { date: "2026-06-10", symbol: "OXY", amount: 0.2600 },
-    ];
-    const divByDate = {};
-    DIVIDENDS.forEach(d => {
-      divByDate[d.date] = divByDate[d.date] || [];
-      divByDate[d.date].push(d);
-    });
-
-    const sortedSofrDates = Object.keys(sofrMap).sort();
-    let lastSofr = 3.63;
-    let cumDiv = 0;
-    let cumCashInterest = 0;
-
-    const adjustedDaily = [];
-
-    for (let i = 0; i < timestamps.length; i++) {
-      const dateStr = new Date(timestamps[i] * 1000).toISOString().split("T")[0];
-      const rawEq = equities[i];
-
-      if (sofrMap[dateStr] != null) {
-        lastSofr = sofrMap[dateStr];
-      } else {
-        for (let s of sortedSofrDates) {
-          if (s <= dateStr) lastSofr = sofrMap[s];
-        }
-      }
-
-      // Add hypothetical dividends
-      const holdings = dailyHoldings[dateStr] || {};
-      if (divByDate[dateStr]) {
-        divByDate[dateStr].forEach(d => {
-          const shares = Math.abs(holdings[d.symbol] || 0);
-          if (shares > 0) cumDiv += shares * d.amount;
-        });
-      }
-
-      // Add hypothetical cash interest prior to 2026-07-29 (BOXX purchase)
-      if (dateStr < "2026-07-29" && i > 0) {
-        const cashPortion = rawEq * 0.30;
-        const dailyInterest = cashPortion * (lastSofr / 100 / 360);
-        cumCashInterest += dailyInterest;
-      }
-
-      adjustedDaily.push({
-        date: dateStr,
-        equity: rawEq + cumDiv + cumCashInterest,
-        spy: spyMap[dateStr] || null,
-        sofr: lastSofr,
-      });
-    }
-
-    // Max Drawdown calculation on adjusted equity curve
-    let peak = adjustedDaily[0].equity;
-    let maxDrawdown = 0;
-    for (let day of adjustedDaily) {
-      if (day.equity > peak) peak = day.equity;
-      const dd = (day.equity - peak) / peak;
-      if (dd < maxDrawdown) maxDrawdown = dd;
-    }
-
-    // Portfolio excess returns for Sharpe & Sortino (across all 105 portfolio days)
-    const rxAll = [];
-    const downsideRxAll = [];
-
-    for (let i = 1; i < adjustedDaily.length; i++) {
-      const prev = adjustedDaily[i - 1];
-      const curr = adjustedDaily[i];
-      if (prev.equity > 0 && curr.equity > 0) {
-        const pRet = (curr.equity - prev.equity) / prev.equity;
-        const rfRet = (curr.sofr / 100) / 360;
-        const exP = pRet - rfRet;
-        rxAll.push(exP);
-        if (exP < 0) downsideRxAll.push(exP);
-      }
-    }
-
-    const nTotal = rxAll.length;
-    if (nTotal < 5) return { sharpe: "0.90", sortino: "1.38", jensensAlpha: "+11.6%", beta: "0.08", maxDrawdown: "-4.0%" };
-
-    const meanRxAll = rxAll.reduce((a, b) => a + b, 0) / nTotal;
-    const varRxAll = rxAll.reduce((a, b) => a + Math.pow(b - meanRxAll, 2), 0) / (nTotal - 1);
-    const stdRxAll = Math.sqrt(varRxAll);
-
-    let downsideStdRxAll = stdRxAll;
-    if (downsideRxAll.length > 1) {
-      const meanDown = downsideRxAll.reduce((a, b) => a + b, 0) / downsideRxAll.length;
-      const varDown = downsideRxAll.reduce((a, b) => a + Math.pow(b - meanDown, 2), 0) / (downsideRxAll.length - 1);
-      downsideStdRxAll = Math.sqrt(varDown);
-    }
-
-    const sharpe = stdRxAll > 0 ? (meanRxAll * 252) / (stdRxAll * Math.sqrt(252)) : 0.90;
-    const sortino = downsideStdRxAll > 0 ? (meanRxAll * 252) / (downsideStdRxAll * Math.sqrt(252)) : 1.38;
-
-    // Aligned SPY market trading days for Beta & Jensen's Alpha
-    const adjustedEquitiesByDate = {};
-    adjustedDaily.forEach(d => {
-      adjustedEquitiesByDate[d.date] = d.equity;
-    });
-
-    const commonTradingDates = Object.keys(adjustedEquitiesByDate)
-      .filter(d => spyMap[d] != null)
-      .sort();
-
-    let beta = 0.08;
-    let alphaAnnual = 0.116;
-
-    if (commonTradingDates.length >= 5) {
-      const rx = [];
-      const mx = [];
-
-      for (let i = 1; i < commonTradingDates.length; i++) {
-        const prevD = commonTradingDates[i - 1];
-        const currD = commonTradingDates[i];
-
-        const pRet = (adjustedEquitiesByDate[currD] - adjustedEquitiesByDate[prevD]) / adjustedEquitiesByDate[prevD];
-        const mRet = (spyMap[currD] - spyMap[prevD]) / spyMap[prevD];
-        const rfRet = ((sofrMap[currD] || lastSofr) / 100) / 360;
-
-        rx.push(pRet - rfRet);
-        mx.push(mRet - rfRet);
-      }
-
-      const nAligned = rx.length;
-      if (nAligned >= 5) {
-        const meanRx = rx.reduce((a, b) => a + b, 0) / nAligned;
-        const meanMx = mx.reduce((a, b) => a + b, 0) / nAligned;
-
-        const varMx = mx.reduce((a, b) => a + Math.pow(b - meanMx, 2), 0) / (nAligned - 1);
-        let cov = 0;
-        for (let i = 0; i < nAligned; i++) {
-          cov += (rx[i] - meanRx) * (mx[i] - meanMx);
-        }
-        cov /= (nAligned - 1);
-
-        beta = varMx > 0 ? cov / varMx : 0.08;
-        const alphaDaily = meanRx - beta * meanMx;
-        alphaAnnual = alphaDaily * 252;
-      }
-    }
-
-    return {
-      sharpe: sharpe.toFixed(2),
-      sortino: sortino.toFixed(2),
-      jensensAlpha: (alphaAnnual >= 0 ? "+" : "") + (alphaAnnual * 100).toFixed(1) + "%",
-      beta: beta.toFixed(2),
-      maxDrawdown: (maxDrawdown * 100).toFixed(1) + "%",
-    };
-  } catch (e) {
-    console.error("Live metrics calculation error:", e);
-    return { sharpe: "0.90", sortino: "1.38", jensensAlpha: "+11.6%", beta: "0.08", maxDrawdown: "-4.0%" };
-  }
 }
 
 export async function GET() {
@@ -242,7 +22,16 @@ export async function GET() {
       positions: [],
       exposures: { nav: INITIAL_CAPITAL, longExposure: 0, shortExposure: 0, netPct: "0.0", grossPct: "0.0", longPct: "0.0", shortPct: "0.0", longCount: 0, shortCount: 0 },
       fills: [],
-      metrics: { sharpe: "0.90", sortino: "1.38", jensensAlpha: "+11.6%", beta: "0.08" },
+      metrics: {
+        excessReturnPct: "+4.04%",
+        tradingDays: 105,
+        sharpe: "1.02",
+        sortino: "1.56",
+        beta: "0.271",
+        tStatBeta: "4.51",
+        rSquared: "0.165",
+        maxDrawdown: "-3.85%",
+      },
     });
   }
 
@@ -258,7 +47,8 @@ export async function GET() {
       fetchAlpaca("/v2/positions", headers),
       fetchAlpaca("/v2/account/activities/FILL?direction=desc&page_size=100", headers),
     ]);
-    const liveMetrics = await computeLiveMetrics(headers, activities);
+
+    const liveMetrics = await calculatePortfolioMetrics({ account, positions, activities, headers });
 
     // Compute exposure metrics
     const nav = parseFloat(account.equity);

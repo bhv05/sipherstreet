@@ -422,11 +422,13 @@ function ActivityInner() {
   var longCount = exposures ? exposures.longCount : 0;
   var shortCount = exposures ? exposures.shortCount : 0;
   var totalPositions = longCount + shortCount;
-  var beta = metrics && metrics.beta ? metrics.beta : (config && config.portfolio_beta !== undefined ? config.portfolio_beta : "0.08");
-  var sharpe = metrics && metrics.sharpe ? metrics.sharpe : (config && config.sharpe_ratio !== undefined ? config.sharpe_ratio : "0.90");
-  var sortino = metrics && metrics.sortino ? metrics.sortino : (config && config.sortino_ratio !== undefined ? config.sortino_ratio : "1.38");
-  var jensensAlpha = metrics && metrics.jensensAlpha ? metrics.jensensAlpha : (config && config.jensens_alpha !== undefined ? config.jensens_alpha : "+11.6%");
-  var maxDrawdown = metrics && metrics.maxDrawdown ? metrics.maxDrawdown : "-4.0%";
+  var excessReturn = metrics && metrics.excessReturnPct ? metrics.excessReturnPct : "+4.04%";
+  var tradingDays = metrics && metrics.tradingDays ? metrics.tradingDays : 105;
+  var beta = metrics && metrics.beta ? metrics.beta : (config && config.portfolio_beta !== undefined ? config.portfolio_beta : "0.271");
+  var tStatBeta = metrics && metrics.tStatBeta ? metrics.tStatBeta : "4.51";
+  var sharpe = metrics && metrics.sharpe ? metrics.sharpe : (config && config.sharpe_ratio !== undefined ? config.sharpe_ratio : "1.02");
+  var sortino = metrics && metrics.sortino ? metrics.sortino : (config && config.sortino_ratio !== undefined ? config.sortino_ratio : "1.56");
+  var maxDrawdown = metrics && metrics.maxDrawdown ? metrics.maxDrawdown : "-3.85%";
   var netTarget = config ? config.net_exposure_target : 30;
 
   /* Earnings: prefer auto-generated earnings-data.json, fallback to manual config */
@@ -515,30 +517,30 @@ function ActivityInner() {
       <div ref={kpiReveal.ref} className={"reveal" + (kpiReveal.inView ? " in-view" : "")} style={{ marginBottom: 36 }}>
         <div className="kpi-grid">
           <KpiCard
-            label="Sharpe Ratio (Ann.)"
-            value={sharpe}
-            subtitle="Target: 1.50 (vs SOFR)"
+            label="Excess Return vs SOFR"
+            value={excessReturn}
+            subtitle={"over " + tradingDays + " trading days"}
             subtitleColor="#16a34a"
             highlight
           />
           <KpiCard
-            label="Sortino Ratio (Ann.)"
+            label="Sharpe Ratio"
+            value={sharpe}
+            subtitle="vs SOFR Risk-Free Rate"
+            subtitleColor="#16a34a"
+            highlight
+          />
+          <KpiCard
+            label="Sortino Ratio"
             value={sortino}
             subtitle={"Max Drawdown: " + maxDrawdown}
             subtitleColor="#16a34a"
             highlight
           />
           <KpiCard
-            label="Jensen's Alpha (Ann.)"
-            value={jensensAlpha}
-            subtitle="Top Quartile vs L/S Peers"
-            subtitleColor="#16a34a"
-            highlight
-          />
-          <KpiCard
             label="Portfolio Beta"
             value={beta}
-            subtitle="Market Neutrality (vs SPX)"
+            subtitle={"t = " + tStatBeta + " vs SPX · daily, since inception"}
             subtitleColor="#1e3a5f"
             highlight
           />
@@ -565,8 +567,8 @@ function ActivityInner() {
           </div>
         </div>
 
-        <p style={{ fontSize: 11, color: "#8896a6", marginTop: 10, textAlign: "right", letterSpacing: "0.02em" }}>
-          * Sharpe Ratio, Sortino Ratio, and Jensen's Alpha are annualised (252 trading days/yr) vs SOFR risk-free rate.
+        <p style={{ fontSize: 11, color: "#8896a6", marginTop: 14, lineHeight: 1.5, letterSpacing: "0.01em" }}>
+          Returns are pro-forma and include (i) interest on uninvested cash accrued daily at SOFR on an ACT/360 basis, excluding short-sale proceeds, and (ii) dividends receivable on long positions net of dividends payable on short positions. Neither is credited by the paper-trading platform. Ratios are annualised using 252 trading days and measured against SOFR. Performance since inception on 26 February 2026 covers 105 trading days; risk-adjusted statistics over this sample carry wide confidence intervals. The pro-forma adjustment will be discontinued once a full year of live trading data is available.
         </p>
       </div>
 
