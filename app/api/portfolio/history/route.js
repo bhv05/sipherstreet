@@ -106,20 +106,35 @@ export async function GET() {
       return Response.json({ portfolio: [], benchmark: [], debug: "No timestamps returned" });
     }
 
-    var firstEquity = equities[0];
-    if (!firstEquity || firstEquity === 0) firstEquity = INITIAL_CAPITAL;
+    // Filter out initial 0.0 equity data points prior to account funding on Feb 26
+    var validIndex = -1;
+    for (var i = 0; i < equities.length; i++) {
+      if (equities[i] && equities[i] > 1000) {
+        validIndex = i;
+        break;
+      }
+    }
+
+    if (validIndex === -1) {
+      return Response.json({ portfolio: [], benchmark: [], debug: "No valid non-zero equity points" });
+    }
+
+    var firstEquity = equities[validIndex];
 
     var firstDate = null;
     var lastDate = null;
 
-    for (var i = 0; i < timestamps.length; i++) {
-      var d = new Date(timestamps[i] * 1000);
+    for (var j = validIndex; j < timestamps.length; j++) {
+      if (!equities[j] || equities[j] <= 0) continue;
+      var d = new Date(timestamps[j] * 1000);
       var dateStr = d.toLocaleDateString("en-CA", { timeZone: "America/New_York" });
-      var rebasedValue = (equities[i] / firstEquity) * INITIAL_CAPITAL;
-      portfolioSeries.push({ date: dateStr, value: Math.round(rebasedValue * 100) / 100 });
+      var rebasedValue = (equities[j] / firstEquity) * INITIAL_CAPITAL;
 
-      if (i === 0) firstDate = dateStr;
-      lastDate = dateStr;
+      if (isFinite(rebasedValue)) {
+        portfolioSeries.push({ date: dateStr, value: Math.round(rebasedValue * 100) / 100 });
+        if (!firstDate) firstDate = dateStr;
+        lastDate = dateStr;
+      }
     }
 
     // Build SOFR benchmark series covering the same date range across calendar days
