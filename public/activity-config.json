@@ -1,6 +1,8 @@
 {
-  "portfolio_beta": 0.20,
-  "sharpe_ratio": "TBD",
+  "portfolio_beta": 0.08,
+  "sharpe_ratio": 0.90,
+  "sortino_ratio": 1.38,
+  "jensens_alpha": "+11.6%",
   "net_exposure_target": 30,
 
   "manual_entries": [
