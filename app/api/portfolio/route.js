@@ -54,11 +54,13 @@ export async function GET() {
     const netDividendAdjustment = parseFloat(metrics.netDividendAdjustment || "0");
     const proFormaAdjustment = interestAccrued + netDividendAdjustment;
 
+    const hasBoxx = positions.some((p) => p.symbol === "BOXX");
     const rawEquity = parseFloat(account.equity);
     const adjEquity = rawEquity + proFormaAdjustment;
     const rawTotalValue = parseFloat(account.portfolio_value);
     const adjTotalValue = rawTotalValue + proFormaAdjustment;
-    const cash = parseFloat(account.cash);
+    const rawCash = parseFloat(account.cash);
+    const adjCash = hasBoxx ? rawCash : rawCash + proFormaAdjustment;
     const totalReturnPct = ((adjEquity - INITIAL_CAPITAL) / INITIAL_CAPITAL) * 100;
 
     // Display name overrides for cash-equivalent / tax instruments
@@ -98,7 +100,7 @@ export async function GET() {
 
     const data = {
       equity: adjEquity,
-      cash: cash,
+      cash: adjCash,
       totalValue: adjTotalValue,
       initialCapital: INITIAL_CAPITAL,
       totalReturnPct: totalReturnPct,
