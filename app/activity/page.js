@@ -526,7 +526,7 @@ function ActivityInner() {
           <KpiCard
             label="Sharpe Ratio (Ann.)"
             value={sharpe}
-            subtitle="vs SOFR Risk-Free Rate"
+            subtitle="Target: 1.50 (vs SOFR)"
             subtitleColor="#16a34a"
             highlight
           />
@@ -568,7 +568,7 @@ function ActivityInner() {
         </div>
 
         <p style={{ fontSize: 11, color: "#8896a6", marginTop: 14, lineHeight: 1.5, letterSpacing: "0.01em" }}>
-          Returns are pro-forma and include (i) interest on uninvested cash accrued daily at SOFR on an ACT/360 basis, excluding short-sale proceeds, and (ii) dividends receivable on long positions net of dividends payable on short positions. Neither is credited by the paper-trading platform. Ratios are annualised using 252 trading days and measured against SOFR. Performance since inception on 26 February 2026 covers 105 trading days; risk-adjusted statistics over this sample carry wide confidence intervals. The pro-forma adjustment will be discontinued once a full year of live trading data is available.
+          Returns are pro-forma and include (i) interest on uninvested cash accrued daily at SOFR on an ACT/360 basis, excluding short-sale proceeds, and (ii) dividends receivable on long positions net of dividends payable on short positions. Due to Alpaca limitations, dividends and cash interest are not credited directly. Ratios are annualised using 252 trading days and measured against SOFR. Performance since inception on 26 February 2026 covers 105 trading days; risk-adjusted statistics over this sample carry wide confidence intervals.
         </p>
       </div>
 
