@@ -87,6 +87,10 @@ class TestMetricsCalculations(unittest.TestCase):
         n_calendar_days = len(calendar_dates) - 1 # 153 days from 26 Feb to 29 Jul
         self.assertEqual(n_calendar_days, 153, "Calendar day count should be 153 days")
         
+        # Test known window flat rate calculation (3.65% * 153 / 360 = 0.0155125 = 1.551%)
+        flat_rate = 0.0365
+        expected_flat_accrual = flat_rate * (153.0 / 360.0) * 100.0 # ~1.551%
+        
         sorted_sofr = sorted(self.sofr_map.keys())
         last_sofr = 3.65
         compounded = 1.0
@@ -101,9 +105,15 @@ class TestMetricsCalculations(unittest.TestCase):
             compounded *= (1.0 + (last_sofr / 100.0 / 360.0))
             
         accrual_pct = (compounded - 1.0) * 100.0
-        print(f"\n[Test 2] Calendar Days: {n_calendar_days} | SOFR ACT/360 Accrual: +{accrual_pct:.3f}%")
-        self.assertGreater(accrual_pct, 1.40, "SOFR accrual should be ~1.55%")
-        self.assertLess(accrual_pct, 1.70, "SOFR accrual should be ~1.55%")
+        diff_from_flat = abs(accrual_pct - expected_flat_accrual)
+        
+        print(f"\n[Test 2] Calendar Days: {n_calendar_days} | SOFR ACT/360 Accrual: +{accrual_pct:.3f}% | Expected Flat: +{expected_flat_accrual:.3f}% | Diff: {diff_from_flat:.4f}%")
+        self.assertLessEqual(diff_from_flat, 0.02, "SOFR accrual should match expected ACT/360 within tight tolerance")
+        
+        # Guard Check: Ensure 365 divisor or trading-day-only accrual fails guard
+        wrong_divisor_accrual = flat_rate * (153.0 / 365.0) * 100.0 # ~1.530% or trading days 105/365 ~1.05%
+        wrong_trading_days_accrual = flat_rate * (105.0 / 365.0) * 100.0 # ~1.050%
+        self.assertGreater(abs(accrual_pct - wrong_trading_days_accrual), 0.30, "Guard: Trading-day-only accrual (1.05%) must fail validation guard against ACT/360 calendar accrual (1.55%)")
 
     def test_3_beta_alignment_guard(self):
         """Test 3: Assert or warn when R² < 0.05 while absolute net exposure > 15%."""

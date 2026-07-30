@@ -13,63 +13,56 @@ async function fetchWithHeaders(url, headers) {
 
 /**
  * Build a SOFR-compounded series rebased to $100,000.
- * Takes the portfolio start date and builds day-by-day using actual published SOFR rates.
- * SOFR is an overnight rate quoted as an annualised percentage, compounded daily using ACT/360.
+ * Accrues interest across EVERY CALENDAR DAY (including weekends & holidays) on an ACT/360 basis.
  */
 async function buildSofrSeries(startDate, endDate) {
   try {
-    const res = await fetch(SOFR_API);
-    if (!res.ok) throw new Error("SOFR API " + res.status);
-    const data = await res.json();
-
-    if (!data.refRates || data.refRates.length === 0) return [];
-
-    // Build a map of date -> daily SOFR rate (percent)
-    const sofrByDate = {};
-    data.refRates.forEach(function (r) {
-      if (r.type === "SOFR") {
-        sofrByDate[r.effectiveDate] = r.percentRate;
+    let sofrByDate = {};
+    try {
+      const res = await fetch(SOFR_API);
+      if (res.ok) {
+        const data = await res.json();
+        (data.refRates || []).forEach(function (r) {
+          if (r.type === "SOFR") sofrByDate[r.effectiveDate] = r.percentRate;
+        });
       }
-    });
+    } catch (e) {
+      console.warn("SOFR API fetch failed, using fallback flat rate 3.65%:", e);
+    }
 
-    // Walk from startDate to endDate, compounding daily
+    var sortedDates = Object.keys(sofrByDate).sort();
+    var lastKnownRate = sortedDates.length > 0 ? sofrByDate[sortedDates[0]] : 3.65;
+
     var series = [];
     var current = new Date(startDate + "T00:00:00Z");
     var end = new Date(endDate + "T00:00:00Z");
     var value = INITIAL_CAPITAL;
-    var lastKnownRate = null;
-
-    // Find the earliest available SOFR rate as fallback
-    var sortedDates = Object.keys(sofrByDate).sort();
-    if (sortedDates.length > 0) {
-      lastKnownRate = sofrByDate[sortedDates[sortedDates.length - 1]];
-    }
+    var startTimestamp = current.getTime();
 
     while (current <= end) {
       var yyyy = current.getUTCFullYear();
       var mm = String(current.getUTCMonth() + 1).padStart(2, "0");
       var dd = String(current.getUTCDate()).padStart(2, "0");
       var dateStr = yyyy + "-" + mm + "-" + dd;
-      var dayOfWeek = current.getUTCDay(); // 0=Sun, 6=Sat
 
-      // Only compound on weekdays (SOFR is an overnight rate for business days)
-      if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-        // Use the SOFR rate for this date, or carry forward the last known rate
-        if (sofrByDate[dateStr] != null) {
-          lastKnownRate = sofrByDate[dateStr];
+      if (sofrByDate[dateStr] != null) {
+        lastKnownRate = sofrByDate[dateStr];
+      } else {
+        for (var i = 0; i < sortedDates.length; i++) {
+          if (sortedDates[i] <= dateStr) lastKnownRate = sofrByDate[sortedDates[i]];
         }
-
-        if (lastKnownRate != null && series.length > 0) {
-          // Compound: daily rate = annualised rate / 360 (ACT/360 convention)
-          var dailyRate = lastKnownRate / 100 / 360;
-          value = value * (1 + dailyRate);
-        }
-
-        series.push({
-          date: dateStr,
-          value: Math.round(value * 100) / 100,
-        });
       }
+
+      // Accrue interest on EVERY CALENDAR DAY (ACT/360 convention)
+      if (current.getTime() > startTimestamp) {
+        var dailyRate = (lastKnownRate / 100) / 360;
+        value = value * (1 + dailyRate);
+      }
+
+      series.push({
+        date: dateStr,
+        value: Math.round(value * 100) / 100,
+      });
 
       current.setUTCDate(current.getUTCDate() + 1);
     }
@@ -98,10 +91,13 @@ export async function GET() {
   var benchmarkSeries = [];
 
   try {
+    const todayNY = new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" });
     var portfolioHistory = await fetchWithHeaders(
-      BASE_URL + "/v2/account/portfolio/history?period=all&timeframe=1D",
+      BASE_URL + "/v2/account/portfolio/history?timeframe=1D&start=2026-02-26T00:00:00Z&end=" + todayNY + "T23:59:59Z",
       headers
-    );
+    ).catch(function () {
+      return fetchWithHeaders(BASE_URL + "/v2/account/portfolio/history?period=all&timeframe=1D", headers);
+    });
 
     var timestamps = portfolioHistory.timestamp || [];
     var equities = portfolioHistory.equity || [];
@@ -117,7 +113,8 @@ export async function GET() {
     var lastDate = null;
 
     for (var i = 0; i < timestamps.length; i++) {
-      var dateStr = new Date(timestamps[i] * 1000).toISOString().split("T")[0];
+      var d = new Date(timestamps[i] * 1000);
+      var dateStr = d.toLocaleDateString("en-CA", { timeZone: "America/New_York" });
       var rebasedValue = (equities[i] / firstEquity) * INITIAL_CAPITAL;
       portfolioSeries.push({ date: dateStr, value: Math.round(rebasedValue * 100) / 100 });
 
@@ -125,7 +122,7 @@ export async function GET() {
       lastDate = dateStr;
     }
 
-    // Build SOFR benchmark series covering the same date range
+    // Build SOFR benchmark series covering the same date range across calendar days
     if (firstDate && lastDate) {
       benchmarkSeries = await buildSofrSeries(firstDate, lastDate);
     }
