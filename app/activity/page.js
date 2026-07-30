@@ -515,21 +515,21 @@ function ActivityInner() {
       <div ref={kpiReveal.ref} className={"reveal" + (kpiReveal.inView ? " in-view" : "")} style={{ marginBottom: 36 }}>
         <div className="kpi-grid">
           <KpiCard
-            label="Sharpe Ratio"
+            label="Sharpe Ratio (Ann.)"
             value={sharpe}
             subtitle="Target: 1.50 (vs SOFR)"
             subtitleColor="#16a34a"
             highlight
           />
           <KpiCard
-            label="Sortino Ratio"
+            label="Sortino Ratio (Ann.)"
             value={sortino}
             subtitle={"Max Drawdown: " + maxDrawdown}
             subtitleColor="#16a34a"
             highlight
           />
           <KpiCard
-            label="Jensen's Alpha"
+            label="Jensen's Alpha (Ann.)"
             value={jensensAlpha}
             subtitle="Top Quartile vs L/S Peers"
             subtitleColor="#16a34a"
@@ -564,6 +564,10 @@ function ActivityInner() {
             <span className="banner-sub">({longCount} Long / {shortCount} Short)</span>
           </div>
         </div>
+
+        <p style={{ fontSize: 11, color: "#8896a6", marginTop: 10, textAlign: "right", letterSpacing: "0.02em" }}>
+          * Sharpe Ratio, Sortino Ratio, and Jensen's Alpha are annualised (252 trading days/yr) vs SOFR risk-free rate.
+        </p>
       </div>
 
       {/* Section B — Filter Bar */}
