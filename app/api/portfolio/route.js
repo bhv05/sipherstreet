@@ -1,4 +1,4 @@
-import { calculatePortfolioMetrics } from "../../../lib/metrics.js";
+import { calculatePortfolioMetrics } from "@/lib/metrics.js";
 
 const BASE_URL = "https://paper-api.alpaca.markets";
 const INITIAL_CAPITAL = 100000;

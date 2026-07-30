@@ -1,4 +1,4 @@
-import { calculatePortfolioMetrics } from "../../../lib/metrics.js";
+import { calculatePortfolioMetrics } from "@/lib/metrics.js";
 
 export const dynamic = 'force-dynamic';
 
