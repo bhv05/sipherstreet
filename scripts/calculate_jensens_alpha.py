@@ -158,48 +158,35 @@ def main():
                     cum_div += shares * d["amount"]
         adjusted.append({"date": date, "equity": day["equity"] + cum_div})
 
-    # Calculate daily portfolio returns
-    port_returns = {}
-    for i in range(1, len(adjusted)):
-        prev = adjusted[i - 1]["equity"]
-        curr = adjusted[i]["equity"]
-        if prev > 0:
-            port_returns[adjusted[i]["date"]] = (curr - prev) / prev
+    # Map portfolio equities by date
+    port_by_date = {a["date"]: a["equity"] for a in adjusted}
 
-    # Calculate daily SPY returns
-    spy_dates = sorted(spy_prices.keys())
-    spy_returns = {}
-    for i in range(1, len(spy_dates)):
-        prev = spy_prices[spy_dates[i - 1]]
-        curr = spy_prices[spy_dates[i]]
-        if prev > 0:
-            spy_returns[spy_dates[i]] = (curr - prev) / prev
-
-    # Get SOFR daily risk-free rates
-    last_sofr = None
-
-    # Align dates: only use dates where we have both portfolio and SPY returns
-    common_dates = sorted(set(port_returns.keys()) & set(spy_returns.keys()))
-    print(f"\n  Aligned {len(common_dates)} common trading days for regression")
+    # Find common market trading dates between portfolio history and SPY
+    common_dates = sorted(set(port_by_date.keys()) & set(spy_prices.keys()))
+    print(f"\n  Aligned {len(common_dates)} common market trading days for regression")
 
     rp_excess = []
     rm_excess = []
 
-    for date in common_dates:
+    for i in range(1, len(common_dates)):
+        prev_d = common_dates[i - 1]
+        curr_d = common_dates[i]
+
+        p_ret = (port_by_date[curr_d] - port_by_date[prev_d]) / port_by_date[prev_d]
+        m_ret = (spy_prices[curr_d] - spy_prices[prev_d]) / spy_prices[prev_d]
+
         # Find SOFR rate
-        if date in sofr_rates:
-            last_sofr = sofr_rates[date]
+        if curr_d in sofr_rates:
+            last_sofr = sofr_rates[curr_d]
         elif last_sofr is None:
             for sd in sorted_sofr:
-                if sd <= date:
+                if sd <= curr_d:
                     last_sofr = sofr_rates[sd]
 
         rf_daily = (last_sofr / 100 / 360) if last_sofr else 0.0
 
-        rp_ex = port_returns[date] - rf_daily
-        rm_ex = spy_returns[date] - rf_daily
-        rp_excess.append(rp_ex)
-        rm_excess.append(rm_ex)
+        rp_excess.append(p_ret - rf_daily)
+        rm_excess.append(m_ret - rf_daily)
 
     rp_excess = np.array(rp_excess)
     rm_excess = np.array(rm_excess)
@@ -233,6 +220,7 @@ def main():
     last_eq = adjusted[-1]["equity"]
     port_total_return = (last_eq - first_eq) / first_eq * 100
 
+    spy_dates = sorted(spy_prices.keys())
     spy_first = spy_prices[spy_dates[0]]
     spy_last = spy_prices[spy_dates[-1]]
     spy_total_return = (spy_last - spy_first) / spy_first * 100
