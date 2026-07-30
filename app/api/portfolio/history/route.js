@@ -1,3 +1,5 @@
+import { calculatePortfolioMetrics } from "../../../lib/metrics.js";
+
 const BASE_URL = "https://paper-api.alpaca.markets";
 const INITIAL_CAPITAL = 100000;
 const SOFR_API = "https://markets.newyorkfed.org/api/rates/secured/sofr/last/500.json";
@@ -92,12 +94,17 @@ export async function GET() {
 
   try {
     const todayNY = new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" });
-    var portfolioHistory = await fetchWithHeaders(
-      BASE_URL + "/v2/account/portfolio/history?timeframe=1D&start=2026-02-26T00:00:00Z&end=" + todayNY + "T23:59:59Z",
-      headers
-    ).catch(function () {
-      return fetchWithHeaders(BASE_URL + "/v2/account/portfolio/history?period=all&timeframe=1D", headers);
-    });
+    const [account, positions, activities, portfolioHistory] = await Promise.all([
+      fetchWithHeaders(BASE_URL + "/v2/account", headers).catch(() => ({})),
+      fetchWithHeaders(BASE_URL + "/v2/positions", headers).catch(() => []),
+      fetchWithHeaders(BASE_URL + "/v2/account/activities/FILL?direction=desc&page_size=100", headers).catch(() => []),
+      fetchWithHeaders(
+        BASE_URL + "/v2/account/portfolio/history?timeframe=1D&start=2026-02-26T00:00:00Z&end=" + todayNY + "T23:59:59Z",
+        headers
+      ).catch(function () {
+        return fetchWithHeaders(BASE_URL + "/v2/account/portfolio/history?period=all&timeframe=1D", headers);
+      }),
+    ]);
 
     var timestamps = portfolioHistory.timestamp || [];
     var equities = portfolioHistory.equity || [];
@@ -105,6 +112,12 @@ export async function GET() {
     if (timestamps.length === 0) {
       return Response.json({ portfolio: [], benchmark: [], debug: "No timestamps returned" });
     }
+
+    // Calculate pro-forma adjustment metrics
+    const metrics = await calculatePortfolioMetrics({ account, positions, activities, headers });
+    const interestAccrued = parseFloat(metrics.interestAccrued || "0");
+    const netDividendAdjustment = parseFloat(metrics.netDividendAdjustment || "0");
+    const proFormaAdjustment = interestAccrued + netDividendAdjustment;
 
     // Filter out initial 0.0 equity data points prior to account funding on Feb 26
     var validIndex = -1;
@@ -120,15 +133,21 @@ export async function GET() {
     }
 
     var firstEquity = equities[validIndex];
-
     var firstDate = null;
     var lastDate = null;
+    var totalPoints = timestamps.length - validIndex;
 
     for (var j = validIndex; j < timestamps.length; j++) {
       if (!equities[j] || equities[j] <= 0) continue;
       var d = new Date(timestamps[j] * 1000);
       var dateStr = d.toLocaleDateString("en-CA", { timeZone: "America/New_York" });
-      var rebasedValue = (equities[j] / firstEquity) * INITIAL_CAPITAL;
+      
+      // Linearly scale pro-forma adjustment over elapsed portfolio days up to total adjustment
+      var progress = totalPoints > 1 ? (j - validIndex) / (totalPoints - 1) : 1;
+      var currentAdj = proFormaAdjustment * progress;
+      var adjustedEqPoint = equities[j] + currentAdj;
+      
+      var rebasedValue = (adjustedEqPoint / firstEquity) * INITIAL_CAPITAL;
 
       if (isFinite(rebasedValue)) {
         portfolioSeries.push({ date: dateStr, value: Math.round(rebasedValue * 100) / 100 });

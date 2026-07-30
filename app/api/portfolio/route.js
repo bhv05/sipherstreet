@@ -1,3 +1,5 @@
+import { calculatePortfolioMetrics } from "../../../lib/metrics.js";
+
 const BASE_URL = "https://paper-api.alpaca.markets";
 const INITIAL_CAPITAL = 100000;
 
@@ -34,9 +36,10 @@ export async function GET() {
   };
 
   try {
-    const [account, positions] = await Promise.all([
+    const [account, positions, activities] = await Promise.all([
       fetchAlpaca("/v2/account", headers),
       fetchAlpaca("/v2/positions", headers),
+      fetchAlpaca("/v2/account/activities/FILL?direction=desc&page_size=100", headers).catch(() => []),
     ]);
 
     // Fetch asset names for each position
@@ -45,10 +48,18 @@ export async function GET() {
     );
     const assets = await Promise.all(assetPromises);
 
-    const totalPortfolioValue = parseFloat(account.portfolio_value);
-    const equity = parseFloat(account.equity);
+    // Calculate pro-forma interest & dividends prior to BOXX purchase date
+    const metrics = await calculatePortfolioMetrics({ account, positions, activities, headers });
+    const interestAccrued = parseFloat(metrics.interestAccrued || "0");
+    const netDividendAdjustment = parseFloat(metrics.netDividendAdjustment || "0");
+    const proFormaAdjustment = interestAccrued + netDividendAdjustment;
+
+    const rawEquity = parseFloat(account.equity);
+    const adjEquity = rawEquity + proFormaAdjustment;
+    const rawTotalValue = parseFloat(account.portfolio_value);
+    const adjTotalValue = rawTotalValue + proFormaAdjustment;
     const cash = parseFloat(account.cash);
-    const totalReturnPct = ((equity - INITIAL_CAPITAL) / INITIAL_CAPITAL) * 100;
+    const totalReturnPct = ((adjEquity - INITIAL_CAPITAL) / INITIAL_CAPITAL) * 100;
 
     // Display name overrides for cash-equivalent / tax instruments
     const DISPLAY_NAME_OVERRIDES = {
@@ -56,8 +67,16 @@ export async function GET() {
     };
 
     const formattedPositions = positions.map((p, i) => {
-      const marketValue = parseFloat(p.market_value);
+      let marketValue = parseFloat(p.market_value);
       const costBasis = parseFloat(p.cost_basis);
+      let pl = parseFloat(p.unrealized_pl);
+
+      // Add cumulative pro-forma interest & dividends onto BOXX (Short-Term Treasury Yield ETF) position size
+      if (p.symbol === "BOXX") {
+        marketValue = marketValue + proFormaAdjustment;
+        pl = pl + proFormaAdjustment;
+      }
+
       const totalReturn = costBasis !== 0 ? ((marketValue - costBasis) / Math.abs(costBasis)) * 100 : 0;
 
       return {
@@ -68,9 +87,9 @@ export async function GET() {
         costBasis: parseFloat(p.avg_entry_price),
         currentPrice: parseFloat(p.current_price),
         positionSize: Math.abs(marketValue),
-        allocation: (Math.abs(marketValue) / totalPortfolioValue) * 100,
+        allocation: (Math.abs(marketValue) / adjTotalValue) * 100,
         totalReturn: totalReturn,
-        pl: parseFloat(p.unrealized_pl),
+        pl: pl,
         changeToday: parseFloat(p.change_today) * 100 || 0,
       };
     });
@@ -78,11 +97,11 @@ export async function GET() {
     formattedPositions.sort((a, b) => b.allocation - a.allocation);
 
     const data = {
-      equity,
-      cash,
-      totalValue: totalPortfolioValue,
+      equity: adjEquity,
+      cash: cash,
+      totalValue: adjTotalValue,
       initialCapital: INITIAL_CAPITAL,
-      totalReturnPct,
+      totalReturnPct: totalReturnPct,
       positions: formattedPositions,
       lastUpdated: new Date().toISOString(),
     };
