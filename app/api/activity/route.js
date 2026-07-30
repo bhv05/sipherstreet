@@ -41,13 +41,19 @@ export async function GET() {
     let longExposure = 0;
     let shortExposure = 0;
 
+    // Cash-equivalent instruments excluded from exposure/beta calculations
+    const CASH_EQUIVALENTS = new Set(["BOXX"]);
+
     const positionMap = {};
     positions.forEach(function (p) {
       const mv = Math.abs(parseFloat(p.market_value));
       const qty = parseFloat(p.qty);
       const side = qty > 0 ? "long" : "short";
-      if (side === "long") longExposure += mv;
-      else shortExposure += mv;
+      const isCashEquiv = CASH_EQUIVALENTS.has(p.symbol);
+      if (!isCashEquiv) {
+        if (side === "long") longExposure += mv;
+        else shortExposure += mv;
+      }
       positionMap[p.symbol] = {
         side: side,
         qty: Math.abs(qty),
@@ -67,8 +73,8 @@ export async function GET() {
       grossPct: ((longExposure + shortExposure) / nav * 100).toFixed(1),
       longPct: (longExposure / nav * 100).toFixed(1),
       shortPct: (shortExposure / nav * 100).toFixed(1),
-      longCount: positions.filter(function(p) { return parseFloat(p.qty) > 0; }).length,
-      shortCount: positions.filter(function(p) { return parseFloat(p.qty) < 0; }).length,
+      longCount: positions.filter(function(p) { return parseFloat(p.qty) > 0 && !CASH_EQUIVALENTS.has(p.symbol); }).length,
+      shortCount: positions.filter(function(p) { return parseFloat(p.qty) < 0 && !CASH_EQUIVALENTS.has(p.symbol); }).length,
     };
 
     // Process fills into categorised entries

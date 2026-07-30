@@ -50,13 +50,18 @@ export async function GET() {
     const cash = parseFloat(account.cash);
     const totalReturnPct = ((equity - INITIAL_CAPITAL) / INITIAL_CAPITAL) * 100;
 
+    // Display name overrides for cash-equivalent / tax instruments
+    const DISPLAY_NAME_OVERRIDES = {
+      "BOXX": "Short-Term Treasury Yield ETF (Cash Equivalent)",
+    };
+
     const formattedPositions = positions.map((p, i) => {
       const marketValue = parseFloat(p.market_value);
       const costBasis = parseFloat(p.cost_basis);
       const totalReturn = costBasis !== 0 ? ((marketValue - costBasis) / Math.abs(costBasis)) * 100 : 0;
 
       return {
-        company: assets[i]?.name || p.symbol,
+        company: DISPLAY_NAME_OVERRIDES[p.symbol] || assets[i]?.name || p.symbol,
         symbol: p.symbol,
         qty: parseFloat(p.qty),
         side: parseFloat(p.qty) > 0 ? "LONG" : "SHORT",
