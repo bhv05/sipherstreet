@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-08-01T08:10:13Z",
+  "last_updated": "2026-08-02T08:11:30Z",
   "total_positions": 11,
   "earnings_calendar": [
     {
@@ -56,7 +56,7 @@
       "date": "2026-10-26",
       "timing": "AMC",
       "consensus_eps": 1.79,
-      "consensus_revenue": "$736M",
+      "consensus_revenue": "$737M",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.11,
       "beat_rate_4q": "4/4",
@@ -67,8 +67,8 @@
       "company": "Meta Platforms, Inc.",
       "date": "2026-10-28",
       "timing": "AMC",
-      "consensus_eps": 7.36,
-      "consensus_revenue": "$63.24B",
+      "consensus_eps": 6.99,
+      "consensus_revenue": "$63.27B",
       "last_quarter_result": "miss",
       "last_quarter_surprise": -1.04,
       "beat_rate_4q": "2/4",
@@ -79,7 +79,7 @@
       "company": "AstraZeneca PLC",
       "date": "2026-10-30",
       "timing": "AMC",
-      "consensus_eps": 1.28,
+      "consensus_eps": null,
       "consensus_revenue": "$16.05B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.07,
