@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-08-04T08:27:09Z",
+  "last_updated": "2026-08-05T08:26:01Z",
   "total_positions": 11,
   "earnings_calendar": [
     {
@@ -44,7 +44,7 @@
       "date": "2026-10-21",
       "timing": "AMC",
       "consensus_eps": 1.82,
-      "consensus_revenue": "$3.76B",
+      "consensus_revenue": "$3.77B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.09,
       "beat_rate_4q": "4/4",
@@ -56,7 +56,7 @@
       "date": "2026-10-26",
       "timing": "AMC",
       "consensus_eps": 1.79,
-      "consensus_revenue": "$737M",
+      "consensus_revenue": "$738M",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.11,
       "beat_rate_4q": "4/4",
@@ -67,11 +67,11 @@
       "company": "Meta Platforms, Inc.",
       "date": "2026-10-28",
       "timing": "AMC",
-      "consensus_eps": 6.99,
-      "consensus_revenue": "$63.27B",
+      "consensus_eps": 6.86,
+      "consensus_revenue": "$63.28B",
       "last_quarter_result": "miss",
       "last_quarter_surprise": -1.04,
-      "beat_rate_4q": "3/4",
+      "beat_rate_4q": "2/4",
       "implied_move": 9.6
     },
     {
@@ -80,7 +80,7 @@
       "date": "2026-10-30",
       "timing": "AMC",
       "consensus_eps": null,
-      "consensus_revenue": "$16.05B",
+      "consensus_revenue": "$16.06B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.07,
       "beat_rate_4q": "3/4",
