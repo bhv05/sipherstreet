@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-08-09T06:43:50Z",
+  "last_updated": "2026-08-10T07:18:43Z",
   "total_positions": 10,
   "earnings_calendar": [
     {
@@ -24,7 +24,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.04,
       "beat_rate_4q": "4/4",
-      "implied_move": 3.3
+      "implied_move": 9.6
     },
     {
       "ticker": "VRT",
@@ -36,7 +36,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.09,
       "beat_rate_4q": "4/4",
-      "implied_move": 6.4
+      "implied_move": 4.8
     },
     {
       "ticker": "CR",
@@ -48,7 +48,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.11,
       "beat_rate_4q": "4/4",
-      "implied_move": 7.0
+      "implied_move": 5.7
     },
     {
       "ticker": "META",
@@ -60,7 +60,7 @@
       "last_quarter_result": "miss",
       "last_quarter_surprise": -1.04,
       "beat_rate_4q": "3/4",
-      "implied_move": 4.8
+      "implied_move": 9.6
     },
     {
       "ticker": "AZN",
@@ -72,7 +72,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.07,
       "beat_rate_4q": "3/4",
-      "implied_move": 4.8
+      "implied_move": 1.8
     },
     {
       "ticker": "BOXX",
