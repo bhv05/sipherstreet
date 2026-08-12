@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-08-11T06:55:18Z",
+  "last_updated": "2026-08-12T07:15:10Z",
   "total_positions": 10,
   "earnings_calendar": [
     {
@@ -43,8 +43,8 @@
       "company": "Crane Company",
       "date": "2026-10-26",
       "timing": "AMC",
-      "consensus_eps": 1.79,
-      "consensus_revenue": "$738M",
+      "consensus_eps": 1.8,
+      "consensus_revenue": "$737M",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.11,
       "beat_rate_4q": "4/4",
@@ -55,11 +55,11 @@
       "company": "Meta Platforms, Inc.",
       "date": "2026-10-28",
       "timing": "AMC",
-      "consensus_eps": 6.98,
+      "consensus_eps": 6.97,
       "consensus_revenue": "$63.31B",
       "last_quarter_result": "miss",
       "last_quarter_surprise": -1.04,
-      "beat_rate_4q": "3/4",
+      "beat_rate_4q": "2/4",
       "implied_move": 9.6
     },
     {
