@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-08-17T06:40:25Z",
-  "total_positions": 10,
+  "last_updated": "2026-08-18T06:32:02Z",
+  "total_positions": 9,
   "earnings_calendar": [
     {
       "ticker": "INTU",
@@ -27,18 +27,6 @@
       "implied_move": 9.6
     },
     {
-      "ticker": "VRT",
-      "company": "Vertiv Holdings Co",
-      "date": "2026-10-21",
-      "timing": "AMC",
-      "consensus_eps": 1.82,
-      "consensus_revenue": "$3.77B",
-      "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.09,
-      "beat_rate_4q": "4/4",
-      "implied_move": 4.8
-    },
-    {
       "ticker": "CR",
       "company": "Crane Company",
       "date": "2026-10-26",
@@ -59,7 +47,7 @@
       "consensus_revenue": "$63.31B",
       "last_quarter_result": "miss",
       "last_quarter_surprise": -1.04,
-      "beat_rate_4q": "2/4",
+      "beat_rate_4q": "3/4",
       "implied_move": 9.6
     },
     {
