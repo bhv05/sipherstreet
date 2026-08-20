@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-08-19T06:32:47Z",
+  "last_updated": "2026-08-20T06:34:44Z",
   "total_positions": 9,
   "earnings_calendar": [
     {
@@ -33,10 +33,10 @@
       "timing": "AMC",
       "consensus_eps": 1.8,
       "consensus_revenue": "$737M",
-      "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.11,
-      "beat_rate_4q": "4/4",
-      "implied_move": 5.7
+      "last_quarter_result": null,
+      "last_quarter_surprise": null,
+      "beat_rate_4q": null,
+      "implied_move": null
     },
     {
       "ticker": "META",
