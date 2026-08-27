@@ -1,19 +1,7 @@
 {
-  "last_updated": "2026-08-26T06:36:37Z",
+  "last_updated": "2026-08-27T17:12:48Z",
   "total_positions": 9,
   "earnings_calendar": [
-    {
-      "ticker": "INTU",
-      "company": "Intuit Inc.",
-      "date": "2026-08-25",
-      "timing": "AMC",
-      "consensus_eps": 3.59,
-      "consensus_revenue": "$4.27B",
-      "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.44,
-      "beat_rate_4q": "4/4",
-      "implied_move": 6.9
-    },
     {
       "ticker": "AVGO",
       "company": "Broadcom Inc.",
@@ -24,7 +12,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.04,
       "beat_rate_4q": "4/4",
-      "implied_move": 9.6
+      "implied_move": 4.7
     },
     {
       "ticker": "CR",
@@ -43,12 +31,12 @@
       "company": "Meta Platforms, Inc.",
       "date": "2026-10-28",
       "timing": "AMC",
-      "consensus_eps": 6.97,
+      "consensus_eps": 6.93,
       "consensus_revenue": "$63.31B",
       "last_quarter_result": "miss",
       "last_quarter_surprise": -1.04,
-      "beat_rate_4q": "3/4",
-      "implied_move": 9.6
+      "beat_rate_4q": "2/4",
+      "implied_move": 5.4
     },
     {
       "ticker": "AZN",
@@ -60,7 +48,19 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.07,
       "beat_rate_4q": "3/4",
-      "implied_move": 1.8
+      "implied_move": 5.6
+    },
+    {
+      "ticker": "INTU",
+      "company": "Intuit Inc.",
+      "date": "2026-11-19",
+      "timing": "AMC",
+      "consensus_eps": 2.88,
+      "consensus_revenue": "$4.31B",
+      "last_quarter_result": "beat",
+      "last_quarter_surprise": 0.44,
+      "beat_rate_4q": "4/4",
+      "implied_move": 7.8
     },
     {
       "ticker": "BOXX",
