@@ -278,7 +278,7 @@ function ActivityInner() {
   var [loading, setLoading] = useState(true);
   var [apiError, setApiError] = useState(false);
   var [activeFilter, setActiveFilter] = useState("all");
-  var [visibleCount, setVisibleCount] = useState(20);
+  var [selectedMonth, setSelectedMonth] = useState(null);
 
   var searchParams = useSearchParams();
   var tickerFilter = searchParams.get("ticker");
@@ -405,12 +405,31 @@ function ActivityInner() {
     });
   }
 
-  var filteredEntries = activeFilter === "all"
-    ? timelineEntries
-    : timelineEntries.filter(function (e) { return e.filterGroup === activeFilter; });
+  /* Build month-year buckets from entries (already sorted newest-first) */
+  var MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  var monthBucketsMap = {};
+  var monthBucketOrder = [];
+  timelineEntries.forEach(function (e) {
+    if (!e.date) return;
+    var key = e.date.substring(0, 7); // "YYYY-MM"
+    if (!monthBucketsMap[key]) {
+      var parts = key.split("-");
+      var label = MONTH_NAMES[parseInt(parts[1], 10) - 1] + " " + parts[0];
+      monthBucketsMap[key] = { key: key, label: label, count: 0 };
+      monthBucketOrder.push(key);
+    }
+    monthBucketsMap[key].count++;
+  });
 
-  var displayedEntries = filteredEntries.slice(0, visibleCount);
-  var hasMore = filteredEntries.length > visibleCount;
+  var activeMonth = selectedMonth || (monthBucketOrder.length > 0 ? monthBucketOrder[0] : null);
+
+  var filteredEntries = timelineEntries.filter(function (e) {
+    if (activeMonth && e.date && e.date.substring(0, 7) !== activeMonth) return false;
+    if (activeFilter !== "all" && e.filterGroup !== activeFilter) return false;
+    return true;
+  });
+
+  var displayedEntries = filteredEntries;
 
   /* KPI values */
   var exposures = apiData ? apiData.exposures : null;
@@ -582,7 +601,6 @@ function ActivityInner() {
               className={"filter-btn" + (isActive ? " active" : "")}
               onClick={function () {
                 setActiveFilter(f.key);
-                setVisibleCount(20);
               }}
             >
               {f.label}
@@ -590,6 +608,26 @@ function ActivityInner() {
           );
         })}
       </div>
+
+      {/* Month-Year Selector */}
+      {monthBucketOrder.length > 1 && (
+        <div className="month-selector-bar">
+          {monthBucketOrder.map(function (key) {
+            var bucket = monthBucketsMap[key];
+            var isActive = key === activeMonth;
+            return (
+              <button
+                key={key}
+                className={"month-btn" + (isActive ? " active" : "")}
+                onClick={function () { setSelectedMonth(key); }}
+              >
+                <span className="month-btn-label">{bucket.label}</span>
+                <span className="month-btn-count">{bucket.count}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* Section C — Activity Timeline */}
       <div ref={timelineReveal.ref} className={"reveal" + (timelineReveal.inView ? " in-view" : "")}>
@@ -611,15 +649,11 @@ function ActivityInner() {
           })}
         </div>
 
-        {hasMore && (
-          <div style={{ textAlign: "center", marginTop: 32 }}>
-            <button
-              className="btn-outline"
-              style={{ padding: "10px 28px", fontSize: 12 }}
-              onClick={function () { setVisibleCount(function (c) { return c + 20; }); }}
-            >
-              Load more
-            </button>
+        {displayedEntries.length > 0 && activeMonth && monthBucketsMap[activeMonth] && (
+          <div style={{ textAlign: "center", marginTop: 24 }}>
+            <p style={{ fontSize: 11, color: "#8896a6" }}>
+              Showing {displayedEntries.length} {displayedEntries.length === 1 ? "entry" : "entries"} for {monthBucketsMap[activeMonth].label}
+            </p>
           </div>
         )}
       </div>
@@ -767,7 +801,7 @@ function ActivityInner() {
         .activity-page .filter-bar {
           display: flex;
           gap: 8px;
-          margin-bottom: 40px;
+          margin-bottom: 16px;
           flex-wrap: wrap;
         }
         .activity-page .filter-btn {
@@ -791,6 +825,70 @@ function ActivityInner() {
           background: var(--navy);
           color: #ffffff;
           border-color: var(--navy);
+        }
+
+        /* ---- Month Selector ---- */
+        .activity-page .month-selector-bar {
+          display: flex;
+          gap: 6px;
+          margin-bottom: 32px;
+          overflow-x: auto;
+          padding-bottom: 6px;
+          scrollbar-width: thin;
+          -webkit-overflow-scrolling: touch;
+        }
+        .activity-page .month-selector-bar::-webkit-scrollbar {
+          height: 4px;
+        }
+        .activity-page .month-selector-bar::-webkit-scrollbar-thumb {
+          background: #cbd5e1;
+          border-radius: 4px;
+        }
+        .activity-page .month-btn {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 14px;
+          font-size: 12px;
+          font-weight: 500;
+          letter-spacing: 0.02em;
+          border: 1px solid var(--border);
+          background: transparent;
+          color: #5a6a7e;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          font-family: inherit;
+          white-space: nowrap;
+          flex-shrink: 0;
+        }
+        .activity-page .month-btn:hover {
+          border-color: var(--accent);
+          color: var(--navy);
+          background: rgba(30, 58, 95, 0.02);
+        }
+        .activity-page .month-btn.active {
+          background: rgba(30, 58, 95, 0.06);
+          color: var(--navy);
+          border-color: var(--navy);
+          font-weight: 600;
+        }
+        .activity-page .month-btn-label {
+          /* inherits */
+        }
+        .activity-page .month-btn-count {
+          font-size: 10px;
+          font-weight: 600;
+          color: #8896a6;
+          background: rgba(136, 150, 166, 0.1);
+          padding: 1px 6px;
+          border-radius: 8px;
+          min-width: 18px;
+          text-align: center;
+        }
+        .activity-page .month-btn.active .month-btn-count {
+          color: var(--navy);
+          background: rgba(30, 58, 95, 0.1);
         }
 
         /* ---- TIMELINE ---- */
@@ -1039,6 +1137,10 @@ function ActivityInner() {
           }
           .activity-page .filter-btn {
             padding: 6px 14px;
+            font-size: 11px;
+          }
+          .activity-page .month-btn {
+            padding: 5px 12px;
             font-size: 11px;
           }
           .activity-page .earn-card {
