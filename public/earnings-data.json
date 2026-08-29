@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-08-28T18:00:27Z",
+  "last_updated": "2026-08-29T12:06:22Z",
   "total_positions": 9,
   "earnings_calendar": [
     {
@@ -12,7 +12,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.04,
       "beat_rate_4q": "4/4",
-      "implied_move": 6.6
+      "implied_move": 6.9
     },
     {
       "ticker": "CR",
@@ -35,7 +35,7 @@
       "consensus_revenue": "$63.31B",
       "last_quarter_result": "miss",
       "last_quarter_surprise": -1.04,
-      "beat_rate_4q": "2/4",
+      "beat_rate_4q": "3/4",
       "implied_move": 5.4
     },
     {
@@ -48,7 +48,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.07,
       "beat_rate_4q": "3/4",
-      "implied_move": 5.4
+      "implied_move": 5.2
     },
     {
       "ticker": "INTU",
@@ -60,7 +60,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.44,
       "beat_rate_4q": "4/4",
-      "implied_move": 7.9
+      "implied_move": 7.7
     },
     {
       "ticker": "BOXX",
