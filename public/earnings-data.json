@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-08-29T12:06:22Z",
+  "last_updated": "2026-08-30T11:02:07Z",
   "total_positions": 9,
   "earnings_calendar": [
     {
@@ -55,7 +55,7 @@
       "company": "Intuit Inc.",
       "date": "2026-11-19",
       "timing": "AMC",
-      "consensus_eps": 2.88,
+      "consensus_eps": 2.84,
       "consensus_revenue": "$4.31B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.44,
