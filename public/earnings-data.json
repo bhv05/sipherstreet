@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-02T10:23:28Z",
+  "last_updated": "2026-09-03T10:31:51Z",
   "total_positions": 9,
   "earnings_calendar": [
     {
@@ -19,7 +19,7 @@
       "company": "Crane Company",
       "date": "2026-10-26",
       "timing": "AMC",
-      "consensus_eps": 1.8,
+      "consensus_eps": 1.81,
       "consensus_revenue": "$737M",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.11,
@@ -35,7 +35,7 @@
       "consensus_revenue": "$63.32B",
       "last_quarter_result": "miss",
       "last_quarter_surprise": -1.04,
-      "beat_rate_4q": "2/4",
+      "beat_rate_4q": "3/4",
       "implied_move": 9.6
     },
     {
@@ -44,7 +44,7 @@
       "date": "2026-10-30",
       "timing": "AMC",
       "consensus_eps": null,
-      "consensus_revenue": "$16.06B",
+      "consensus_revenue": "$16.03B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.07,
       "beat_rate_4q": "3/4",
@@ -55,7 +55,7 @@
       "company": "Intuit Inc.",
       "date": "2026-11-19",
       "timing": "AMC",
-      "consensus_eps": 2.84,
+      "consensus_eps": 2.72,
       "consensus_revenue": "$4.31B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.44,
