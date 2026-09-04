@@ -2,7 +2,6 @@ import "./globals.css";
 import { ViewTransitions } from "next-view-transitions";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import ThemeSwitcher from "./components/ThemeSwitcher";
 import { Analytics } from "@vercel/analytics/react";
 
 export const metadata = {
@@ -32,7 +31,7 @@ export default function RootLayout({ children }) {
         <head>
           <script
             dangerouslySetInnerHTML={{
-              __html: `(function(){try{var t=localStorage.getItem("sipher_theme")||"azure";document.documentElement.setAttribute("data-theme",t);}catch(e){}})();`,
+              __html: `(function(){try{localStorage.removeItem("sipher_theme");document.documentElement.setAttribute("data-theme","azure");}catch(e){}})();`,
             }}
           />
           <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -46,7 +45,6 @@ export default function RootLayout({ children }) {
           <Navbar />
           <main>{children}</main>
           <Footer />
-          <ThemeSwitcher />
           <Analytics />
         </body>
       </html>
