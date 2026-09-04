@@ -140,7 +140,7 @@ const VALUES = [
   },
   {
     title: "Independent alignment",
-    desc: "We co-invest £10,000 of partner capital directly into the strategy. Our compensation structure of 1% management fee and 17.5% performance fee ensures that partner rewards are earned exclusively through capital growth and disciplined risk management.",
+    desc: "We co-invest $10,000 of partner capital directly into the strategy. Our compensation structure of 1% management fee and 17.5% performance fee ensures that partner rewards are earned exclusively through capital growth and disciplined risk management.",
   },
   {
     title: "Intellectual rigour",
@@ -240,23 +240,9 @@ export default function Home() {
         <div style={{ maxWidth: 1160, width: "100%", margin: "auto", padding: "24px 24px", position: "relative", zIndex: 1 }}>
           <div className={"reveal-group" + (heroLoaded ? " in-view" : "")}>
 
-            {/* Eyebrow */}
-            <div
-              className="reveal-item"
-              style={{ display: "inline-flex", alignItems: "center", gap: 12, marginBottom: 28 }}
-            >
-              <span style={{ fontSize: 11, letterSpacing: "0.25em", textTransform: "uppercase", color: "var(--accent-light)", fontWeight: 600 }}>
-                Independent Long/Short Equity
-              </span>
-              <span
-                className="reveal-line-expand"
-                style={{ display: "inline-block", width: 48, height: 1, background: "var(--accent-light)", verticalAlign: "middle" }}
-              />
-            </div>
-
             {/* Headline */}
             <h1
-              className="reveal-item reveal-delay-1"
+              className="reveal-item"
               style={{
                 fontSize: "clamp(52px, 7.8vw, 96px)",
                 fontWeight: 200,
@@ -323,7 +309,7 @@ export default function Home() {
                 </div>
                 <div>
                   <div style={{ fontSize: 10, color: "rgba(244, 243, 239, 0.55)", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 6 }}>Co-Invested Capital</div>
-                  <div style={{ fontSize: 26, fontWeight: 300, color: "#ffffff", letterSpacing: "0.01em" }}>£10,000</div>
+                  <div style={{ fontSize: 26, fontWeight: 300, color: "#ffffff", letterSpacing: "0.01em" }}>$10,000</div>
                 </div>
               </div>
             </div>
@@ -522,7 +508,7 @@ export default function Home() {
                 ["Performance Fee", "17.50% of net profits subject to high-water mark"],
                 ["Strategy & Structure", "U.S. & European L/S Equity Partnership"],
                 ["Benchmark", "SOFR"],
-                ["Partner Co-Investment", "£10,000 partner capital co-invested into the strategy"],
+                ["Partner Co-Investment", "$10,000 partner capital co-invested into the strategy"],
                 ["Valuation & Pricing", "Rebased NAV computed daily from point-in-time exchange feeds"],
                 ["Transparency & Reporting", "Open-source holdings, trade ledger, and historical pitch models"],
               ].map(function (row, idx) {

@@ -60,7 +60,7 @@ export default function Footer() {
           </div>
           <div className="footer-term">
             <span className="footer-term-label">Co-Investment</span>
-            <span className="footer-term-value">£10k Partner AUM</span>
+            <span className="footer-term-value">$10k Partner AUM</span>
           </div>
         </div>
       </div>
