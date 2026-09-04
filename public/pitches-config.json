@@ -37,7 +37,7 @@
     }
   },
 
-  "hedgeSymbols": ["QQQ", "XLI", "XLU", "SPY", "IWM", "TLT", "GLD", "VXX", "SQQQ", "SH"],
+  "hedgeSymbols": ["PPH", "QQQ", "XLI", "XLU", "SPY", "IWM", "TLT", "GLD", "VXX", "SQQQ", "SH"],
 
   "defaultPitchTeam": "Bhavya Patel, Henish Patel"
 }

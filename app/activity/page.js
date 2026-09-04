@@ -31,7 +31,7 @@ function fmt(n, decimals) {
 /* ── Pill colour map ── */
 var PILL_COLORS = {
   green:  { bg: "rgba(22, 163, 74, 0.10)", color: "#16a34a", dot: "#16a34a" },
-  red:    { bg: "rgba(220, 38, 38, 0.10)", color: "#dc2626", dot: "#dc2626" },
+  red:    { bg: "rgba(220, 38, 38, 0.10)", color: "#f87171", dot: "#dc2626" },
   grey:   { bg: "rgba(108, 117, 125, 0.10)", color: "#6c757d", dot: "#94a3b8" },
   pink:   { bg: "rgba(181, 81, 142, 0.10)", color: "#b5518e", dot: "#b5518e" },
   teal:   { bg: "rgba(13, 148, 136, 0.10)", color: "#0d9488", dot: "#0d9488" },
@@ -48,9 +48,9 @@ var FILTERS = [
 ];
 
 /* ── KPI Card ── */
-function KpiCard({ label, value, subtitle, subtitleColor, highlight }) {
+function KpiCard({ label, value, subtitle, subtitleColor, highlight, delayClass }) {
   return (
-    <div className={"kpi-card" + (highlight ? " kpi-highlight" : "")}>
+    <div className={"kpi-card hover-lift reveal-item " + (delayClass || "") + (highlight ? " kpi-highlight" : "")}>
       <div className="kpi-label">{label}</div>
       <div className="kpi-value">{value}</div>
       {subtitle && (
@@ -112,7 +112,8 @@ function TimelineEntry({ entry, config, isLast }) {
 }
 
 /* ── Earnings Risk Briefing Card ── */
-function EarningsCard({ ticker, data, position, nav }) {
+function EarningsCard({ ticker, data, position, nav, idx }) {
+  var delayClass = idx != null ? "reveal-delay-" + Math.min(idx + 1, 8) : "";
   var days = daysUntil(data.date);
   var isUpcoming = data.date && days >= 0 && days <= 14;
   var isPast = data.date && days < 0;
@@ -184,7 +185,7 @@ function EarningsCard({ ticker, data, position, nav }) {
           {isETF && (
             <div className="earn-row">
               <span className="earn-label">Status</span>
-              <span className="earn-val" style={{ color: "#8896a6" }}>{data.note || "ETF, no earnings"}</span>
+              <span className="earn-val" style={{ color: "#64748b" }}>{data.note || "ETF, no earnings"}</span>
             </div>
           )}
           <div className="earn-row">
@@ -212,7 +213,7 @@ function EarningsCard({ ticker, data, position, nav }) {
           )}
           <div className="earn-row">
             <span className="earn-label">Position</span>
-            <span className="earn-val" style={{ color: "#8896a6", fontStyle: "italic" }}>No current position</span>
+            <span className="earn-val" style={{ color: "#64748b", fontStyle: "italic" }}>No current position</span>
           </div>
         </div>
       )}
@@ -497,8 +498,8 @@ function ActivityInner() {
     return (
       <div className="page-section" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: 14, color: "#5a6a7e", letterSpacing: "0.1em" }}>LOADING ACTIVITY DATA...</div>
-          <div style={{ fontSize: 12, color: "#8896a6", marginTop: 8 }}>Fetching from Alpaca API</div>
+          <div style={{ fontSize: 14, color: "#64748b", letterSpacing: "0.1em" }}>LOADING ACTIVITY DATA...</div>
+          <div style={{ fontSize: 12, color: "#64748b", marginTop: 8 }}>Fetching from Alpaca API</div>
         </div>
       </div>
     );
@@ -507,12 +508,12 @@ function ActivityInner() {
   return (
     <div className="page-section activity-page" style={{ maxWidth: 1100 }}>
       {/* Page Header */}
-      <div ref={headerReveal.ref} className={"reveal" + (headerReveal.inView ? " in-view" : "")}>
-        <p className="section-label">Decision Log</p>
-        <h2 className="section-title" style={{ marginBottom: 8 }}>
+      <div ref={headerReveal.ref} className={"reveal-group" + (headerReveal.inView ? " in-view" : "")}>
+        <p className="section-label reveal-item">Decision Log</p>
+        <h2 className="section-title reveal-item reveal-delay-1" style={{ marginBottom: 8 }}>
           Portfolio <span>Activity</span>
         </h2>
-        <p style={{ fontSize: 13, color: "#8896a6", marginBottom: 40 }}>
+        <p className="reveal-item reveal-delay-2" style={{ fontSize: 13, color: "#64748b", marginBottom: 40 }}>
           Capital allocation decisions, position changes, and key milestones updated in real time.
         </p>
       </div>
@@ -528,12 +529,12 @@ function ActivityInner() {
       {tickerFilter && (
         <div className="activity-notice notice-info">
           <span>Filtering: <b>{tickerFilter.toUpperCase()}</b></span>
-          <Link href="/activity" style={{ marginLeft: "auto", fontSize: 11, color: "#8896a6" }}>Clear filter ×</Link>
+          <Link href="/activity" style={{ marginLeft: "auto", fontSize: 11, color: "#64748b" }}>Clear filter ×</Link>
         </div>
       )}
 
       {/* Section A — Risk & Performance Dashboard */}
-      <div ref={kpiReveal.ref} className={"reveal" + (kpiReveal.inView ? " in-view" : "")} style={{ marginBottom: 36 }}>
+      <div ref={kpiReveal.ref} className={"reveal-group" + (kpiReveal.inView ? " in-view" : "")} style={{ marginBottom: 36 }}>
         <div className="kpi-grid">
           <KpiCard
             label="Jensen's Alpha (Ann.)"
@@ -541,6 +542,7 @@ function ActivityInner() {
             subtitle="vs SPX · 252 days/yr"
             subtitleColor="#16a34a"
             highlight
+            delayClass="reveal-delay-1"
           />
           <KpiCard
             label="Sharpe Ratio (Ann.)"
@@ -548,6 +550,7 @@ function ActivityInner() {
             subtitle="Target: 1.50 (vs SOFR)"
             subtitleColor="#16a34a"
             highlight
+            delayClass="reveal-delay-2"
           />
           <KpiCard
             label="Sortino Ratio (Ann.)"
@@ -555,6 +558,7 @@ function ActivityInner() {
             subtitle={"Max Drawdown: " + maxDrawdown}
             subtitleColor="#16a34a"
             highlight
+            delayClass="reveal-delay-3"
           />
           <KpiCard
             label="Portfolio Beta"
@@ -562,15 +566,16 @@ function ActivityInner() {
             subtitle="vs SPX · daily, since inception"
             subtitleColor="#1e3a5f"
             highlight
+            delayClass="reveal-delay-4"
           />
         </div>
 
         {/* Secondary Exposure Bar */}
-        <div className="exposure-banner">
+        <div className="exposure-banner hover-lift reveal-item reveal-delay-3">
           <div className="banner-item">
             <span className="banner-label">Net Long Exposure:</span>
             <span className="banner-val">{netExposure}</span>
-            <span className="banner-sub">(Target: {netTarget}%)</span>
+            <span className="banner-sub">(Target: &lt; 30%)</span>
           </div>
           <div className="banner-divider" />
           <div className="banner-item">
@@ -586,7 +591,7 @@ function ActivityInner() {
           </div>
         </div>
 
-        <p style={{ fontSize: 11, color: "#8896a6", marginTop: 14, lineHeight: 1.5, letterSpacing: "0.01em" }}>
+        <p style={{ fontSize: 11, color: "#64748b", marginTop: 14, lineHeight: 1.5, letterSpacing: "0.01em" }}>
           Returns are pro-forma and include (i) interest on uninvested cash accrued daily at SOFR on an ACT/360 basis, excluding short-sale proceeds, and (ii) dividends receivable on long positions net of dividends payable on short positions. Due to Alpaca limitations, dividends and cash interest are not credited directly. Ratios are annualised using 252 trading days and measured against SOFR. Performance since inception on 26 February 2026 covers 105 trading days; risk-adjusted statistics over this sample carry wide confidence intervals.
         </p>
       </div>
@@ -630,10 +635,10 @@ function ActivityInner() {
       )}
 
       {/* Section C — Activity Timeline */}
-      <div ref={timelineReveal.ref} className={"reveal" + (timelineReveal.inView ? " in-view" : "")}>
+      <div ref={timelineReveal.ref} className={"reveal-group" + (timelineReveal.inView ? " in-view" : "")}>
         <div className="tl-container">
           {displayedEntries.length === 0 && (
-            <div style={{ textAlign: "center", padding: "48px 0", color: "#8896a6", fontSize: 13 }}>
+            <div style={{ textAlign: "center", padding: "48px 0", color: "#64748b", fontSize: 13 }}>
               No activity entries to display.
             </div>
           )}
@@ -651,7 +656,7 @@ function ActivityInner() {
 
         {displayedEntries.length > 0 && activeMonth && monthBucketsMap[activeMonth] && (
           <div style={{ textAlign: "center", marginTop: 24 }}>
-            <p style={{ fontSize: 11, color: "#8896a6" }}>
+            <p style={{ fontSize: 11, color: "#64748b" }}>
               Showing {displayedEntries.length} {displayedEntries.length === 1 ? "entry" : "entries"} for {monthBucketsMap[activeMonth].label}
             </p>
           </div>
@@ -660,18 +665,18 @@ function ActivityInner() {
 
       {/* Section D — Earnings Risk Briefing (portfolio tickers only) */}
       {earningsData.length > 0 && (
-        <div ref={earningsReveal.ref} className={"earn-section reveal" + (earningsReveal.inView ? " in-view" : "")}>
-          <p className="section-label">Earnings Watch</p>
-          <h3 className="earn-heading">Upcoming Earnings</h3>
-          <p className="earn-sub">Earnings risk briefing for current positions</p>
+        <div ref={earningsReveal.ref} className={"earn-section reveal-group" + (earningsReveal.inView ? " in-view" : "")}>
+          <p className="section-label reveal-item">Earnings Watch</p>
+          <h3 className="earn-heading reveal-item reveal-delay-1">Upcoming Earnings</h3>
+          <p className="earn-sub reveal-item reveal-delay-2">Earnings risk briefing for current positions</p>
           {earningsLastUpdated && (
-            <p style={{ fontSize: 11, color: "#8896a6", marginTop: -20, marginBottom: 24 }}>
+            <p className="reveal-item reveal-delay-2" style={{ fontSize: 11, color: "#64748b", marginTop: -20, marginBottom: 24 }}>
               Last updated: {new Date(earningsLastUpdated).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
             </p>
           )}
           <div className="earn-grid">
-            {earningsData.map(function (item) {
-              return <EarningsCard key={item.ticker} ticker={item.ticker} data={item.data} position={item.position || null} nav={accountNav} />;
+            {earningsData.map(function (item, i) {
+              return <EarningsCard key={item.ticker} ticker={item.ticker} data={item.data} position={item.position || null} nav={accountNav} idx={i} />;
             })}
           </div>
         </div>
@@ -692,7 +697,7 @@ function ActivityInner() {
           }
         }
         .activity-page .kpi-card {
-          background: var(--card);
+          background: var(--bg-card);
           border: 1px solid var(--border);
           border-radius: 10px;
           padding: 18px 20px;
@@ -711,7 +716,7 @@ function ActivityInner() {
         }
         .activity-page .kpi-label {
           font-size: 11px;
-          color: #8896a6;
+          color: #64748b;
           text-transform: uppercase;
           letter-spacing: 0.1em;
           font-weight: 600;
@@ -734,12 +739,12 @@ function ActivityInner() {
           display: flex;
           align-items: center;
           justify-content: space-around;
-          background: #f8fafc;
+          background: var(--bg-card);
           border: 1px solid var(--border);
           border-radius: 8px;
           padding: 12px 20px;
           font-size: 12px;
-          color: #5a6a7e;
+          color: #64748b;
           flex-wrap: wrap;
           gap: 12px;
         }
@@ -750,14 +755,14 @@ function ActivityInner() {
         }
         .activity-page .banner-label {
           font-weight: 500;
-          color: #8896a6;
+          color: #64748b;
         }
         .activity-page .banner-val {
           font-weight: 600;
           color: var(--navy);
         }
         .activity-page .banner-sub {
-          color: #8896a6;
+          color: #64748b;
           font-size: 11px;
         }
         .activity-page .banner-divider {
@@ -811,7 +816,7 @@ function ActivityInner() {
           letter-spacing: 0.04em;
           border: 1px solid var(--border);
           background: transparent;
-          color: #5a6a7e;
+          color: #64748b;
           border-radius: 20px;
           cursor: pointer;
           transition: all 0.2s ease;
@@ -854,7 +859,7 @@ function ActivityInner() {
           letter-spacing: 0.02em;
           border: 1px solid var(--border);
           background: transparent;
-          color: #5a6a7e;
+          color: #64748b;
           border-radius: 6px;
           cursor: pointer;
           transition: all 0.2s ease;
@@ -879,7 +884,7 @@ function ActivityInner() {
         .activity-page .month-btn-count {
           font-size: 10px;
           font-weight: 600;
-          color: #8896a6;
+          color: #64748b;
           background: rgba(136, 150, 166, 0.1);
           padding: 1px 6px;
           border-radius: 8px;
@@ -930,7 +935,7 @@ function ActivityInner() {
 
         /* Content card */
         .activity-page .tl-card {
-          background: var(--card);
+          background: var(--bg-card);
           border: 1px solid var(--border);
           border-radius: 10px;
           padding: 20px 24px;
@@ -950,7 +955,7 @@ function ActivityInner() {
         }
         .activity-page .tl-date {
           font-size: 11px;
-          color: #8896a6;
+          color: #64748b;
           letter-spacing: 0.04em;
           font-weight: 500;
         }
@@ -973,7 +978,7 @@ function ActivityInner() {
         }
         .activity-page .tl-desc {
           font-size: 13px;
-          color: #5a6a7e;
+          color: #64748b;
           line-height: 1.7;
           margin: 0 0 8px 0;
         }
@@ -1005,7 +1010,7 @@ function ActivityInner() {
         }
         .activity-page .earn-sub {
           font-size: 13px;
-          color: #8896a6;
+          color: #64748b;
           margin-bottom: 28px;
         }
         .activity-page .earn-grid {
@@ -1027,7 +1032,7 @@ function ActivityInner() {
         .activity-page .earn-card {
           flex: 0 0 320px;
           scroll-snap-align: start;
-          background: var(--card);
+          background: var(--bg-card);
           border: 1px solid var(--border);
           border-radius: 10px;
           padding: 18px 20px;
@@ -1038,7 +1043,7 @@ function ActivityInner() {
           box-shadow: 0 4px 12px rgba(26, 42, 68, 0.06);
         }
         .activity-page .earn-urgent {
-          border-left: 3px solid #b8860b;
+          border-left: 3px solid #c9a96e;
           border-radius: 0 10px 10px 0;
         }
         .activity-page .earn-header {
@@ -1081,12 +1086,12 @@ function ActivityInner() {
         }
         .activity-page .earn-countdown-muted {
           font-size: 11px;
-          color: #8896a6;
+          color: #64748b;
           font-weight: 500;
         }
         .activity-page .earn-company {
           font-size: 12px;
-          color: #8896a6;
+          color: #64748b;
           margin-top: 2px;
         }
         .activity-page .earn-divider {
@@ -1107,7 +1112,7 @@ function ActivityInner() {
         }
         .activity-page .earn-label {
           font-size: 11px;
-          color: #8896a6;
+          color: #64748b;
           text-transform: uppercase;
           letter-spacing: 0.06em;
           font-weight: 500;
@@ -1165,6 +1170,34 @@ function ActivityInner() {
             font-size: 12px;
           }
         }
+        @media (max-width: 480px) {
+          .activity-page {
+            max-width: 100% !important;
+            overflow-x: hidden;
+          }
+          .activity-page .kpi-card {
+            padding: 14px 16px;
+          }
+          .activity-page .kpi-value {
+            font-size: 20px;
+          }
+          .activity-page .exposure-banner {
+            padding: 12px 16px;
+            font-size: 11px;
+          }
+          .activity-page .filter-btn {
+            flex: 1;
+            text-align: center;
+            justify-content: center;
+          }
+          .activity-page .earn-card {
+            flex: 0 0 260px;
+          }
+          .activity-page .tl-card {
+            padding: 14px 14px;
+            margin-left: 2px;
+          }
+        }
       `}</style>
     </div>
   );
@@ -1176,8 +1209,8 @@ export default function Activity() {
     <Suspense fallback={
       <div className="page-section" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: 14, color: "#5a6a7e", letterSpacing: "0.1em" }}>LOADING ACTIVITY DATA...</div>
-          <div style={{ fontSize: 12, color: "#8896a6", marginTop: 8 }}>Fetching from Alpaca API</div>
+          <div style={{ fontSize: 14, color: "#64748b", letterSpacing: "0.1em" }}>LOADING ACTIVITY DATA...</div>
+          <div style={{ fontSize: 12, color: "#64748b", marginTop: 8 }}>Fetching from Alpaca API</div>
         </div>
       </div>
     }>

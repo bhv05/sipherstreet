@@ -3,7 +3,7 @@
   "sharpe_ratio": 1.02,
   "sortino_ratio": 1.56,
   "excess_return": "+4.04%",
-  "net_exposure_target": 30,
+  "net_exposure_target": "< 30%",
 
   "manual_entries": [
     {

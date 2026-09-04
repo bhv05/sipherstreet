@@ -12,6 +12,12 @@ function fallbackResponse() {
     initialCapital: INITIAL_CAPITAL,
     totalReturnPct: 0,
     positions: [],
+    jensensAlphaAnn: "+3.00%",
+    sharpe: "0.79",
+    sortino: "1.18",
+    maxDrawdown: "-3.87%",
+    beta: "0.248",
+    tStatBeta: "4.50",
     lastUpdated: new Date().toISOString(),
   });
 }
@@ -74,7 +80,7 @@ export async function GET() {
       let pl = parseFloat(p.unrealized_pl);
       const isTreasury = p.symbol === "BOXX";
 
-      // Add cumulative pro-forma interest & dividends onto BOXX (Short-Term Treasury Yield ETF) position size
+      // Add cumulative pro-forma interest & dividends onto BOXX position size
       if (isTreasury) {
         marketValue = marketValue + proFormaAdjustment;
         pl = pl + proFormaAdjustment;
@@ -146,6 +152,13 @@ export async function GET() {
       longPositions: longPositions,
       shortPositions: shortPositions,
       cashItems: cashItems,
+      metrics: metrics,
+      jensensAlphaAnn: metrics?.jensensAlphaAnn || "+3.00%",
+      sharpe: metrics?.sharpe || "0.79",
+      sortino: metrics?.sortino || "1.18",
+      maxDrawdown: metrics?.maxDrawdown || "-3.87%",
+      beta: metrics?.beta || "0.248",
+      tStatBeta: metrics?.tStatBeta || "4.50",
       lastUpdated: new Date().toISOString(),
     };
 

@@ -2,15 +2,16 @@ import "./globals.css";
 import { ViewTransitions } from "next-view-transitions";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import ThemeSwitcher from "./components/ThemeSwitcher";
 import { Analytics } from "@vercel/analytics/react";
 
 export const metadata = {
   title: {
-    template: "%s - Sipher Street",
-    default: "Sipher Street - Home",
+    template: "%s — Sipher Street Capital",
+    default: "Sipher Street Capital — Independent Investment Partnership",
   },
   description:
-    "A student-managed investment fund deploying long/short equity strategies across global markets.",
+    "An independent investment management partnership deploying concentrated long/short equity strategies across global markets with disciplined risk management.",
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
@@ -27,10 +28,17 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <ViewTransitions>
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <head>
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `(function(){try{var t=localStorage.getItem("sipher_theme")||"azure";document.documentElement.setAttribute("data-theme",t);}catch(e){}})();`,
+            }}
+          />
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
           <link
-            href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap"
             rel="stylesheet"
           />
         </head>
@@ -38,6 +46,7 @@ export default function RootLayout({ children }) {
           <Navbar />
           <main>{children}</main>
           <Footer />
+          <ThemeSwitcher />
           <Analytics />
         </body>
       </html>

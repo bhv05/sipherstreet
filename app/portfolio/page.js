@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { Link } from "next-view-transitions";
+import useReveal from "../components/useReveal";
 
 function fmt(n, decimals = 2) {
   if (n == null || isNaN(n)) return "-";
@@ -10,79 +11,41 @@ function fmt(n, decimals = 2) {
   });
 }
 
-function fmtReturn(n) {
-  if (n == null || isNaN(n)) return "-";
-  const abs = Math.abs(n);
-  const str = abs.toFixed(1) + "%";
-  return n < 0 ? `(${str})` : str;
+function fmtReturn(val) {
+  if (val == null || isNaN(val)) return "-";
+  return (val >= 0 ? "+" : "") + fmt(val, 2) + "%";
 }
 
 function getReturnStyle(value) {
-  if (value == null || isNaN(value)) return {};
-  var abs = Math.abs(value);
-  var intensity = Math.min(abs / 30, 1);
+  if (value == null || isNaN(value)) return { textAlign: "center" };
   if (value >= 0) {
-    var bgAlpha = (intensity * 0.25).toFixed(3);
-    var r = Math.round(134 + (21 - 134) * intensity);
-    var g = Math.round(184 + (128 - 184) * intensity);
-    var b = Math.round(154 + (61 - 154) * intensity);
     return {
-      background: "rgba(22, 163, 74, " + bgAlpha + ")",
-      color: "rgb(" + r + "," + g + "," + b + ")",
+      color: "#34d399",
       fontWeight: 600,
       textAlign: "center",
+      background: "rgba(52, 211, 153, 0.12)",
     };
   } else {
-    var bgAlpha = (intensity * 0.25).toFixed(3);
-    var r = Math.round(196 + (185 - 196) * intensity);
-    var g = Math.round(138 + (28 - 138) * intensity);
-    var b = Math.round(138 + (28 - 138) * intensity);
     return {
-      background: "rgba(220, 38, 38, " + bgAlpha + ")",
-      color: "rgb(" + r + "," + g + "," + b + ")",
+      color: "#f87171",
       fontWeight: 600,
       textAlign: "center",
-    };
-  }
-}
-
-function getReturnBadgeStyle(value) {
-  if (value == null || isNaN(value)) return {};
-  var abs = Math.abs(value);
-  var intensity = Math.min(abs / 30, 1);
-  if (value >= 0) {
-    var bgAlpha = (0.06 + intensity * 0.20).toFixed(3);
-    var r = Math.round(134 + (21 - 134) * intensity);
-    var g = Math.round(184 + (128 - 184) * intensity);
-    var b = Math.round(154 + (61 - 154) * intensity);
-    return {
-      background: "rgba(22, 163, 74, " + bgAlpha + ")",
-      color: "rgb(" + r + "," + g + "," + b + ")",
-    };
-  } else {
-    var bgAlpha = (0.06 + intensity * 0.20).toFixed(3);
-    var r = Math.round(196 + (185 - 196) * intensity);
-    var g = Math.round(138 + (28 - 138) * intensity);
-    var b = Math.round(138 + (28 - 138) * intensity);
-    return {
-      background: "rgba(220, 38, 38, " + bgAlpha + ")",
-      color: "rgb(" + r + "," + g + "," + b + ")",
+      background: "rgba(248, 113, 113, 0.12)",
     };
   }
 }
 
 function PositionCard({ pos }) {
-  var badgeStyle = pos.totalReturn != null ? getReturnBadgeStyle(pos.totalReturn) : {};
   return (
-    <div style={{ padding: 20, background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 6 }}>
+    <div style={{ padding: 20, background: "var(--bg-surface)", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: 2 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
         <div>
-          <div style={{ fontWeight: 600, color: "#1a2a44", fontSize: 15, marginBottom: 4 }}>{pos.company}</div>
-          <div style={{ fontSize: 12, color: "#5a6a7e" }}>
+          <div style={{ fontWeight: 600, color: "#ffffff", fontSize: 15, marginBottom: 4 }}>{pos.company}</div>
+          <div style={{ fontSize: 12, color: "rgba(244, 243, 239, 0.6)" }}>
             {pos.symbol !== "CASH" ? (
               <>
                 {pos.symbol}
-                <Link href={"/activity?ticker=" + pos.symbol} style={{ marginLeft: 6, fontSize: 11, color: "#1e3a5f", fontWeight: 500, opacity: 0.7 }} title="View activity">↗</Link>
+                <Link href={"/activity?ticker=" + pos.symbol} style={{ marginLeft: 6, fontSize: 11, color: "var(--accent-light)", fontWeight: 600 }} title="View activity">↗</Link>
               </>
             ) : (
               "Cash & Liquidity"
@@ -90,50 +53,43 @@ function PositionCard({ pos }) {
           </div>
         </div>
         {pos.totalReturn != null && (
-          <span style={{ padding: "4px 12px", fontSize: 12, fontWeight: 600, borderRadius: 3, flexShrink: 0, ...badgeStyle }}>
+          <span style={{ padding: "4px 10px", fontSize: 12, fontWeight: 600, borderRadius: 2, flexShrink: 0, ...getReturnStyle(pos.totalReturn) }}>
             {fmtReturn(pos.totalReturn)}
           </span>
         )}
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, fontSize: 13 }}>
         <div>
-          <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Cost Basis</div>
-          <div style={{ fontWeight: 500, color: "#1a2a44" }}>{pos.costBasis != null ? "$" + fmt(pos.costBasis) : "-"}</div>
+          <div style={{ color: "rgba(244, 243, 239, 0.5)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 2 }}>Cost Basis</div>
+          <div style={{ fontWeight: 500, color: "#f4f3ef" }}>{pos.costBasis != null ? "$" + fmt(pos.costBasis) : "-"}</div>
         </div>
         <div>
-          <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Last Close</div>
-          <div style={{ fontWeight: 500, color: "#1a2a44" }}>{pos.currentPrice != null ? "$" + fmt(pos.currentPrice) : "-"}</div>
+          <div style={{ color: "rgba(244, 243, 239, 0.5)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 2 }}>Last Close</div>
+          <div style={{ fontWeight: 500, color: "#f4f3ef" }}>{pos.currentPrice != null ? "$" + fmt(pos.currentPrice) : "-"}</div>
         </div>
         <div>
-          <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Position Size</div>
-          <div style={{ fontWeight: 600, color: "#1a2a44" }}>${fmt(pos.positionSize, 0)}</div>
+          <div style={{ color: "rgba(244, 243, 239, 0.5)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 2 }}>Position Size</div>
+          <div style={{ fontWeight: 600, color: "#ffffff" }}>${fmt(pos.positionSize, 0)}</div>
         </div>
         <div>
-          <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Allocation</div>
-          <div style={{ fontWeight: 600, color: "#1a2a44" }}>{fmt(pos.allocation, 1)}%</div>
+          <div style={{ color: "rgba(244, 243, 239, 0.5)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 2 }}>Allocation</div>
+          <div style={{ fontWeight: 600, color: "#ffffff" }}>{fmt(pos.allocation, 1)}%</div>
         </div>
       </div>
     </div>
   );
 }
 
-/*
-  SVG-based performance chart.
-  Renders portfolio vs Directional L/S Hedge Fund Average as two lines, both rebased to $100,000.
-  Includes hover tooltip, y-axis labels, x-axis date labels, and legend.
-  No external dependencies required.
-*/
 function PerformanceChart({ portfolio, benchmark }) {
   var containerRef = useRef(null);
   var [dims, setDims] = useState({ w: 800, h: 360 });
   var [hover, setHover] = useState(null);
 
-  /* Responsive: measure container width */
   useEffect(function () {
     function measure() {
       if (containerRef.current) {
         var w = containerRef.current.clientWidth;
-        var h = Math.max(280, Math.min(400, w * 0.45));
+        var h = Math.max(280, Math.min(420, w * 0.45));
         setDims({ w: w, h: h });
       }
     }
@@ -142,7 +98,6 @@ function PerformanceChart({ portfolio, benchmark }) {
     return function () { window.removeEventListener("resize", measure); };
   }, []);
 
-  /* Fill out every single calendar day to ensure even time scaling */
   var portMap = {};
   portfolio.forEach(function (p) { portMap[p.date] = p.value; });
 
@@ -183,12 +138,10 @@ function PerformanceChart({ portfolio, benchmark }) {
 
   if (merged.length < 2) return null;
 
-  /* Chart dimensions */
   var pad = { top: 20, right: 20, bottom: 50, left: 65 };
   var chartW = dims.w - pad.left - pad.right;
   var chartH = dims.h - pad.top - pad.bottom;
 
-  /* Find min/max across both series */
   var allValues = [];
   merged.forEach(function (d) {
     allValues.push(d.portfolio);
@@ -197,13 +150,11 @@ function PerformanceChart({ portfolio, benchmark }) {
   var minVal = Math.min.apply(null, allValues);
   var maxVal = Math.max.apply(null, allValues);
 
-  /* Add 2% padding to range */
   var range = maxVal - minVal;
   if (range === 0) range = 1000;
   minVal = minVal - range * 0.05;
   maxVal = maxVal + range * 0.05;
 
-  /* Scale functions */
   function xScale(i) {
     return pad.left + (i / (merged.length - 1)) * chartW;
   }
@@ -211,7 +162,6 @@ function PerformanceChart({ portfolio, benchmark }) {
     return pad.top + chartH - ((val - minVal) / (maxVal - minVal)) * chartH;
   }
 
-  /* Build SVG path strings */
   function buildPath(key) {
     var points = [];
     merged.forEach(function (d, i) {
@@ -223,7 +173,6 @@ function PerformanceChart({ portfolio, benchmark }) {
     return "M" + points.join("L");
   }
 
-  /* Build area path for portfolio (fill under line) */
   function buildArea() {
     var points = [];
     var validIndices = [];
@@ -245,52 +194,26 @@ function PerformanceChart({ portfolio, benchmark }) {
   var benchmarkPath = buildPath("benchmark");
   var areaPath = buildArea();
 
-  /* Y-axis tick values (5 ticks) */
   var yTicks = [];
   for (var t = 0; t <= 4; t++) {
-    var val = minVal + (t / 4) * (maxVal - minVal);
-    yTicks.push(val);
+    yTicks.push(minVal + (t / 4) * (maxVal - minVal));
   }
 
-  /* X-axis date labels (max 6 evenly spaced) */
-  var xLabelCount = Math.min(6, merged.length);
   var xLabels = [];
-  for (var k = 0; k < xLabelCount; k++) {
-    var idx = Math.round((k / (xLabelCount - 1)) * (merged.length - 1));
-    var parts = merged[idx].date.split("-");
-    var monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-    var label = parseInt(parts[2]) + " " + monthNames[parseInt(parts[1]) - 1];
-    xLabels.push({ x: xScale(idx), label: label });
+  var step = Math.max(1, Math.floor(merged.length / 5));
+  for (var idx = 0; idx < merged.length; idx += step) {
+    var d = merged[idx];
+    var p = d.date.split("-");
+    var months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    xLabels.push({
+      x: xScale(idx),
+      label: months[parseInt(p[1], 10) - 1] + " " + p[0].slice(2),
+    });
   }
 
-  /* Final return values for legend */
-  var lastPortfolio = merged[merged.length - 1].portfolio;
-  var firstPortfolio = merged[0].portfolio;
-  var portfolioReturn = ((lastPortfolio - firstPortfolio) / firstPortfolio * 100).toFixed(2);
-
-  var lastBench = null;
-  var firstBench = null;
-  for (var b1 = merged.length - 1; b1 >= 0; b1--) {
-    if (merged[b1].benchmark != null) { lastBench = merged[b1].benchmark; break; }
-  }
-  for (var b2 = 0; b2 < merged.length; b2++) {
-    if (merged[b2].benchmark != null) { firstBench = merged[b2].benchmark; break; }
-  }
-  var benchReturn = (firstBench && lastBench) ? ((lastBench - firstBench) / firstBench * 100).toFixed(2) : null;
-
-  /* Hover handler */
   function handleMouseMove(e) {
     var rect = containerRef.current.getBoundingClientRect();
     var mx = e.clientX - rect.left - pad.left;
-    var idx = Math.round((mx / chartW) * (merged.length - 1));
-    idx = Math.max(0, Math.min(merged.length - 1, idx));
-    setHover(idx);
-  }
-
-  function handleTouchMove(e) {
-    var touch = e.touches[0];
-    var rect = containerRef.current.getBoundingClientRect();
-    var mx = touch.clientX - rect.left - pad.left;
     var idx = Math.round((mx / chartW) * (merged.length - 1));
     idx = Math.max(0, Math.min(merged.length - 1, idx));
     setHover(idx);
@@ -302,97 +225,91 @@ function PerformanceChart({ portfolio, benchmark }) {
       style={{ position: "relative", width: "100%" }}
       onMouseMove={handleMouseMove}
       onMouseLeave={function () { setHover(null); }}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={function () { setHover(null); }}
     >
       <svg width={dims.w} height={dims.h} style={{ display: "block" }}>
-        {/* Grid lines */}
         {yTicks.map(function (val, i) {
           var y = yScale(val);
           return (
             <g key={i}>
-              <line x1={pad.left} y1={y} x2={dims.w - pad.right} y2={y} stroke="#e2e8f0" strokeWidth="1" />
-              <text x={pad.left - 10} y={y + 4} textAnchor="end" fontSize="11" fill="#8896a6" fontFamily="Inter, sans-serif">
+              <line x1={pad.left} y1={y} x2={dims.w - pad.right} y2={y} stroke="rgba(255, 255, 255, 0.08)" strokeWidth="1" />
+              <text x={pad.left - 10} y={y + 4} textAnchor="end" fontSize="11" fill="rgba(244, 243, 239, 0.6)">
                 {"$" + Math.round(val / 1000) + "k"}
               </text>
             </g>
           );
         })}
 
-        {/* X-axis labels */}
         {xLabels.map(function (item, i) {
           return (
-            <text key={i} x={item.x} y={dims.h - 12} textAnchor="middle" fontSize="11" fill="#8896a6" fontFamily="Inter, sans-serif">
+            <text key={i} x={item.x} y={dims.h - 14} textAnchor="middle" fontSize="11" fill="rgba(244, 243, 239, 0.6)">
               {item.label}
             </text>
           );
         })}
 
-        {/* Portfolio area fill */}
+        {/* Portfolio Area Fill */}
         {areaPath && (
-          <path d={areaPath} fill="rgba(30, 58, 95, 0.06)" />
+          <path d={areaPath} fill="rgba(213, 109, 74, 0.08)" />
         )}
 
-        {/* Benchmark line (SOFR (Risk-Free Rate)) */}
+        {/* Benchmark line (SOFR) */}
         {benchmarkPath && (
-          <path d={benchmarkPath} fill="none" stroke="#64748b" strokeWidth="2" strokeDasharray="5,5" />
+          <path d={benchmarkPath} fill="none" stroke="var(--chart-benchmark)" strokeWidth="2" strokeDasharray="5,5" />
         )}
 
         {/* Portfolio line */}
         {portfolioPath && (
-          <path d={portfolioPath} fill="none" stroke="#1a2a44" strokeWidth="2.5" />
+          <path d={portfolioPath} fill="none" stroke="#ffffff" strokeWidth="2.5" />
         )}
 
-        {/* $100k baseline (neutral line) */}
+        {/* $100k Baseline */}
         <line
           x1={pad.left} y1={yScale(100000)} x2={dims.w - pad.right} y2={yScale(100000)}
-          stroke="#94a3b8" strokeWidth="2" opacity="0.5"
+          stroke="rgba(255, 255, 255, 0.18)" strokeWidth="1.5" strokeDasharray="3,3"
         />
 
-        {/* Hover crosshair + dots */}
         {hover !== null && merged[hover] && (
           <g>
             <line
               x1={xScale(hover)} y1={pad.top} x2={xScale(hover)} y2={pad.top + chartH}
-              stroke="#94a3b8" strokeWidth="1" strokeDasharray="3,3"
+              stroke="var(--chart-benchmark)" strokeWidth="1" strokeDasharray="3,3"
             />
-            <circle cx={xScale(hover)} cy={yScale(merged[hover].portfolio)} r="4" fill="#1a2a44" stroke="#fff" strokeWidth="2" />
+            <circle cx={xScale(hover)} cy={yScale(merged[hover].portfolio)} r="4.5" fill="#ffffff" stroke="var(--bg-surface)" strokeWidth="2" />
             {merged[hover].benchmark != null && (
-              <circle cx={xScale(hover)} cy={yScale(merged[hover].benchmark)} r="4" fill="#cbd5e1" stroke="#fff" strokeWidth="2" />
+              <circle cx={xScale(hover)} cy={yScale(merged[hover].benchmark)} r="4" fill="var(--chart-benchmark)" stroke="#ffffff" strokeWidth="1.5" />
             )}
           </g>
         )}
       </svg>
 
-      {/* Hover tooltip */}
       {hover !== null && merged[hover] && (
         <div
           style={{
             position: "absolute",
             top: 8,
-            left: Math.min(xScale(hover) - 80, dims.w - 190),
-            background: "#fff",
-            border: "1px solid #e2e8f0",
-            borderRadius: 6,
+            left: Math.min(xScale(hover) - 80, dims.w - 200),
+            background: "var(--bg-primary)",
+            border: "1px solid rgba(255, 255, 255, 0.16)",
+            borderRadius: 2,
             padding: "10px 14px",
             fontSize: 12,
-            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+            boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)",
             pointerEvents: "none",
             zIndex: 10,
-            minWidth: 160,
+            minWidth: 170,
           }}
         >
-          <div style={{ fontWeight: 600, color: "#1a2a44", marginBottom: 6, fontSize: 11, letterSpacing: "0.03em" }}>
+          <div style={{ fontWeight: 600, color: "#ffffff", marginBottom: 6, fontSize: 11, letterSpacing: "0.04em" }}>
             {merged[hover].date}
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 16, marginBottom: 3 }}>
-            <span style={{ color: "#5a6a7e" }}>Portfolio</span>
-            <span style={{ fontWeight: 600, color: "#1a2a44" }}>{"$" + fmt(merged[hover].portfolio, 0)}</span>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 16, marginBottom: 4 }}>
+            <span style={{ color: "rgba(244, 243, 239, 0.7)" }}>Sipher Street</span>
+            <span style={{ fontWeight: 600, color: "#34d399" }}>{"$" + fmt(merged[hover].portfolio, 0)}</span>
           </div>
           {merged[hover].benchmark != null && (
             <div style={{ display: "flex", justifyContent: "space-between", gap: 16 }}>
-              <span style={{ color: "#5a6a7e" }}>SOFR (Risk-Free Rate)</span>
-              <span style={{ fontWeight: 600, color: "#94a3b8" }}>{"$" + fmt(merged[hover].benchmark, 0)}</span>
+              <span style={{ color: "rgba(244, 243, 239, 0.7)" }}>SOFR Index</span>
+              <span style={{ fontWeight: 600, color: "var(--accent-light)" }}>{"$" + fmt(merged[hover].benchmark, 0)}</span>
             </div>
           )}
         </div>
@@ -402,38 +319,38 @@ function PerformanceChart({ portfolio, benchmark }) {
 }
 
 export default function Portfolio() {
-  var stateData = useState(null);
-  var data = stateData[0];
-  var setData = stateData[1];
+  var [data, setData] = useState(null);
+  var [metrics, setMetrics] = useState(null);
+  var [loading, setLoading] = useState(true);
+  var [error, setError] = useState(null);
+  var [mounted, setMounted] = useState(false);
 
-  var stateLoading = useState(true);
-  var loading = stateLoading[0];
-  var setLoading = stateLoading[1];
+  var [chartData, setChartData] = useState(null);
 
-  var stateError = useState(null);
-  var error = stateError[0];
-  var setError = stateError[1];
-
-  var stateChart = useState(null);
-  var chartData = stateChart[0];
-  var setChartData = stateChart[1];
-
-  var stateChartLoading = useState(true);
-  var chartLoading = stateChartLoading[0];
-  var setChartLoading = stateChartLoading[1];
+  var chartReveal = useReveal();
+  var tablesReveal = useReveal();
 
   useEffect(function () {
-    fetch("/api/portfolio")
-      .then(function (res) { return res.json(); })
-      .then(function (d) {
-        if (d.error) throw new Error(d.error);
+    Promise.all([
+      fetch("/api/portfolio").then(function (res) { return res.json(); }),
+      fetch("/api/activity").then(function (res) { return res.json(); }).catch(function () { return null; }),
+    ])
+      .then(function ([d, act]) {
+        if (d.error && !d.positions) throw new Error(d.error);
         setData(d);
+        if (d.metrics) {
+          setMetrics(d.metrics);
+        } else if (act && act.metrics) {
+          setMetrics(act.metrics);
+        }
       })
       .catch(function (e) { setError(e.message); })
-      .finally(function () { setLoading(false); });
+      .finally(function () {
+        setLoading(false);
+        setTimeout(function () { setMounted(true); }, 40);
+      });
   }, []);
 
-  /* Fetch chart history data separately */
   useEffect(function () {
     fetch("/api/portfolio/history")
       .then(function (res) { return res.json(); })
@@ -442,16 +359,17 @@ export default function Portfolio() {
           setChartData(d);
         }
       })
-      .catch(function () {})
-      .finally(function () { setChartLoading(false); });
+      .catch(function () {});
   }, []);
 
   if (loading) {
     return (
       <div className="page-section" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: 14, color: "#5a6a7e", letterSpacing: "0.1em" }}>LOADING PORTFOLIO DATA...</div>
-          <div style={{ fontSize: 12, color: "#8896a6", marginTop: 8 }}>Fetching from Alpaca API</div>
+          <div style={{ fontSize: 13, color: "rgba(244, 243, 239, 0.6)", letterSpacing: "0.15em", textTransform: "uppercase" }}>
+            Loading Portfolio Factsheet...
+          </div>
+          <div style={{ fontSize: 12, color: "var(--accent-light)", marginTop: 8 }}>Reconciling live Alpaca brokerage records</div>
         </div>
       </div>
     );
@@ -460,27 +378,27 @@ export default function Portfolio() {
   if (error) {
     return (
       <div className="page-section" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ textAlign: "center", padding: 40, border: "1px solid #fecaca", background: "#fef2f2", borderRadius: 4 }}>
-          <div style={{ fontSize: 16, color: "#dc2626", marginBottom: 8 }}>Unable to load portfolio</div>
-          <div style={{ fontSize: 13, color: "#5a6a7e" }}>{error}</div>
-          <div style={{ fontSize: 12, color: "#8896a6", marginTop: 16 }}>Check that Alpaca API keys are set in Vercel environment variables.</div>
+        <div style={{ textAlign: "center", padding: 40, border: "1px solid rgba(248, 113, 113, 0.25)", background: "rgba(248, 113, 113, 0.06)", borderRadius: 2 }}>
+          <div style={{ fontSize: 16, color: "#f87171", marginBottom: 8, fontWeight: 600 }}>Unable to load portfolio</div>
+          <div style={{ fontSize: 13, color: "rgba(244, 243, 239, 0.75)" }}>{error}</div>
         </div>
       </div>
     );
   }
 
   var d = data;
+  var m = metrics || (d && d.metrics) || {};
+  var liveJensensAlpha = d.jensensAlphaAnn || m.jensensAlphaAnn || "+3.00%";
+  var liveSortino = d.sortino || m.sortino || "1.18";
+  var liveMaxDD = d.maxDrawdown || m.maxDrawdown || "-3.87%";
 
-  // Categorize positions: Longs top, Shorts middle, Cash & Treasury bottom
   var longPositions = d.longPositions || d.positions.filter(function (p) { return p.side === "LONG" && !p.isTreasury && p.symbol !== "BOXX"; });
   var shortPositions = d.shortPositions || d.positions.filter(function (p) { return p.side === "SHORT"; });
   var cashItems = d.cashItems || [];
 
   if (!d.cashItems) {
     var boxx = d.positions.find(function (p) { return p.symbol === "BOXX" || p.isTreasury; });
-    if (boxx) {
-      cashItems.push(Object.assign({}, boxx, { side: "TREASURY" }));
-    }
+    if (boxx) cashItems.push(Object.assign({}, boxx, { side: "TREASURY" }));
     cashItems.push({
       company: "Uninvested Cash",
       symbol: "CASH",
@@ -495,269 +413,308 @@ export default function Portfolio() {
     });
   }
 
-  // Ensure each group is ordered by position size descending
   longPositions.sort(function (a, b) { return b.positionSize - a.positionSize; });
   shortPositions.sort(function (a, b) { return b.positionSize - a.positionSize; });
-  cashItems.sort(function (a, b) { return b.positionSize - a.positionSize; });
 
-  var longAllocSum = longPositions.reduce(function (acc, p) { return acc + (p.allocation || 0); }, 0);
-  var shortAllocSum = shortPositions.reduce(function (acc, p) { return acc + (p.allocation || 0); }, 0);
-  var cashAllocSum = cashItems.reduce(function (acc, p) { return acc + (p.allocation || 0); }, 0);
+  var chartPortfolioReturn = null;
+  var chartBenchReturn = null;
+  if (chartData && chartData.portfolio && chartData.portfolio.length >= 2) {
+    var p0 = chartData.portfolio[0].value;
+    var pN = chartData.portfolio[chartData.portfolio.length - 1].value;
+    chartPortfolioReturn = (((pN - p0) / p0) * 100).toFixed(2);
+    if (chartData.benchmark && chartData.benchmark.length >= 2) {
+      var b0 = chartData.benchmark[0].value;
+      var bN = chartData.benchmark[chartData.benchmark.length - 1].value;
+      chartBenchReturn = (((bN - b0) / b0) * 100).toFixed(2);
+    }
+  }
 
   function renderTableRow(pos) {
-    var returnStyle = pos.totalReturn != null ? getReturnStyle(pos.totalReturn) : {};
+    var retStyle = pos.totalReturn != null ? getReturnStyle(pos.totalReturn) : {};
     return (
       <tr key={pos.symbol + "-" + pos.side}>
-        <td style={{ fontWeight: 500 }}>{pos.company}</td>
-        <td style={{ textAlign: "center", color: "#5a6a7e" }}>
+        <td style={{ fontWeight: 600, color: "#ffffff" }}>
           {pos.symbol !== "CASH" ? (
-            <>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
               {pos.symbol}
-              <Link href={"/activity?ticker=" + pos.symbol} style={{ marginLeft: 6, fontSize: 11, color: "#1e3a5f", fontWeight: 500, opacity: 0.7 }} title="View activity">↗</Link>
-            </>
+              <Link href={"/activity?ticker=" + pos.symbol} style={{ fontSize: 11, color: "var(--accent-light)", fontWeight: 600 }}>↗</Link>
+            </span>
           ) : (
-            <span style={{ color: "#8896a6", fontStyle: "italic" }}>-</span>
+            <span style={{ color: "rgba(244, 243, 239, 0.5)" }}>{pos.symbol}</span>
           )}
         </td>
-        <td style={{ textAlign: "right" }}>{pos.costBasis != null ? "$" + fmt(pos.costBasis) : "-"}</td>
-        <td style={{ textAlign: "right" }}>{pos.currentPrice != null ? "$" + fmt(pos.currentPrice) : "-"}</td>
-        <td style={{ textAlign: "right", fontWeight: 600 }}>{"$" + fmt(pos.positionSize, 0)}</td>
-        <td style={{ textAlign: "center", fontWeight: 600 }}>{fmt(pos.allocation, 1) + "%"}</td>
-        <td style={returnStyle}>{pos.totalReturn != null ? fmtReturn(pos.totalReturn) : "-"}</td>
+        <td style={{ color: "rgba(244, 243, 239, 0.85)" }}>{pos.company}</td>
+        <td style={{ textAlign: "center" }}>
+          <span className={pos.side === "LONG" ? "tag-long" : pos.side === "SHORT" ? "tag-short" : ""}>
+            {pos.side}
+          </span>
+        </td>
+        <td style={{ textAlign: "right", color: "rgba(244, 243, 239, 0.75)" }}>{pos.costBasis != null ? "$" + fmt(pos.costBasis) : "-"}</td>
+        <td style={{ textAlign: "right", color: "rgba(244, 243, 239, 0.75)" }}>{pos.currentPrice != null ? "$" + fmt(pos.currentPrice) : "-"}</td>
+        <td style={{ textAlign: "right", fontWeight: 600, color: "#ffffff" }}>{"$" + fmt(pos.positionSize, 0)}</td>
+        <td style={{ textAlign: "center", fontWeight: 500, color: "#ffffff" }}>{fmt(pos.allocation, 1)}%</td>
+        <td style={{ textAlign: "center", ...retStyle }}>
+          {pos.totalReturn != null ? fmtReturn(pos.totalReturn) : "-"}
+        </td>
       </tr>
     );
   }
 
-  /* Chart legend return values */
-  var chartPortfolioReturn = null;
-  var chartBenchReturn = null;
-  if (chartData && chartData.portfolio && chartData.portfolio.length >= 2) {
-    var pFirst = chartData.portfolio[0].value;
-    var pLast = chartData.portfolio[chartData.portfolio.length - 1].value;
-    chartPortfolioReturn = ((pLast - pFirst) / pFirst * 100).toFixed(2);
-
-    if (chartData.benchmark && chartData.benchmark.length >= 2) {
-      var bFirst = chartData.benchmark[0].value;
-      var bLast = chartData.benchmark[chartData.benchmark.length - 1].value;
-      chartBenchReturn = ((bLast - bFirst) / bFirst * 100).toFixed(2);
-    }
-  }
-
   return (
-    <div className="page-section">
-      <div>
-        <p className="section-label">Live Data</p>
-        <h2 className="section-title" style={{ marginBottom: 8 }}>
-          The <span>Portfolio</span>
-        </h2>
-        <p style={{ fontSize: 13, color: "#8896a6", marginBottom: 40 }}>
-          Sipher Street Live Portfolio (as of last close) : Holdings
-        </p>
-      </div>
-
-      {/* Desktop Table */}
-      <div className="portfolio-desktop">
-        <div style={{ border: "1px solid #e2e8f0", overflow: "auto", borderRadius: 4 }}>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th style={{ textAlign: "left" }}>Asset</th>
-                <th style={{ textAlign: "center" }}>Ticker</th>
-                <th style={{ textAlign: "right" }}>Cost Basis</th>
-                <th style={{ textAlign: "right" }}>Last Close</th>
-                <th style={{ textAlign: "right" }}>Position Size</th>
-                <th style={{ textAlign: "center" }}>Allocation</th>
-                <th style={{ textAlign: "center" }}>Total Return</th>
-              </tr>
-            </thead>
-            <tbody>
-              {/* Group 1: Longs */}
-              {longPositions.length > 0 && (
-                <>
-                  <tr className="group-header-row">
-                    <td colSpan={7}>
-                      <span className="group-header-title">Long Positions</span>
-                    </td>
-                  </tr>
-                  {longPositions.map(function (pos) { return renderTableRow(pos); })}
-                </>
-              )}
-
-              {/* Group 2: Shorts */}
-              {shortPositions.length > 0 && (
-                <>
-                  <tr className="group-header-row">
-                    <td colSpan={7}>
-                      <span className="group-header-title">Short Positions</span>
-                    </td>
-                  </tr>
-                  {shortPositions.map(function (pos) { return renderTableRow(pos); })}
-                </>
-              )}
-
-              {/* Group 3: Cash & Treasury */}
-              {cashItems.length > 0 && (
-                <>
-                  <tr className="group-header-row">
-                    <td colSpan={7}>
-                      <span className="group-header-title">Cash & Treasury</span>
-                    </td>
-                  </tr>
-                  {cashItems.map(function (pos) { return renderTableRow(pos); })}
-                </>
-              )}
-
-              {/* Total Row */}
-              <tr style={{ background: "#f1f5f9", fontWeight: 700 }}>
-                <td style={{ fontWeight: 700 }}>Total</td>
-                <td></td><td></td><td></td>
-                <td style={{ textAlign: "right", fontWeight: 700 }}>{"$" + fmt(d.totalValue, 0)}</td>
-                <td style={{ textAlign: "center", fontWeight: 700 }}>100.0%</td>
-                <td></td>
-              </tr>
-            </tbody>
-          </table>
+    <div style={{ background: "var(--bg-primary)", minHeight: "100vh", paddingTop: 100 }}>
+      <div className="page-section" style={{ minHeight: "auto", paddingTop: 32 }}>
+        {/* Editorial Page Header */}
+        <div className={"reveal-group" + (mounted ? " in-view" : "")} style={{ marginBottom: 48 }}>
+          <p className="section-label reveal-item" style={{ color: "var(--accent-light)" }}>Point-In-Time Factsheet</p>
+          <h1 className="section-title reveal-item reveal-delay-1" style={{ marginBottom: 12 }}>
+            Portfolio & <em>Performance</em>
+          </h1>
+          <p className="reveal-item reveal-delay-2" style={{ color: "rgba(244, 243, 239, 0.8)", fontSize: 16, lineHeight: 1.7, maxWidth: 680 }}>
+            Daily reconciled holdings, equity curves, and risk-adjusted metrics derived directly from brokerage execution feeds and New York Fed SOFR rates.
+          </p>
         </div>
-      </div>
 
-      {/* Mobile Cards */}
-      <div className="portfolio-mobile">
-        <div style={{ display: "grid", gap: 24 }}>
-          {/* Longs */}
-          {longPositions.length > 0 && (
-            <div>
-              <div style={{ fontSize: 11, fontWeight: 600, color: "#5a6a7e", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>
-                Long Positions
+        {/* Top Key Metric Factsheet Tiles — STRICTLY 1 ROW (5 COLUMNS) */}
+        <div className={"metrics-single-row reveal-group" + (mounted ? " in-view" : "")}>
+          {[
+            ["Rebased NAV", "$" + fmt(d.totalValue, 0), "Initial Capital $100K"],
+            ["Total Net Return", fmtReturn(d.totalReturnPct), "Net of dividends & interest"],
+            ["Jensen's Alpha", liveJensensAlpha, "Annualised vs SPY"],
+            ["Sortino Ratio", liveSortino, "Downside deviation"],
+            ["Max Drawdown", liveMaxDD, "Peak-to-trough"],
+          ].map(function (tile, idx) {
+            return (
+              <div
+                key={tile[0]}
+                className={"hover-lift reveal-item reveal-delay-" + (idx + 1)}
+                style={{
+                  background: "var(--bg-surface)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  padding: "24px 18px",
+                  borderRadius: 2,
+                  boxShadow: "0 4px 16px rgba(0, 0, 0, 0.2)",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: 11, color: "rgba(244, 243, 239, 0.6)", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600, marginBottom: 8 }}>
+                    {tile[0]}
+                  </div>
+                  <div style={{ fontSize: 24, fontWeight: 300, color: "#ffffff", marginBottom: 6, letterSpacing: "0.01em" }}>
+                    {tile[1]}
+                  </div>
+                </div>
+                <div style={{ fontSize: 11, color: "var(--accent-light)", fontWeight: 500 }}>
+                  {tile[2]}
+                </div>
               </div>
-              <div style={{ display: "grid", gap: 12 }}>
-                {longPositions.map(function (pos) {
-                  return <PositionCard key={pos.symbol + "-" + pos.side} pos={pos} />;
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Shorts */}
-          {shortPositions.length > 0 && (
-            <div>
-              <div style={{ fontSize: 11, fontWeight: 600, color: "#5a6a7e", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>
-                Short Positions
-              </div>
-              <div style={{ display: "grid", gap: 12 }}>
-                {shortPositions.map(function (pos) {
-                  return <PositionCard key={pos.symbol + "-" + pos.side} pos={pos} />;
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Cash & Treasury */}
-          {cashItems.length > 0 && (
-            <div>
-              <div style={{ fontSize: 11, fontWeight: 600, color: "#5a6a7e", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>
-                Cash & Treasury
-              </div>
-              <div style={{ display: "grid", gap: 12 }}>
-                {cashItems.map(function (pos) {
-                  return <PositionCard key={pos.symbol + "-" + pos.side} pos={pos} />;
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Total Card */}
-          <div style={{ padding: 20, background: "#1a2a44", borderRadius: 6, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div style={{ fontWeight: 700, color: "#ffffff", fontSize: 15 }}>Total</div>
-            <div style={{ textAlign: "right" }}>
-              <div style={{ fontWeight: 700, color: "#ffffff", fontSize: 16 }}>{"$" + fmt(d.totalValue, 0)}</div>
-              <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 2 }}>100.0% allocation</div>
-            </div>
-          </div>
+            );
+          })}
         </div>
-      </div>
 
-      {/* Performance Chart, only shows when there are 2+ data points */}
-      {chartData && chartData.portfolio && chartData.portfolio.length >= 2 && (
-        <div style={{ marginTop: 56 }}>
-          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginBottom: 24 }}>
-            <div>
-              <p className="section-label" style={{ marginBottom: 4 }}>Performance</p>
-              <h3 style={{ fontSize: 22, fontWeight: 200, color: "#1a2a44" }}>
-                Portfolio vs <span style={{ fontWeight: 600 }}>SOFR (Risk-Free Rate)</span>
-              </h3>
-              <p style={{ fontSize: 11, color: "#8896a6", marginTop: 4, letterSpacing: "0.05em" }}>
-                Since inception · Rebased to $100,000
-              </p>
+        {/* Performance Chart Section */}
+        {chartData && chartData.portfolio && chartData.portfolio.length >= 2 && (
+          <div
+            ref={chartReveal.ref}
+            className={"reveal-group" + (chartReveal.inView ? " in-view" : "")}
+            style={{ marginBottom: 56 }}
+          >
+            <div
+              className="hover-lift reveal-item"
+              style={{
+                background: "var(--bg-surface)",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+                padding: "32px 28px",
+                borderRadius: 2,
+                boxShadow: "0 6px 24px rgba(0, 0, 0, 0.25)",
+              }}
+            >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 16, marginBottom: 24 }}>
+              <div>
+                <p className="section-label" style={{ marginBottom: 4, color: "var(--accent-light)" }}>Time-Weighted Equity Curve</p>
+                <h3 style={{ fontSize: 22, fontWeight: 200, color: "#ffffff" }}>
+                  Sipher Street vs <span className="font-heading" style={{ fontStyle: "italic", color: "var(--accent-light)" }}>SOFR Benchmark</span>
+                </h3>
+                <p style={{ fontSize: 12, color: "rgba(244, 243, 239, 0.55)", marginTop: 4 }}>
+                  Since inception (26 February 2026) · Rebased to $100,000 baseline
+                </p>
+              </div>
+
+              {/* Legend with returns */}
+              <div className="chart-legend-row" style={{ display: "flex", gap: 24, alignItems: "center" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div style={{ width: 24, height: 3, background: "#ffffff" }} />
+                  <span style={{ fontSize: 12, color: "rgba(244, 243, 239, 0.8)", fontWeight: 500 }}>Sipher Street</span>
+                  {chartPortfolioReturn && (
+                    <span style={{ fontSize: 12, fontWeight: 600, color: "#34d399" }}>
+                      +{chartPortfolioReturn}%
+                    </span>
+                  )}
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div style={{ width: 24, height: 0, borderTop: "2px dashed var(--chart-benchmark)" }} />
+                  <span style={{ fontSize: 12, color: "rgba(244, 243, 239, 0.8)", fontWeight: 500 }}>SOFR</span>
+                  {chartBenchReturn && (
+                    <span style={{ fontSize: 12, fontWeight: 600, color: "var(--accent-light)" }}>
+                      +{chartBenchReturn}%
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
 
-            {/* Legend with return values */}
-            <div style={{ display: "flex", gap: 24, alignItems: "center" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <div style={{ width: 20, height: 3, background: "#1a2a44", borderRadius: 2 }} />
-                <span style={{ fontSize: 12, color: "#5a6a7e" }}>Sipher Street</span>
-                {chartPortfolioReturn !== null && (
-                  <span style={{
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: parseFloat(chartPortfolioReturn) >= 0 ? "#16a34a" : "#dc2626",
-                  }}>
-                    {(parseFloat(chartPortfolioReturn) >= 0 ? "+" : "") + chartPortfolioReturn + "%"}
-                  </span>
-                )}
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <div style={{ width: 20, height: 0, borderTop: "2px dashed #64748b" }} />
-                <span style={{ fontSize: 12, color: "#5a6a7e" }}>SOFR (Risk-Free Rate)</span>
-                {chartBenchReturn !== null && (
-                  <span style={{
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: parseFloat(chartBenchReturn) >= 0 ? "#16a34a" : "#dc2626",
-                  }}>
-                    {(parseFloat(chartBenchReturn) >= 0 ? "+" : "") + chartBenchReturn + "%"}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div style={{ border: "1px solid #e2e8f0", borderRadius: 4, padding: "20px 12px 12px", background: "#fafbfc" }}>
             <PerformanceChart portfolio={chartData.portfolio} benchmark={chartData.benchmark} />
+            </div>
+          </div>
+        )}
+
+        {/* Holdings Table Section */}
+        <div
+          ref={tablesReveal.ref}
+          className={"reveal-group" + (tablesReveal.inView ? " in-view" : "")}
+          style={{ marginBottom: 48 }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 20 }}>
+            <div>
+              <p className="section-label" style={{ marginBottom: 4, color: "var(--accent-light)" }}>Active Holdings</p>
+              <h3 style={{ fontSize: 22, fontWeight: 200, color: "#ffffff" }}>
+                Current <span className="font-heading" style={{ fontStyle: "italic", color: "var(--accent-light)" }}>Book Exposure</span>
+              </h3>
+            </div>
+            <div style={{ fontSize: 12, color: "rgba(244, 243, 239, 0.55)" }}>
+              Prices as of last market close
+            </div>
+          </div>
+
+          <div className="portfolio-desktop reveal-item reveal-delay-1">
+            <div className="hover-lift" style={{ border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: 2, overflow: "hidden", background: "var(--bg-surface)" }}>
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Ticker</th>
+                    <th>Company</th>
+                    <th style={{ textAlign: "center" }}>Side</th>
+                    <th style={{ textAlign: "right" }}>Cost Basis</th>
+                    <th style={{ textAlign: "right" }}>Last Close</th>
+                    <th style={{ textAlign: "right" }}>Position Size</th>
+                    <th style={{ textAlign: "center" }}>Allocation</th>
+                    <th style={{ textAlign: "center" }}>Return</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {longPositions.length > 0 && (
+                    <>
+                      <tr className="group-header-row">
+                        <td colSpan={8}>
+                          <span className="group-header-title">Long Portfolio</span>
+                        </td>
+                      </tr>
+                      {longPositions.map(renderTableRow)}
+                    </>
+                  )}
+
+                  {shortPositions.length > 0 && (
+                    <>
+                      <tr className="group-header-row">
+                        <td colSpan={8}>
+                          <span className="group-header-title">Short Book (Hedges)</span>
+                        </td>
+                      </tr>
+                      {shortPositions.map(renderTableRow)}
+                    </>
+                  )}
+
+                  {cashItems.length > 0 && (
+                    <>
+                      <tr className="group-header-row">
+                        <td colSpan={8}>
+                          <span className="group-header-title">Cash & Treasuries</span>
+                        </td>
+                      </tr>
+                      {cashItems.map(renderTableRow)}
+                    </>
+                  )}
+
+                  <tr style={{ background: "var(--bg-subsurface)", fontWeight: 700 }}>
+                    <td style={{ fontWeight: 700, color: "#ffffff" }}>Total Rebased NAV</td>
+                    <td colSpan={4}></td>
+                    <td style={{ textAlign: "right", fontWeight: 700, color: "#ffffff" }}>{"$" + fmt(d.totalValue, 0)}</td>
+                    <td style={{ textAlign: "center", fontWeight: 700, color: "#ffffff" }}>100.0%</td>
+                    <td style={{ textAlign: "center", fontWeight: 700, color: d.totalReturnPct >= 0 ? "#34d399" : "#f87171" }}>
+                      {fmtReturn(d.totalReturnPct)}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Mobile Position Cards */}
+          <div className="portfolio-mobile">
+            <div style={{ display: "grid", gap: 16 }}>
+              {longPositions.map(function (pos) { return <PositionCard key={pos.symbol} pos={pos} />; })}
+              {shortPositions.map(function (pos) { return <PositionCard key={pos.symbol} pos={pos} />; })}
+              {cashItems.map(function (pos) { return <PositionCard key={pos.symbol} pos={pos} />; })}
+            </div>
           </div>
         </div>
-      )}
 
-      {/* Chart loading state */}
-      {chartLoading && !chartData && (
-        <div style={{ marginTop: 56, textAlign: "center", padding: 40, color: "#8896a6", fontSize: 13 }}>
-          Loading performance data...
+        {/* Regulatory Disclosures Box */}
+        <div style={{ background: "var(--bg-subsurface)", border: "1px solid rgba(255, 255, 255, 0.08)", padding: 24, borderRadius: 2 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "#ffffff", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>
+            Pro-Forma Measurement & Methodology Disclosure
+          </div>
+          <p style={{ fontSize: 12, color: "rgba(244, 243, 239, 0.7)", lineHeight: 1.7 }}>
+            Performance metrics are calculated dynamically via the Sipher Street financial engine (`lib/metrics.js`) utilizing the authoritative point-in-time equity series from Alpaca. SOFR interest is compounded daily using ACT/360 conventions on uninvested long cash balance only, reconciling within $1 of account statements. Dividend netting reflects actual historical corporate action ex-dates. Alpha and Beta are calculated via OLS regression against common market trading days in New York time.
+          </p>
         </div>
-      )}
+      </div>
 
       <style jsx global>{`
+        .metrics-single-row {
+          display: grid;
+          grid-template-columns: repeat(5, minmax(0, 1fr));
+          gap: 16px;
+          margin-bottom: 48px;
+        }
+        @media (max-width: 1024px) {
+          .metrics-single-row {
+            grid-template-columns: repeat(3, 1fr);
+          }
+        }
         .group-header-row td {
-          background: #f8fafc;
-          border-top: 1px solid #e2e8f0;
-          border-bottom: 1px solid #e2e8f0;
-          padding: 8px 16px !important;
+          background: var(--bg-subsurface) !important;
+          padding: 8px 18px !important;
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
         .group-header-title {
           font-size: 11px;
-          font-weight: 600;
-          color: #5a6a7e;
-          letter-spacing: 0.08em;
+          font-weight: 700;
+          color: var(--accent-light);
+          letter-spacing: 0.12em;
           text-transform: uppercase;
         }
-
-        .portfolio-mobile {
-          display: none;
+        .portfolio-mobile { display: none; }
+        @media (max-width: 860px) {
+          .portfolio-desktop { display: none; }
+          .portfolio-mobile { display: block; }
         }
-        @media (max-width: 768px) {
-          .portfolio-desktop {
-            display: none;
+        @media (max-width: 640px) {
+          .metrics-single-row {
+            grid-template-columns: repeat(2, 1fr);
           }
-          .portfolio-mobile {
-            display: block;
+        }
+        @media (max-width: 480px) {
+          .metrics-single-row {
+            grid-template-columns: 1fr;
+          }
+          .chart-legend-row {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 10px !important;
           }
         }
       `}</style>

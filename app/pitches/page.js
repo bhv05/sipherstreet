@@ -3,34 +3,17 @@ import { useState, useEffect, useRef } from "react";
 import useReveal from "../components/useReveal";
 
 /*
-  PITCHES PAGE — Dynamic from Alpaca
-  ===================================
-  Active pitches are sourced from current Alpaca positions.
-  Archived pitches are derived from fully-closed fill history.
-  Manual overrides (deck, model, target price) come from
-  public/pitches-config.json — edit that file to add materials.
-
-  Strategy-type pitches (e.g. hedging) are defined as
-  "manualPitches" in the config and rendered separately.
+  PITCHES / RESEARCH PAGE — Institutional Tabbed Architecture (Option 1)
+  ======================================================================
+  Tabs:
+  - Realized Track Record (Archived pitches ordered strictly latest to oldest)
+  - Active Theses (Current live portfolio positions)
+  - Portfolio Hedges (Active & closed macro overlay hedges)
+  - All Research (Unified view with Realized Track Record first)
 */
 
 const ZOOM_LEVELS = [50, 75, 100, 125, 150, 200];
-
-/*
-  QUALITY_BOOST multiplies the render resolution beyond what DPR alone
-  requires. A value of 2 means on a 2x retina display at 100% zoom,
-  the canvas is rendered at 4x the display pixels. This is what makes
-  chart labels, logos, and bold text razor-sharp instead of slightly soft.
-  Increase to 2.5 or 3 if you want even more crispness (at the cost of
-  slightly more memory and render time per page).
-*/
 var QUALITY_BOOST = 2;
-
-/*
-  MINIMUM_SCALE ensures that even at 50% zoom on a 1x display, we never
-  render below this PDF.js scale factor. PDF.js scale 3 roughly equals
-  ~216 DPI which keeps text legible and clean.
-*/
 var MINIMUM_SCALE = 3;
 
 function formatDate(dateStr) {
@@ -63,78 +46,41 @@ function loadPdfJs() {
 
 function PdfIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6z" fill="#e53e3e" />
-      <path d="M14 2v6h6" fill="#fc8181" />
-      <text x="12" y="17.5" textAnchor="middle" fontSize="6.5" fontWeight="bold" fill="white" fontFamily="Arial">PDF</text>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-light)" strokeWidth="2">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
+      <line x1="16" y1="13" x2="8" y2="13" />
+      <line x1="16" y1="17" x2="8" y2="17" />
+      <polyline points="10 9 9 9 8 9" />
     </svg>
   );
 }
 
 function XlsIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6z" fill="#217346" />
-      <path d="M14 2v6h6" fill="#33a867" />
-      <text x="12" y="17.5" textAnchor="middle" fontSize="5.5" fontWeight="bold" fill="white" fontFamily="Arial">XLS</text>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
+      <line x1="8" y1="13" x2="16" y2="17" />
+      <line x1="16" y1="13" x2="8" y2="17" />
     </svg>
   );
 }
 
-function PdfIconSmall() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6z" fill="#e53e3e" />
-      <path d="M14 2v6h6" fill="#fc8181" />
-      <text x="12" y="17.5" textAnchor="middle" fontSize="6.5" fontWeight="bold" fill="white" fontFamily="Arial">PDF</text>
-    </svg>
-  );
-}
-
-function XlsIconSmall() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6z" fill="#217346" />
-      <path d="M14 2v6h6" fill="#33a867" />
-      <text x="12" y="17.5" textAnchor="middle" fontSize="5.5" fontWeight="bold" fill="white" fontFamily="Arial">XLS</text>
-    </svg>
-  );
-}
-
-/* Greyed-out placeholder icons for missing deck/model */
 function PdfIconDisabled() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" opacity="0.3">
-      <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6z" fill="#94a3b8" />
-      <path d="M14 2v6h6" fill="#cbd5e1" />
-      <text x="12" y="17.5" textAnchor="middle" fontSize="6.5" fontWeight="bold" fill="white" fontFamily="Arial">PDF</text>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(244, 243, 239, 0.25)" strokeWidth="2">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
     </svg>
   );
 }
+
 function XlsIconDisabled() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" opacity="0.3">
-      <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6z" fill="#94a3b8" />
-      <path d="M14 2v6h6" fill="#cbd5e1" />
-      <text x="12" y="17.5" textAnchor="middle" fontSize="5.5" fontWeight="bold" fill="white" fontFamily="Arial">XLS</text>
-    </svg>
-  );
-}
-function PdfIconSmallDisabled() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" opacity="0.3">
-      <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6z" fill="#94a3b8" />
-      <path d="M14 2v6h6" fill="#cbd5e1" />
-      <text x="12" y="17.5" textAnchor="middle" fontSize="6.5" fontWeight="bold" fill="white" fontFamily="Arial">PDF</text>
-    </svg>
-  );
-}
-function XlsIconSmallDisabled() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" opacity="0.3">
-      <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6z" fill="#94a3b8" />
-      <path d="M14 2v6h6" fill="#cbd5e1" />
-      <text x="12" y="17.5" textAnchor="middle" fontSize="5.5" fontWeight="bold" fill="white" fontFamily="Arial">XLS</text>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(244, 243, 239, 0.25)" strokeWidth="2">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
     </svg>
   );
 }
@@ -186,167 +132,220 @@ function PdfViewer({ pdf, company, onClose }) {
   }, [pdf]);
 
   useEffect(function () {
+    if (!pdfDocRef.current || numPages === 0) return;
+    var thisRenderId = ++renderIdRef.current;
     var doc = pdfDocRef.current;
-    if (!doc || numPages === 0) return;
 
-    renderIdRef.current += 1;
-    var thisRenderId = renderIdRef.current;
+    for (var pageNum = 1; pageNum <= numPages; pageNum++) {
+      (function (pNum) {
+        doc.getPage(pNum).then(function (page) {
+          if (thisRenderId !== renderIdRef.current) return;
+          var unscaledVp = page.getViewport({ scale: 1 });
+          var displayW = (baseWidth * zoom) / 100;
+          var cssScale = displayW / unscaledVp.width;
+          var dpr = window.devicePixelRatio || 1;
+          var renderScale = Math.max(cssScale * dpr * QUALITY_BOOST, MINIMUM_SCALE);
+          var renderVp = page.getViewport({ scale: renderScale });
 
-    async function renderAll() {
-      var dpr = window.devicePixelRatio || 1;
-      var displayWidth = baseWidth * (zoom / 100);
+          var canvas = canvasRefs.current[pNum - 1];
+          if (!canvas) return;
 
-      for (var i = 1; i <= doc.numPages; i++) {
-        if (renderIdRef.current !== thisRenderId) return;
+          canvas.width = Math.round(renderVp.width);
+          canvas.height = Math.round(renderVp.height);
+          canvas.style.width = Math.round(unscaledVp.width * cssScale) + "px";
+          canvas.style.height = Math.round(unscaledVp.height * cssScale) + "px";
 
-        var page = await doc.getPage(i);
-        var nativeViewport = page.getViewport({ scale: 1 });
+          var ctx = canvas.getContext("2d");
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = "high";
 
-        var calculatedScale = (displayWidth / nativeViewport.width) * dpr * QUALITY_BOOST;
-        var renderScale = Math.max(calculatedScale, MINIMUM_SCALE);
-        var viewport = page.getViewport({ scale: renderScale });
-
-        var canvas = canvasRefs.current[i - 1];
-        if (!canvas || renderIdRef.current !== thisRenderId) continue;
-
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-
-        canvas.style.width = displayWidth + "px";
-        canvas.style.height = Math.round(displayWidth * (nativeViewport.height / nativeViewport.width)) + "px";
-
-        var ctx = canvas.getContext("2d");
-        await page.render({ canvasContext: ctx, viewport: viewport }).promise;
-      }
+          page.render({ canvasContext: ctx, viewport: renderVp });
+        });
+      })(pageNum);
     }
-
-    renderAll();
   }, [numPages, zoom, baseWidth]);
 
-  var zoomIn = function () { setZoomIndex(function (i) { return Math.min(i + 1, ZOOM_LEVELS.length - 1); }); };
-  var zoomOut = function () { setZoomIndex(function (i) { return Math.max(i - 1, 0); }); };
-  var zoomReset = function () { setZoomIndex(2); };
+  useEffect(function () {
+    function handleKeyDown(e) {
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return function () { window.removeEventListener("keydown", handleKeyDown); };
+  }, [onClose]);
 
-  var pageElements = [];
-  for (var i = 0; i < numPages; i++) {
-    pageElements.push(i);
-  }
+  function zoomIn() { if (zoomIndex < ZOOM_LEVELS.length - 1) setZoomIndex(zoomIndex + 1); }
+  function zoomOut() { if (zoomIndex > 0) setZoomIndex(zoomIndex - 1); }
 
   return (
     <div
-      style={{
-        position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
-        zIndex: 200, background: "rgba(0,0,0,0.6)",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        padding: 10,
-      }}
       onClick={onClose}
+      className="pdf-viewer-overlay"
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0, 15, 20, 0.88)",
+        backdropFilter: "blur(8px)",
+        zIndex: 1000,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "20px",
+        boxSizing: "border-box",
+      }}
     >
       <div
-        style={{
-          background: "#fff", borderRadius: 8,
-          width: "95vw", height: "92vh", maxWidth: 1200,
-          display: "flex", flexDirection: "column", overflow: "hidden",
-        }}
         onClick={function (e) { e.stopPropagation(); }}
-        onContextMenu={function (e) { e.preventDefault(); }}
+        style={{
+          width: "100%",
+          maxWidth: 1000,
+          background: "var(--bg-surface)",
+          border: "1px solid rgba(255, 255, 255, 0.15)",
+          borderRadius: 4,
+          display: "flex",
+          flexDirection: "column",
+          maxHeight: "92vh",
+          overflow: "hidden",
+          boxShadow: "0 24px 64px rgba(0, 0, 0, 0.6)",
+        }}
       >
-        {/* Header */}
+        {/* Viewer Header */}
         <div
           style={{
-            display: "flex", alignItems: "center", justifyContent: "space-between",
-            padding: "12px 16px", background: "#f1f5f9",
-            borderBottom: "1px solid #e2e8f0", flexShrink: 0, gap: 8,
+            padding: "16px 24px",
+            borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            background: "var(--bg-subsurface)",
           }}
         >
-          <span
-            style={{
-              fontSize: 14, fontWeight: 600, color: "#1a2a44",
-              overflow: "hidden", textOverflow: "ellipsis",
-              whiteSpace: "nowrap", flex: 1, minWidth: 0,
-            }}
-          >
-            {company}
-          </span>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-            <button
-              onClick={zoomOut}
-              disabled={zoomIndex === 0}
+          <div>
+            <div style={{ fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--accent-light)", fontWeight: 600 }}>
+              Research Memo & Presentation
+            </div>
+            <h3 style={{ fontSize: 18, color: "#ffffff", margin: 0, fontWeight: 300 }}>{company}</h3>
+          </div>
+
+          {/* Controls */}
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(255, 255, 255, 0.05)", borderRadius: 4, padding: 3 }}>
+              <button
+                onClick={zoomOut}
+                disabled={zoomIndex === 0}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "#ffffff",
+                  fontSize: 16,
+                  cursor: "pointer",
+                  width: 28,
+                  height: 28,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  opacity: zoomIndex === 0 ? 0.3 : 1,
+                }}
+              >
+                −
+              </button>
+              <span style={{ fontSize: 12, color: "rgba(244, 243, 239, 0.8)", minWidth: 44, textAlign: "center" }}>
+                {zoom}%
+              </span>
+              <button
+                onClick={zoomIn}
+                disabled={zoomIndex === ZOOM_LEVELS.length - 1}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "#ffffff",
+                  fontSize: 16,
+                  cursor: "pointer",
+                  width: 28,
+                  height: 28,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  opacity: zoomIndex === ZOOM_LEVELS.length - 1 ? 0.3 : 1,
+                }}
+              >
+                +
+              </button>
+            </div>
+
+            <a
+              href={pdf}
+              download
               style={{
-                width: 32, height: 32, border: "1px solid #e2e8f0", background: "#fff",
-                borderRadius: 4, cursor: zoomIndex === 0 ? "default" : "pointer",
-                fontSize: 16, color: zoomIndex === 0 ? "#cbd5e1" : "#1a2a44",
-                display: "flex", alignItems: "center", justifyContent: "center",
+                padding: "6px 14px",
+                background: "var(--accent-dim)",
+                border: "1px solid rgba(213, 109, 74, 0.4)",
+                color: "var(--accent-light)",
+                borderRadius: 2,
+                fontSize: 12,
+                fontWeight: 600,
+                textDecoration: "none",
               }}
-            >{"\u2212"}</button>
-            <span
-              onClick={zoomReset}
-              style={{ minWidth: 44, textAlign: "center", color: "#5a6a7e", cursor: "pointer", fontSize: 12 }}
-            >{zoom + "%"}</span>
-            <button
-              onClick={zoomIn}
-              disabled={zoomIndex === ZOOM_LEVELS.length - 1}
-              style={{
-                width: 32, height: 32, border: "1px solid #e2e8f0", background: "#fff",
-                borderRadius: 4, cursor: zoomIndex === ZOOM_LEVELS.length - 1 ? "default" : "pointer",
-                fontSize: 16, color: zoomIndex === ZOOM_LEVELS.length - 1 ? "#cbd5e1" : "#1a2a44",
-                display: "flex", alignItems: "center", justifyContent: "center",
-              }}
-            >+</button>
-            <div style={{ width: 1, height: 20, background: "#e2e8f0", margin: "0 4px" }} />
+            >
+              DOWNLOAD PDF
+            </a>
+
             <button
               onClick={onClose}
               style={{
-                width: 32, height: 32, border: "1px solid #e2e8f0", background: "#fff",
-                borderRadius: 4, cursor: "pointer", fontSize: 18, color: "#1a2a44",
-                display: "flex", alignItems: "center", justifyContent: "center",
+                background: "none",
+                border: "none",
+                color: "rgba(244, 243, 239, 0.7)",
+                fontSize: 22,
+                cursor: "pointer",
+                padding: "0 6px",
               }}
-            >{"\u2715"}</button>
+            >
+              ✕
+            </button>
           </div>
         </div>
 
-        {/* Scrollable page area */}
+        {/* Viewer Content */}
         <div
           ref={contentRef}
           style={{
-            flex: 1, overflow: "auto", background: "#e5e7eb",
-            WebkitOverflowScrolling: "touch",
+            flex: 1,
+            overflowY: "auto",
+            padding: "24px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 20,
+            background: "#001a21",
           }}
-          onContextMenu={function (e) { e.preventDefault(); }}
         >
-          <div style={{ padding: 20 }}>
-            {loading && (
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 300 }}>
-                <div style={{ fontSize: 14, color: "#5a6a7e", letterSpacing: "0.1em", textAlign: "center" }}>
-                  LOADING PITCH DECK...
-                </div>
-              </div>
-            )}
-
-            {error && (
-              <div style={{ textAlign: "center", padding: 40, color: "#dc2626", fontSize: 14 }}>
-                Unable to load PDF. Please try again.
-              </div>
-            )}
-
-            {pageElements.map(function (idx) {
-              return (
+          {loading && (
+            <div style={{ color: "rgba(244, 243, 239, 0.6)", padding: "60px 0", fontSize: 14 }}>
+              Loading high-resolution deck...
+            </div>
+          )}
+          {error && (
+            <div style={{ color: "#f87171", padding: "60px 0", fontSize: 14 }}>
+              Unable to load PDF document preview. Please use the download button above.
+            </div>
+          )}
+          {Array.from({ length: numPages }).map(function (_, idx) {
+            return (
+              <div
+                key={idx}
+                style={{
+                  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.5)",
+                  background: "#ffffff",
+                  lineHeight: 0,
+                }}
+              >
                 <canvas
-                  key={idx}
                   ref={function (el) { canvasRefs.current[idx] = el; }}
-                  style={{
-                    display: "block",
-                    margin: "0 auto 8px",
-                    maxWidth: zoom <= 100 ? "100%" : "none",
-                    pointerEvents: "none",
-                    userSelect: "none",
-                    WebkitUserSelect: "none",
-                    WebkitTouchCallout: "none",
-                  }}
+                  style={{ display: "block" }}
                 />
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
@@ -354,325 +353,159 @@ function PdfViewer({ pdf, company, onClose }) {
 }
 
 function getDecisionStyle(decision) {
-  var d = decision.toLowerCase();
-  if (d === "buy") return { background: "rgba(22, 163, 74, 0.1)", color: "#16a34a" };
-  if (d === "short") return { background: "rgba(220, 38, 38, 0.1)", color: "#dc2626" };
-  return { background: "rgba(30, 58, 95, 0.08)", color: "#1e3a5f" };
+  var d = (decision || "").toLowerCase();
+  if (d === "buy" || d === "long") {
+    return { background: "rgba(34, 197, 94, 0.15)", color: "#4ade80", border: "1px solid rgba(34, 197, 94, 0.3)" };
+  }
+  if (d === "short") {
+    return { background: "rgba(239, 68, 68, 0.15)", color: "#f87171", border: "1px solid rgba(239, 68, 68, 0.3)" };
+  }
+  return { background: "var(--accent-dim)", color: "var(--accent-light)", border: "1px solid var(--border-accent)" };
 }
 
-var linkStyle = {
-  fontSize: 14, color: "#1e3a5f", textDecoration: "underline",
-  cursor: "pointer", fontWeight: 600, display: "flex", alignItems: "center", gap: 6,
+function getProfitStyle(pct) {
+  if (!pct) return { color: "#ffffff", background: "rgba(255, 255, 255, 0.08)", border: "1px solid rgba(255, 255, 255, 0.1)" };
+  var isPositive = pct.startsWith("+");
+  return {
+    color: isPositive ? "#4ade80" : "#f87171",
+    background: isPositive ? "rgba(34, 197, 94, 0.15)" : "rgba(239, 68, 68, 0.15)",
+    border: isPositive ? "1px solid rgba(34, 197, 94, 0.3)" : "1px solid rgba(239, 68, 68, 0.3)",
+  };
+}
+
+var actionBtnStyle = {
+  fontSize: 13,
+  color: "var(--accent-light)",
+  cursor: "pointer",
+  fontWeight: 600,
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 6,
+  textDecoration: "none",
+  transition: "opacity 0.2s ease",
 };
 
-var linkStyleDesktop = {
-  fontSize: 15, color: "#1e3a5f", textDecoration: "underline",
-  cursor: "pointer", fontWeight: 600, display: "flex", alignItems: "center", gap: 6,
+var disabledActionStyle = {
+  fontSize: 13,
+  color: "rgba(244, 243, 239, 0.25)",
+  cursor: "default",
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 6,
+  textDecoration: "none",
 };
 
-var disabledLinkStyle = {
-  fontSize: 14, color: "#b0bec5", textDecoration: "none",
-  cursor: "default", fontWeight: 500, display: "flex", alignItems: "center", gap: 6,
-  opacity: 0.5,
-};
-
-var disabledLinkStyleDesktop = {
-  fontSize: 15, color: "#b0bec5", textDecoration: "none",
-  cursor: "default", fontWeight: 500, display: "flex", alignItems: "center", gap: 6,
-  opacity: 0.5,
-};
-
-/* ──────── Pitch links with placeholder fallback ──────── */
-function PitchLink({ deck, onClick, size }) {
+function PitchLink({ deck, onClick }) {
   if (deck) {
     return (
-      <span onClick={onClick} style={size === "small" ? linkStyle : linkStyleDesktop}>
-        {size === "small" ? <PdfIconSmall /> : <PdfIcon />}
-        Pitch
+      <span onClick={onClick} style={actionBtnStyle}>
+        <PdfIcon /> Memo Deck
       </span>
     );
   }
   return (
-    <span style={size === "small" ? disabledLinkStyle : disabledLinkStyleDesktop} title="Pitch deck pending">
-      {size === "small" ? <PdfIconSmallDisabled /> : <PdfIconDisabled />}
-      Pending
+    <span style={disabledActionStyle} title="Pitch memo pending">
+      <PdfIconDisabled /> Memo
     </span>
   );
 }
 
-function ModelLink({ model, size }) {
+function ModelLink({ model }) {
   if (model) {
     return (
-      <a href={model} download style={size === "small" ? linkStyle : linkStyleDesktop}>
-        {size === "small" ? <XlsIconSmall /> : <XlsIcon />}
-        Model
+      <a href={model} download style={{ ...actionBtnStyle, color: "#4ade80" }}>
+        <XlsIcon /> Model
       </a>
     );
   }
   return (
-    <span style={size === "small" ? disabledLinkStyle : disabledLinkStyleDesktop} title="Model pending">
-      {size === "small" ? <XlsIconSmallDisabled /> : <XlsIconDisabled />}
-      Pending
+    <span style={disabledActionStyle} title="DCF Model pending">
+      <XlsIconDisabled /> Model
     </span>
   );
 }
 
-/* ──────── Mobile card for active pitches ──────── */
-function PitchCard({ p, onOpenDeck }) {
-  var ds = getDecisionStyle(p.decision);
-  var dt = formatDate(p.date);
-  return (
-    <div style={{ padding: 20, background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 6 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
-        <div>
-          <div style={{ fontWeight: 600, color: "#1a2a44", fontSize: 15, marginBottom: 4 }}>{p.company}</div>
-          <div style={{ fontSize: 12, color: "#5a6a7e" }}>{dt.line1} {dt.line2}</div>
-        </div>
-        <span style={{ padding: "4px 12px", fontSize: 11, fontWeight: 600, borderRadius: 3, background: ds.background, color: ds.color, flexShrink: 0 }}>
-          {p.decision}
-        </span>
-      </div>
-      {p.isStrategy ? (
-        <div style={{ marginBottom: 14 }}>
-          <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>Hedging Instruments</div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-            {p.basket && p.basket.map(function (ticker) {
-              return (
-                <span key={ticker} style={{ padding: "3px 8px", background: "#fff", border: "1px solid #e2e8f0", borderRadius: 4, fontSize: 12, fontWeight: 500, color: "#1a2a44" }}>
-                  {ticker}
-                </span>
-              );
-            })}
-          </div>
-        </div>
-      ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 14, fontSize: 13 }}>
-          <div>
-            <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Target</div>
-            <div style={{ fontWeight: 500, color: p.targetPrice ? "#1a2a44" : "#b0bec5" }}>{p.targetPrice || "—"}</div>
-          </div>
-          <div>
-            <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Transaction</div>
-            <div style={{ fontWeight: 500, color: "#1a2a44" }}>{p.transactionPrice}</div>
-          </div>
-        </div>
-      )}
-      <div style={{ fontSize: 12, color: "#5a6a7e", marginBottom: 14 }}>{p.pitchTeam}</div>
-      <div style={{ display: "flex", gap: 20 }}>
-        <PitchLink deck={p.deck} onClick={function () { onOpenDeck({ deck: p.deck, company: p.company }); }} size="small" />
-        <ModelLink model={p.model} size="small" />
-      </div>
-    </div>
-  );
-}
-
-/* ──────── Mobile card for archived pitches ──────── */
-function ArchivedPitchCard({ p, onOpenDeck }) {
-  var dtPitched = formatDate(p.datePitched);
-  var dtSold = formatDate(p.dateSold);
-  var isPositive = p.profitPct.startsWith("+");
-  var pctColor = isPositive ? "#16a34a" : "#dc2626";
-  return (
-    <div style={{ padding: 20, background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 6 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
-        <div>
-          <div style={{ fontWeight: 600, color: "#1a2a44", fontSize: 15, marginBottom: 4 }}>{p.company}</div>
-          <div style={{ fontSize: 11, color: "#5a6a7e" }}>Pitched {dtPitched.line1} {dtPitched.line2}</div>
-          <div style={{ fontSize: 11, color: "#5a6a7e" }}>Closed {dtSold.line1} {dtSold.line2}</div>
-        </div>
-        <span style={{
-          padding: "4px 12px", fontSize: 11, fontWeight: 600, borderRadius: 3,
-          background: "rgba(30, 58, 95, 0.08)", color: "#5a6a7e", flexShrink: 0,
-        }}>
-          CLOSED
-        </span>
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 14, fontSize: 13 }}>
-        <div>
-          <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Entry</div>
-          <div style={{ fontWeight: 500, color: "#1a2a44" }}>{p.transactionPrice}</div>
-        </div>
-        <div>
-          <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Exit</div>
-          <div style={{ fontWeight: 500, color: "#1a2a44" }}>{p.sellPrice}</div>
-        </div>
-        <div>
-          <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Return</div>
-          <div style={{ fontWeight: 600, color: pctColor }}>{p.profitPct}</div>
-        </div>
-      </div>
-      <div style={{ fontSize: 12, color: "#5a6a7e", marginBottom: 14 }}>{p.pitchTeam}</div>
-      <div style={{ display: "flex", gap: 20 }}>
-        <PitchLink deck={p.deck} onClick={function () { onOpenDeck({ deck: p.deck, company: p.company }); }} size="small" />
-        <ModelLink model={p.model} size="small" />
-      </div>
-    </div>
-  );
-}
-
-/* ──────── Custom links for hedges (hides deck/model if missing) ──────── */
-function HedgeLink({ deck, model, onClick }) {
-  if (!deck && !model) return null;
-  return (
-    <div style={{ display: "flex", gap: 20, marginTop: 6 }}>
-      {deck && (
-        <span onClick={onClick} style={linkStyleDesktop}>
-          <PdfIcon /> Pitch
-        </span>
-      )}
-      {model && (
-        <a href={model} download style={linkStyleDesktop}>
-          <XlsIcon /> Model
-        </a>
-      )}
-    </div>
-  );
-}
-
-function HedgeLinkSmall({ deck, model, onClick }) {
-  if (!deck && !model) return null;
-  return (
-    <div style={{ display: "flex", gap: 20, marginTop: 14 }}>
-      {deck && (
-        <span onClick={onClick} style={linkStyle}>
-          <PdfIconSmall /> Pitch
-        </span>
-      )}
-      {model && (
-        <a href={model} download style={linkStyle}>
-          <XlsIconSmall /> Model
-        </a>
-      )}
-    </div>
-  );
-}
-
-/* ──────── Mobile card for active hedges ──────── */
-function HedgeCard({ p, onOpenDeck }) {
-  var ds = getDecisionStyle(p.decision);
-  var dt = formatDate(p.date);
-  return (
-    <div style={{ padding: 20, background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 6 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
-        <div>
-          <div style={{ fontWeight: 600, color: "#1a2a44", fontSize: 15, marginBottom: 4 }}>{p.company}</div>
-          <div style={{ fontSize: 12, color: "#5a6a7e" }}>{dt.line1} {dt.line2}</div>
-        </div>
-        <span style={{ padding: "4px 12px", fontSize: 11, fontWeight: 600, borderRadius: 3, background: ds.background, color: ds.color, flexShrink: 0 }}>
-          {p.decision}
-        </span>
-      </div>
-      
-      {p.isStrategy ? (
-        <div style={{ marginBottom: 14 }}>
-          <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>Hedging Instruments</div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-            {p.basket && p.basket.map(function (ticker) {
-              return (
-                <span key={ticker} style={{ padding: "3px 8px", background: "#fff", border: "1px solid #e2e8f0", borderRadius: 4, fontSize: 12, fontWeight: 500, color: "#1a2a44" }}>
-                  {ticker}
-                </span>
-              );
-            })}
-          </div>
-        </div>
-      ) : (
-        <div style={{ marginBottom: 14, fontSize: 13 }}>
-          <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Type</div>
-          <div style={{ fontWeight: 500, color: "#1a2a44" }}>Index Hedge</div>
-        </div>
-      )}
-      
-      <div style={{ fontSize: 12, color: "#5a6a7e" }}>{p.pitchTeam}</div>
-      <HedgeLinkSmall deck={p.deck} model={p.model} onClick={function () { onOpenDeck({ deck: p.deck, company: p.company }); }} />
-    </div>
-  );
-}
-
-/* ──────── Mobile card for archived hedges ──────── */
-function ArchivedHedgeCard({ p, onOpenDeck }) {
-  var dtPitched = formatDate(p.datePitched);
-  var dtSold = formatDate(p.dateSold);
-  var isPositive = p.profitPct.startsWith("+");
-  var pctColor = isPositive ? "#16a34a" : "#dc2626";
-  return (
-    <div style={{ padding: 20, background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 6 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
-        <div>
-          <div style={{ fontWeight: 600, color: "#1a2a44", fontSize: 15, marginBottom: 4 }}>{p.company}</div>
-          <div style={{ fontSize: 11, color: "#5a6a7e" }}>Pitched {dtPitched.line1} {dtPitched.line2}</div>
-          <div style={{ fontSize: 11, color: "#5a6a7e" }}>Closed {dtSold.line1} {dtSold.line2}</div>
-        </div>
-        <span style={{
-          padding: "4px 12px", fontSize: 11, fontWeight: 600, borderRadius: 3,
-          background: "rgba(30, 58, 95, 0.08)", color: "#5a6a7e", flexShrink: 0,
-        }}>
-          CLOSED
-        </span>
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 14, fontSize: 13 }}>
-        <div>
-          <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Entry</div>
-          <div style={{ fontWeight: 500, color: "#1a2a44" }}>{p.transactionPrice}</div>
-        </div>
-        <div>
-          <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Exit</div>
-          <div style={{ fontWeight: 500, color: "#1a2a44" }}>{p.sellPrice}</div>
-        </div>
-        <div>
-          <div style={{ color: "#8896a6", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Return</div>
-          <div style={{ fontWeight: 600, color: pctColor }}>{p.profitPct}</div>
-        </div>
-      </div>
-      <div style={{ fontSize: 12, color: "#5a6a7e" }}>{p.pitchTeam}</div>
-      <HedgeLinkSmall deck={p.deck} model={p.model} onClick={function () { onOpenDeck({ deck: p.deck, company: p.company }); }} />
-    </div>
-  );
-}
-
-/* ──────── Main Page Component ──────── */
 export default function Pitches() {
-  var openDeck = useState(null);
-  var openDeckValue = openDeck[0];
-  var setOpenDeck = openDeck[1];
+  const [activeTab, setActiveTab] = useState("archived"); // Default to Realized Track Record as requested
+  const [openDeck, setOpenDeck] = useState(null);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [mounted, setMounted] = useState(false);
 
-  var stateData = useState(null);
-  var data = stateData[0];
-  var setData = stateData[1];
+  const heroReveal = useReveal();
+  const contentReveal = useReveal();
 
-  var stateLoading = useState(true);
-  var loading = stateLoading[0];
-  var setLoading = stateLoading[1];
-
-  var stateError = useState(null);
-  var error = stateError[0];
-  var setError = stateError[1];
-
-  var headerReveal = useReveal();
-  var contentReveal = useReveal();
-  var hedgesHeaderReveal = useReveal();
-  var hedgesContentReveal = useReveal();
-  var archivedHeaderReveal = useReveal();
-  var archivedContentReveal = useReveal();
-
-  /* Fetch pitches data from API on mount */
-  useEffect(function () {
+  useEffect(() => {
     fetch("/api/pitches")
-      .then(function (res) { return res.json(); })
-      .then(function (d) {
-        setData(d);
-      })
-      .catch(function (e) { setError(e.message); })
-      .finally(function () { setLoading(false); });
+      .then((res) => res.json())
+      .then((d) => setData(d))
+      .catch((e) => setError(e.message))
+      .finally(() => {
+        setLoading(false);
+        setTimeout(() => setMounted(true), 40);
+      });
   }, []);
 
-  /* ──────── Loading state ──────── */
+  function parseDateStr(s) {
+    if (!s) return 0;
+    var months = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
+    var p = s.split("-");
+    if (p.length !== 3) return 0;
+    return new Date(parseInt(p[2]), months[p[1]], parseInt(p[0])).getTime();
+  }
+
+  const manualPitches = (data && data.manualPitches) || [];
+  const activeManual = manualPitches.filter((p) => !p.isStrategy);
+  const hedgeManual = manualPitches.filter((p) => p.isStrategy);
+
+  // Active positions sorted latest first
+  const activePitches = activeManual.concat((data && data.activePitches) || []);
+  activePitches.sort((a, b) => parseDateStr(b.date) - parseDateStr(a.date));
+
+  // Archived pitches strictly sorted from LATEST CLOSED to OLDEST
+  const archivedPitches = (data && data.archivedPitches) || [];
+  archivedPitches.sort((a, b) => parseDateStr(b.dateSold) - parseDateStr(a.dateSold));
+
+  // Active & Archived Hedges
+  const activeHedges = hedgeManual.concat((data && data.hedges) || []);
+  activeHedges.sort((a, b) => parseDateStr(b.date) - parseDateStr(a.date));
+
+  const archivedHedges = (data && data.archivedHedges) || [];
+  archivedHedges.sort((a, b) => parseDateStr(b.dateSold) - parseDateStr(a.dateSold));
+
+  const totalResearchCount = activePitches.length + archivedPitches.length + activeHedges.length + archivedHedges.length;
+
+  // Compute average realized return on closed positions
+  let avgReturnStr = "—";
+  if (archivedPitches.length > 0) {
+    let sum = 0;
+    let count = 0;
+    archivedPitches.forEach((p) => {
+      if (p.profitPct) {
+        const val = parseFloat(p.profitPct.replace("+", "").replace("%", ""));
+        if (!isNaN(val)) {
+          sum += val;
+          count++;
+        }
+      }
+    });
+    if (count > 0) {
+      const avg = sum / count;
+      avgReturnStr = (avg >= 0 ? "+" : "") + avg.toFixed(1) + "%";
+    }
+  }
+
   if (loading) {
     return (
-      <div className="page-section" style={{ maxWidth: 1100, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ background: "var(--bg-primary)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", color: "#ffffff" }}>
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: 14, color: "#5a6a7e", letterSpacing: "0.1em" }}>LOADING PITCHES...</div>
-          <div style={{ fontSize: 12, color: "#8896a6", marginTop: 8 }}>Fetching from Alpaca Portfolio</div>
+          <div style={{ fontSize: 12, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--accent-light)", marginBottom: 8 }}>
+            Sipher Street Capital
+          </div>
+          <div style={{ fontSize: 16, color: "rgba(244, 243, 239, 0.8)", fontWeight: 300 }}>
+            Loading institutional research & memos...
+          </div>
         </div>
       </div>
     );
@@ -680,379 +513,232 @@ export default function Pitches() {
 
   if (error) {
     return (
-      <div className="page-section" style={{ maxWidth: 1100, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ textAlign: "center", padding: 40, border: "1px solid #fecaca", background: "#fef2f2", borderRadius: 4 }}>
-          <div style={{ fontSize: 16, color: "#dc2626", marginBottom: 8 }}>Unable to load pitches</div>
-          <div style={{ fontSize: 13, color: "#5a6a7e" }}>{error}</div>
+      <div style={{ background: "var(--bg-primary)", minHeight: "100vh", padding: "140px 24px", color: "#ffffff" }}>
+        <div style={{ maxWidth: 700, margin: "0 auto", padding: 32, background: "var(--bg-surface)", border: "1px solid rgba(239, 68, 68, 0.3)", borderRadius: 2 }}>
+          <h3 style={{ color: "#f87171", margin: "0 0 8px 0" }}>Unable to load research database</h3>
+          <p style={{ color: "rgba(244, 243, 239, 0.7)", margin: 0 }}>{error}</p>
         </div>
       </div>
     );
   }
 
-  function parseDateStr(s) {
-    if (!s) return 0;
-    var months = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
-    var p = s.split("-");
-    if (p.length !== 3) return 0;
-    return new Date(parseInt(p[2]), months[p[1]], parseInt(p[0])).getTime();
-  }
-
-  /* ──────── Merge manual strategy pitches into the active list ──────── */
-  var manualPitches = (data && data.manualPitches) || [];
-  var activeManual = manualPitches.filter(function (p) { return !p.isStrategy; });
-  var hedgeManual = manualPitches.filter(function (p) { return p.isStrategy; });
-
-  var activePitches = activeManual.concat((data && data.activePitches) || []);
-  activePitches.sort(function (a, b) { return parseDateStr(b.date) - parseDateStr(a.date); });
-
-  var archivedPitches = (data && data.archivedPitches) || [];
-  archivedPitches.sort(function (a, b) { return parseDateStr(b.dateSold) - parseDateStr(a.dateSold); });
-
-  var activeHedges = hedgeManual.concat((data && data.hedges) || []);
-  activeHedges.sort(function (a, b) { return parseDateStr(b.date) - parseDateStr(a.date); });
-
-  var archivedHedges = (data && data.archivedHedges) || [];
-  archivedHedges.sort(function (a, b) { return parseDateStr(b.dateSold) - parseDateStr(a.dateSold); });
-
-  function getProfitStyle(pct) {
-    var isPositive = pct.startsWith("+");
-    return {
-      color: isPositive ? "#16a34a" : "#dc2626",
-      background: isPositive ? "rgba(22, 163, 74, 0.1)" : "rgba(220, 38, 38, 0.1)",
-    };
-  }
-
   return (
-    <div className="page-section" style={{ maxWidth: 1100 }}>
-      {/* ──────────── ACTIVE PITCHES ──────────── */}
-      <div ref={headerReveal.ref} className={"reveal" + (headerReveal.inView ? " in-view" : "")}>
-        <p className="section-label">Investment Theses</p>
-        <h2 className="section-title">
-          Active <span>Pitches</span>
-        </h2>
-      </div>
+    <div style={{ background: "var(--bg-primary)", minHeight: "100vh", color: "#f4f3ef" }}>
+      {/* ══════════════════════════════════════════════════════
+          HERO — Institutional Research Header
+          ══════════════════════════════════════════════════════ */}
+      <section
+        style={{
+          paddingTop: 140,
+          paddingBottom: 60,
+          borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+        }}
+      >
+        <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 24px" }}>
+          <div className={"reveal-group" + (mounted ? " in-view" : "")}>
+            <div className="reveal-item" style={{ display: "inline-flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+              <span
+                style={{
+                  fontSize: 11,
+                  letterSpacing: "0.25em",
+                  textTransform: "uppercase",
+                  color: "var(--accent-light)",
+                  fontWeight: 600,
+                }}
+              >
+                Investment Research & Thesis Archive
+              </span>
+              <span className="reveal-line-expand" style={{ width: 32, height: 1, background: "var(--accent-light)" }} />
+            </div>
 
-      <div ref={contentReveal.ref} className={"reveal" + (contentReveal.inView ? " in-view" : "")}>
-        <div className="pitches-desktop">
-          <div style={{ border: "1px solid #e2e8f0", borderRadius: 4, overflow: "auto" }}>
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th style={{ textAlign: "left" }}>Date</th>
-                  <th style={{ textAlign: "left" }}>Investment</th>
-                  <th style={{ textAlign: "center" }}>Decision</th>
-                  <th style={{ textAlign: "center" }}>Target Price</th>
-                  <th style={{ textAlign: "center" }}>Transaction Price</th>
-                  <th style={{ textAlign: "left" }}>Pitch Team</th>
-                </tr>
-              </thead>
-              <tbody>
-                {activePitches.map(function (p, i) {
-                  var ds = getDecisionStyle(p.decision);
-                  var dt = formatDate(p.date);
-                  return (
-                    <tr key={p.symbol || ("manual-" + i)}>
-                      <td style={{ color: "#1a2a44", lineHeight: 1.4 }}>
-                        <div style={{ fontWeight: 500 }}>{dt.line1}</div>
-                        <div style={{ color: "#5a6a7e", fontSize: 12 }}>{dt.line2}</div>
-                      </td>
-                      <td>
-                        <div style={{ fontWeight: 600, color: "#1a2a44", marginBottom: 8, fontSize: 15 }}>{p.company}</div>
-                        <div style={{ display: "flex", gap: 20, marginTop: 2 }}>
-                          <PitchLink
-                            deck={p.deck}
-                            onClick={function (e) { e.stopPropagation(); setOpenDeck({ deck: p.deck, company: p.company }); }}
-                            size="large"
-                          />
-                          <ModelLink model={p.model} size="large" />
-                        </div>
-                      </td>
-                      <td style={{ textAlign: "center" }}>
-                        <span style={{ padding: "4px 14px", fontSize: 12, fontWeight: 600, borderRadius: 3, background: ds.background, color: ds.color }}>
-                          {p.decision}
-                        </span>
-                      </td>
-                      {p.isStrategy ? (
-                        <td colSpan={2} style={{ textAlign: "center", padding: "12px" }}>
-                          <div style={{ fontSize: 10, color: "#8896a6", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>Hedging Instruments</div>
-                          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center" }}>
-                            {p.basket && p.basket.map(function (ticker) {
-                              return (
-                                <span key={ticker} style={{ padding: "3px 8px", background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 4, fontSize: 12, fontWeight: 500, color: "#1a2a44" }}>
-                                  {ticker}
-                                </span>
-                              );
-                            })}
-                          </div>
-                        </td>
-                      ) : (
-                        <>
-                          <td style={{ textAlign: "center", fontWeight: 500, color: p.targetPrice ? "#1a2a44" : "#b0bec5" }}>
-                            {p.targetPrice || "—"}
-                          </td>
-                          <td style={{ textAlign: "center", fontWeight: 500, color: "#1a2a44" }}>{p.transactionPrice}</td>
-                        </>
-                      )}
-                      <td style={{ color: "#5a6a7e", fontSize: 13, maxWidth: 280 }}>{p.pitchTeam}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+            <h1
+              className="reveal-item reveal-delay-1"
+              style={{
+                fontSize: "clamp(36px, 5.5vw, 68px)",
+                fontWeight: 200,
+                lineHeight: 1.12,
+                letterSpacing: "-0.03em",
+                color: "#ffffff",
+                marginBottom: 20,
+              }}
+            >
+              Institutional <em>Research</em>
+            </h1>
 
-      <div className="pitches-mobile">
-        <div style={{ display: "grid", gap: 16 }}>
-          {activePitches.map(function (p, i) {
-            return <PitchCard key={p.symbol || ("manual-" + i)} p={p} onOpenDeck={setOpenDeck} />;
-          })}
-        </div>
-      </div>
+            <p
+              className="reveal-item reveal-delay-2"
+              style={{
+                fontSize: "clamp(15px, 1.8vw, 18px)",
+                color: "rgba(244, 243, 239, 0.8)",
+                lineHeight: 1.7,
+                maxWidth: 820,
+                fontWeight: 300,
+                marginBottom: 40,
+              }}
+            >
+              Every position in the Sipher Street Capital portfolio is underpinned by an exhaustive written thesis memo, proprietary discounted cash flow (DCF) model, and stress-tested risk analysis. Explore our completed track record, active investment theses, and macro hedges.
+            </p>
 
-      {/* ──────────── PORTFOLIO HEDGES ──────────── */}
-      {(activeHedges.length > 0 || archivedHedges.length > 0) && (
-        <div style={{ marginTop: 80 }}>
-          <div ref={hedgesHeaderReveal.ref} className={"reveal" + (hedgesHeaderReveal.inView ? " in-view" : "")}>
-            <p className="section-label">Risk Management</p>
-            <h2 className="section-title">
-              Portfolio <span>Hedges</span>
-            </h2>
-          </div>
-
-          <div ref={hedgesContentReveal.ref} className={"reveal" + (hedgesContentReveal.inView ? " in-view" : "")}>
-            {activeHedges.length > 0 && (
-              <>
-                <h3 style={{ fontSize: 16, fontWeight: 600, color: "#1a2a44", marginBottom: 16 }}>Active Hedges</h3>
-                <div className="pitches-desktop">
-                  <div style={{ border: "1px solid #e2e8f0", borderRadius: 4, overflow: "auto", marginBottom: 32 }}>
-                    <table className="data-table">
-                      <thead>
-                        <tr>
-                          <th style={{ textAlign: "left" }}>Date</th>
-                          <th style={{ textAlign: "left" }}>Hedge Strategy / Instrument</th>
-                          <th style={{ textAlign: "center" }}>Decision</th>
-                          <th style={{ textAlign: "left" }}>Details</th>
-                          <th style={{ textAlign: "left" }}>Pitch Team</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {activeHedges.map(function (p, i) {
-                          var ds = getDecisionStyle(p.decision);
-                          var dt = formatDate(p.date);
-                          return (
-                            <tr key={p.symbol || ("hedge-" + i)}>
-                              <td style={{ color: "#1a2a44", lineHeight: 1.4 }}>
-                                <div style={{ fontWeight: 500 }}>{dt.line1}</div>
-                                <div style={{ color: "#5a6a7e", fontSize: 12 }}>{dt.line2}</div>
-                              </td>
-                              <td>
-                                <div style={{ fontWeight: 600, color: "#1a2a44", fontSize: 15 }}>{p.company}</div>
-                                <HedgeLink deck={p.deck} model={p.model} onClick={function (e) { e.stopPropagation(); setOpenDeck({ deck: p.deck, company: p.company }); }} />
-                              </td>
-                              <td style={{ textAlign: "center" }}>
-                                <span style={{ padding: "4px 14px", fontSize: 12, fontWeight: 600, borderRadius: 3, background: ds.background, color: ds.color }}>
-                                  {p.decision}
-                                </span>
-                              </td>
-                              <td>
-                                {p.isStrategy ? (
-                                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                                    {p.basket && p.basket.map(function (ticker) {
-                                      return (
-                                        <span key={ticker} style={{ padding: "3px 8px", background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 4, fontSize: 12, fontWeight: 500, color: "#1a2a44" }}>
-                                          {ticker}
-                                        </span>
-                                      );
-                                    })}
-                                  </div>
-                                ) : (
-                                  <span style={{ color: "#5a6a7e", fontSize: 13 }}>Index/ETF Hedge</span>
-                                )}
-                              </td>
-                              <td style={{ color: "#5a6a7e", fontSize: 13, maxWidth: 280 }}>{p.pitchTeam}</td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                <div className="pitches-mobile" style={{ marginBottom: 32 }}>
-                  <div style={{ display: "grid", gap: 16 }}>
-                    {activeHedges.map(function (p, i) {
-                      return <HedgeCard key={p.symbol || ("hedge-" + i)} p={p} onOpenDeck={setOpenDeck} />;
-                    })}
-                  </div>
-                </div>
-              </>
-            )}
-
-            {archivedHedges.length > 0 && (
-              <>
-                <h3 style={{ fontSize: 16, fontWeight: 600, color: "#1a2a44", marginBottom: 16, marginTop: 32 }}>Closed Hedges</h3>
-                <div className="pitches-desktop">
-                  <div style={{ border: "1px solid #e2e8f0", borderRadius: 4, overflow: "auto" }}>
-                    <table className="data-table">
-                      <thead>
-                        <tr>
-                          <th style={{ textAlign: "left" }}>Pitched</th>
-                          <th style={{ textAlign: "left" }}>Hedge Strategy / Instrument</th>
-                          <th style={{ textAlign: "center" }}>Entry Price</th>
-                          <th style={{ textAlign: "center" }}>Exit Price</th>
-                          <th style={{ textAlign: "center" }}>Return</th>
-                          <th style={{ textAlign: "center" }}>Date Sold</th>
-                          <th style={{ textAlign: "left" }}>Pitch Team</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {archivedHedges.map(function (p, i) {
-                          var dtPitched = formatDate(p.datePitched);
-                          var dtSold = formatDate(p.dateSold);
-                          var profitStyle = getProfitStyle(p.profitPct);
-                          return (
-                            <tr key={p.symbol || ("archived-hedge-" + i)}>
-                              <td style={{ color: "#1a2a44", lineHeight: 1.4 }}>
-                                <div style={{ fontWeight: 500 }}>{dtPitched.line1}</div>
-                                <div style={{ color: "#5a6a7e", fontSize: 12 }}>{dtPitched.line2}</div>
-                              </td>
-                              <td>
-                                <div style={{ fontWeight: 600, color: "#1a2a44", fontSize: 15 }}>{p.company}</div>
-                                <HedgeLink deck={p.deck} model={p.model} onClick={function (e) { e.stopPropagation(); setOpenDeck({ deck: p.deck, company: p.company }); }} />
-                              </td>
-                              <td style={{ textAlign: "center", fontWeight: 500, color: "#1a2a44" }}>{p.transactionPrice}</td>
-                              <td style={{ textAlign: "center", fontWeight: 500, color: "#1a2a44" }}>{p.sellPrice}</td>
-                              <td style={{ textAlign: "center" }}>
-                                <span style={{
-                                  padding: "4px 14px", fontSize: 12, fontWeight: 700, borderRadius: 3,
-                                  background: profitStyle.background, color: profitStyle.color,
-                                }}>
-                                  {p.profitPct}
-                                </span>
-                              </td>
-                              <td style={{ textAlign: "center", color: "#1a2a44", lineHeight: 1.4 }}>
-                                <div style={{ fontWeight: 500 }}>{dtSold.line1}</div>
-                                <div style={{ color: "#5a6a7e", fontSize: 12 }}>{dtSold.line2}</div>
-                              </td>
-                              <td style={{ color: "#5a6a7e", fontSize: 13, maxWidth: 280 }}>{p.pitchTeam}</td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                <div className="pitches-mobile">
-                  <div style={{ display: "grid", gap: 16 }}>
-                    {archivedHedges.map(function (p, i) {
-                      return <ArchivedHedgeCard key={p.symbol || ("archived-hedge-" + i)} p={p} onOpenDeck={setOpenDeck} />;
-                    })}
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ──────────── ARCHIVED / CLOSED POSITIONS ──────────── */}
-      {archivedPitches.length > 0 && (
-        <div style={{ marginTop: 80 }}>
-          <div ref={archivedHeaderReveal.ref} className={"reveal" + (archivedHeaderReveal.inView ? " in-view" : "")}>
-            <p className="section-label">Closed Positions</p>
-            <h2 className="section-title">
-              Archived <span>Pitches</span>
-            </h2>
-
-            {/* Summary strip — aggregate performance banner */}
-            <div style={{
-              display: "flex", flexWrap: "wrap", gap: 24, padding: "16px 24px",
-              background: "linear-gradient(135deg, #0f1c30 0%, #1a2a44 100%)",
-              borderRadius: 6, marginBottom: 32, alignItems: "center",
-            }}>
-              <div>
-                <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>
-                  Positions Closed
-                </div>
-                <div style={{ fontSize: 22, fontWeight: 600, color: "#ffffff" }}>
-                  {archivedPitches.length}
-                </div>
+            {/* Performance & Metric Ribbon */}
+            <div className="research-kpi-ribbon hover-lift reveal-item reveal-delay-3">
+              <div className="kpi-block">
+                <span className="kpi-label">Completed Theses</span>
+                <span className="kpi-value">{archivedPitches.length}</span>
               </div>
-              <div style={{ width: 1, height: 36, background: "rgba(255,255,255,0.12)" }} />
-              <div>
-                <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>
-                  Avg. Realised Return
-                </div>
-                <div style={{ fontSize: 22, fontWeight: 600, color: "#34d399" }}>
-                  {(function () {
-                    var sum = 0;
-                    archivedPitches.forEach(function (p) {
-                      sum += parseFloat(p.profitPct.replace("+", ""));
-                    });
-                    var avg = sum / archivedPitches.length;
-                    return (avg >= 0 ? "+" : "") + avg.toFixed(1) + "%";
-                  })()}
-                </div>
+              <div className="kpi-divider" />
+              <div className="kpi-block">
+                <span className="kpi-label">Avg. Realized Return</span>
+                <span className="kpi-value" style={{ color: "#4ade80" }}>{avgReturnStr}</span>
+              </div>
+              <div className="kpi-divider" />
+              <div className="kpi-block">
+                <span className="kpi-label">Active Live Positions</span>
+                <span className="kpi-value">{activePitches.length}</span>
+              </div>
+              <div className="kpi-divider" />
+              <div className="kpi-block">
+                <span className="kpi-label">Portfolio Hedges</span>
+                <span className="kpi-value">{activeHedges.length + archivedHedges.length}</span>
               </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          <div ref={archivedContentReveal.ref} className={"reveal" + (archivedContentReveal.inView ? " in-view" : "")}>
-            {/* Desktop table */}
-            <div className="pitches-desktop">
-              <div style={{ border: "1px solid #e2e8f0", borderRadius: 4, overflow: "auto" }}>
-                <table className="data-table">
+      {/* ══════════════════════════════════════════════════════
+          SEGMENTED VIEW FILTER TABS (OPTION 1)
+          ══════════════════════════════════════════════════════ */}
+      <section style={{ maxWidth: 1180, margin: "0 auto", padding: "40px 24px 96px" }}>
+        <div ref={contentReveal.ref} className={"reveal-group" + (contentReveal.inView ? " in-view" : "")}>
+          
+          {/* Filter Bar */}
+          <div className="tab-bar-container reveal-item">
+            <div className="tabs-group">
+              <button
+                onClick={() => setActiveTab("archived")}
+                className={`tab-btn ${activeTab === "archived" ? "active" : ""}`}
+              >
+                <span>Realized Track Record</span>
+                <span className="tab-pill">{archivedPitches.length}</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab("active")}
+                className={`tab-btn ${activeTab === "active" ? "active" : ""}`}
+              >
+                <span>Active Theses</span>
+                <span className="tab-pill">{activePitches.length}</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab("hedges")}
+                className={`tab-btn ${activeTab === "hedges" ? "active" : ""}`}
+              >
+                <span>Portfolio Hedges</span>
+                <span className="tab-pill">{activeHedges.length + archivedHedges.length}</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab("all")}
+                className={`tab-btn ${activeTab === "all" ? "active" : ""}`}
+              >
+                <span>All Research</span>
+                <span className="tab-pill">{totalResearchCount}</span>
+              </button>
+            </div>
+
+            {/* Sort indicator */}
+            <div className="sort-indicator">
+              <span>Chronological:</span>
+              <strong>Latest to Oldest</strong>
+            </div>
+          </div>
+
+          {/* ──────────────────────────────────────────────────
+              TAB CONTENT: REALIZED TRACK RECORD (ARCHIVED)
+              ────────────────────────────────────────────────── */}
+          {(activeTab === "archived" || activeTab === "all") && archivedPitches.length > 0 && (
+            <div style={{ marginBottom: activeTab === "all" ? 64 : 0 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 20 }}>
+                <div>
+                  <h2 style={{ fontSize: 24, fontWeight: 300, color: "#ffffff", margin: "0 0 6px 0" }}>
+                    Realized Track Record <em>(Historical Memos)</em>
+                  </h2>
+                  <p style={{ fontSize: 14, color: "rgba(244, 243, 239, 0.7)", margin: 0 }}>
+                    Completed investment theses sorted strictly by exit date (latest to oldest), including realized profit %, pitch decks, and financial models.
+                  </p>
+                </div>
+              </div>
+
+              {/* Table Wrapper */}
+              <div className="table-wrapper">
+                <table className="research-table">
                   <thead>
                     <tr>
-                      <th style={{ textAlign: "left" }}>Pitched</th>
+                      <th style={{ textAlign: "left", width: 110 }}>Pitched</th>
                       <th style={{ textAlign: "left" }}>Investment</th>
-                      <th style={{ textAlign: "center" }}>Entry Price</th>
-                      <th style={{ textAlign: "center" }}>Exit Price</th>
-                      <th style={{ textAlign: "center" }}>Return</th>
-                      <th style={{ textAlign: "center" }}>Date Sold</th>
-                      <th style={{ textAlign: "left" }}>Pitch Team</th>
+                      <th style={{ textAlign: "center", width: 110 }}>Entry Price</th>
+                      <th style={{ textAlign: "center", width: 110 }}>Exit Price</th>
+                      <th style={{ textAlign: "center", width: 120 }}>Return</th>
+                      <th style={{ textAlign: "center", width: 110 }}>Date Sold</th>
+                      <th style={{ textAlign: "left", width: 220 }}>Pitch Team</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {archivedPitches.map(function (p, i) {
-                      var dtPitched = formatDate(p.datePitched);
-                      var dtSold = formatDate(p.dateSold);
-                      var profitStyle = getProfitStyle(p.profitPct);
+                    {archivedPitches.map((p, i) => {
+                      const dtPitched = formatDate(p.datePitched);
+                      const dtSold = formatDate(p.dateSold);
+                      const profitStyle = getProfitStyle(p.profitPct);
                       return (
-                        <tr key={p.symbol || ("archived-" + i)}>
-                          <td style={{ color: "#1a2a44", lineHeight: 1.4 }}>
-                            <div style={{ fontWeight: 500 }}>{dtPitched.line1}</div>
-                            <div style={{ color: "#5a6a7e", fontSize: 12 }}>{dtPitched.line2}</div>
+                        <tr key={p.symbol || "archived-" + i}>
+                          <td>
+                            <div style={{ fontWeight: 500, color: "#ffffff" }}>{dtPitched.line1}</div>
+                            <div style={{ fontSize: 11, color: "rgba(244, 243, 239, 0.5)" }}>{dtPitched.line2}</div>
                           </td>
                           <td>
-                            <div style={{ fontWeight: 600, color: "#1a2a44", marginBottom: 8, fontSize: 15 }}>{p.company}</div>
-                            <div style={{ display: "flex", gap: 20, marginTop: 2 }}>
+                            <div style={{ fontWeight: 600, color: "#ffffff", fontSize: 15, marginBottom: 6 }}>
+                              {p.company}
+                            </div>
+                            <div style={{ display: "flex", gap: 16 }}>
                               <PitchLink
                                 deck={p.deck}
-                                onClick={function (e) { e.stopPropagation(); setOpenDeck({ deck: p.deck, company: p.company }); }}
-                                size="large"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setOpenDeck({ deck: p.deck, company: p.company });
+                                }}
                               />
-                              <ModelLink model={p.model} size="large" />
+                              <ModelLink model={p.model} />
                             </div>
                           </td>
-                          <td style={{ textAlign: "center", fontWeight: 500, color: "#1a2a44" }}>{p.transactionPrice}</td>
-                          <td style={{ textAlign: "center", fontWeight: 500, color: "#1a2a44" }}>{p.sellPrice}</td>
+                          <td style={{ textAlign: "center", fontWeight: 500, color: "rgba(244, 243, 239, 0.9)" }}>
+                            {p.transactionPrice}
+                          </td>
+                          <td style={{ textAlign: "center", fontWeight: 500, color: "rgba(244, 243, 239, 0.9)" }}>
+                            {p.sellPrice}
+                          </td>
                           <td style={{ textAlign: "center" }}>
-                            <span style={{
-                              padding: "4px 14px", fontSize: 12, fontWeight: 700, borderRadius: 3,
-                              background: profitStyle.background, color: profitStyle.color,
-                            }}>
+                            <span
+                              style={{
+                                padding: "4px 12px",
+                                fontSize: 12,
+                                fontWeight: 700,
+                                borderRadius: 2,
+                                background: profitStyle.background,
+                                color: profitStyle.color,
+                                border: profitStyle.border,
+                                display: "inline-block",
+                              }}
+                            >
                               {p.profitPct}
                             </span>
                           </td>
-                          <td style={{ textAlign: "center", color: "#1a2a44", lineHeight: 1.4 }}>
-                            <div style={{ fontWeight: 500 }}>{dtSold.line1}</div>
-                            <div style={{ color: "#5a6a7e", fontSize: 12 }}>{dtSold.line2}</div>
+                          <td style={{ textAlign: "center" }}>
+                            <div style={{ fontWeight: 500, color: "#ffffff" }}>{dtSold.line1}</div>
+                            <div style={{ fontSize: 11, color: "rgba(244, 243, 239, 0.5)" }}>{dtSold.line2}</div>
                           </td>
-                          <td style={{ color: "#5a6a7e", fontSize: 13, maxWidth: 280 }}>{p.pitchTeam}</td>
+                          <td style={{ fontSize: 13, color: "rgba(244, 243, 239, 0.75)", lineHeight: 1.4 }}>
+                            {p.pitchTeam}
+                          </td>
                         </tr>
                       );
                     })}
@@ -1060,33 +746,476 @@ export default function Pitches() {
                 </table>
               </div>
             </div>
+          )}
 
-            {/* Mobile cards */}
-            <div className="pitches-mobile">
-              <div style={{ display: "grid", gap: 16 }}>
-                {archivedPitches.map(function (p, i) {
-                  return <ArchivedPitchCard key={p.symbol || ("archived-" + i)} p={p} onOpenDeck={setOpenDeck} />;
-                })}
+          {/* ──────────────────────────────────────────────────
+              TAB CONTENT: ACTIVE THESES (LIVE POSITIONS)
+              ────────────────────────────────────────────────── */}
+          {(activeTab === "active" || activeTab === "all") && activePitches.length > 0 && (
+            <div style={{ marginBottom: activeTab === "all" ? 64 : 0 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 20 }}>
+                <div>
+                  <h2 style={{ fontSize: 24, fontWeight: 300, color: "#ffffff", margin: "0 0 6px 0" }}>
+                    Active Investment Theses <em>(Live Book)</em>
+                  </h2>
+                  <p style={{ fontSize: 14, color: "rgba(244, 243, 239, 0.7)", margin: 0 }}>
+                    Live long and short positions currently held in the Alpaca portfolio, with target prices and research materials.
+                  </p>
+                </div>
+              </div>
+
+              {/* Table Wrapper */}
+              <div className="table-wrapper">
+                <table className="research-table">
+                  <thead>
+                    <tr>
+                      <th style={{ textAlign: "left", width: 110 }}>Date</th>
+                      <th style={{ textAlign: "left" }}>Investment</th>
+                      <th style={{ textAlign: "center", width: 110 }}>Decision</th>
+                      <th style={{ textAlign: "center", width: 120 }}>Target Price</th>
+                      <th style={{ textAlign: "center", width: 130 }}>Transaction Price</th>
+                      <th style={{ textAlign: "left", width: 240 }}>Pitch Team</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {activePitches.map((p, i) => {
+                      const ds = getDecisionStyle(p.decision);
+                      const dt = formatDate(p.date);
+                      return (
+                        <tr key={p.symbol || "active-" + i}>
+                          <td>
+                            <div style={{ fontWeight: 500, color: "#ffffff" }}>{dt.line1}</div>
+                            <div style={{ fontSize: 11, color: "rgba(244, 243, 239, 0.5)" }}>{dt.line2}</div>
+                          </td>
+                          <td>
+                            <div style={{ fontWeight: 600, color: "#ffffff", fontSize: 15, marginBottom: 6 }}>
+                              {p.company}
+                            </div>
+                            <div style={{ display: "flex", gap: 16 }}>
+                              <PitchLink
+                                deck={p.deck}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setOpenDeck({ deck: p.deck, company: p.company });
+                                }}
+                              />
+                              <ModelLink model={p.model} />
+                            </div>
+                          </td>
+                          <td style={{ textAlign: "center" }}>
+                            <span
+                              style={{
+                                padding: "4px 12px",
+                                fontSize: 11,
+                                fontWeight: 700,
+                                borderRadius: 2,
+                                background: ds.background,
+                                color: ds.color,
+                                border: ds.border,
+                                textTransform: "uppercase",
+                                letterSpacing: "0.08em",
+                              }}
+                            >
+                              {p.decision}
+                            </span>
+                          </td>
+                          <td style={{ textAlign: "center", fontWeight: 500, color: p.targetPrice ? "#ffffff" : "rgba(244, 243, 239, 0.4)" }}>
+                            {p.targetPrice || "—"}
+                          </td>
+                          <td style={{ textAlign: "center", fontWeight: 500, color: "rgba(244, 243, 239, 0.9)" }}>
+                            {p.transactionPrice}
+                          </td>
+                          <td style={{ fontSize: 13, color: "rgba(244, 243, 239, 0.75)", lineHeight: 1.4 }}>
+                            {p.pitchTeam}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          )}
 
-      {/* ──────────── PDF VIEWER (handles both active + archived) ──────────── */}
-      {openDeckValue !== null && openDeckValue.deck && (
+          {/* ──────────────────────────────────────────────────
+              TAB CONTENT: PORTFOLIO HEDGES & OVERLAYS
+              ────────────────────────────────────────────────── */}
+          {(activeTab === "hedges" || activeTab === "all") && (activeHedges.length > 0 || archivedHedges.length > 0) && (
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 20 }}>
+                <div>
+                  <h2 style={{ fontSize: 24, fontWeight: 300, color: "#ffffff", margin: "0 0 6px 0" }}>
+                    Portfolio Hedges & Systematic Overlays
+                  </h2>
+                  <p style={{ fontSize: 14, color: "rgba(244, 243, 239, 0.7)", margin: 0 }}>
+                    Beta hedges, ETF baskets, and options structures deployed to neutralize market risk and isolate single-stock alpha.
+                  </p>
+                </div>
+              </div>
+
+              {/* Active Hedges Table */}
+              {activeHedges.length > 0 && (
+                <div style={{ marginBottom: 32 }}>
+                  <h3 style={{ fontSize: 16, color: "var(--accent-light)", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 14 }}>
+                    Active Hedges
+                  </h3>
+                  <div className="table-wrapper desktop-only">
+                    <table className="research-table">
+                      <thead>
+                        <tr>
+                          <th style={{ textAlign: "left", width: 110 }}>Date</th>
+                          <th style={{ textAlign: "left" }}>Hedge Instrument</th>
+                          <th style={{ textAlign: "center", width: 110 }}>Decision</th>
+                          <th style={{ textAlign: "left" }}>Strategy Details</th>
+                          <th style={{ textAlign: "left", width: 240 }}>Pitch Team</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {activeHedges.map((p, i) => {
+                          const ds = getDecisionStyle(p.decision);
+                          const dt = formatDate(p.date);
+                          return (
+                            <tr key={p.symbol || "hedge-" + i}>
+                              <td>
+                                <div style={{ fontWeight: 500, color: "#ffffff" }}>{dt.line1}</div>
+                                <div style={{ fontSize: 11, color: "rgba(244, 243, 239, 0.5)" }}>{dt.line2}</div>
+                              </td>
+                              <td>
+                                <div style={{ fontWeight: 600, color: "#ffffff", fontSize: 15 }}>{p.company}</div>
+                              </td>
+                              <td style={{ textAlign: "center" }}>
+                                <span
+                                  style={{
+                                    padding: "4px 12px",
+                                    fontSize: 11,
+                                    fontWeight: 700,
+                                    borderRadius: 2,
+                                    background: ds.background,
+                                    color: ds.color,
+                                    border: ds.border,
+                                    textTransform: "uppercase",
+                                  }}
+                                >
+                                  {p.decision}
+                                </span>
+                              </td>
+                              <td>
+                                {p.basket ? (
+                                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                                    {p.basket.map((ticker) => (
+                                      <span
+                                        key={ticker}
+                                        style={{
+                                          padding: "3px 8px",
+                                          background: "rgba(255, 255, 255, 0.06)",
+                                          border: "1px solid rgba(255, 255, 255, 0.1)",
+                                          borderRadius: 2,
+                                          fontSize: 12,
+                                          color: "#ffffff",
+                                        }}
+                                      >
+                                        {ticker}
+                                      </span>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <span style={{ color: "rgba(244, 243, 239, 0.7)", fontSize: 13 }}>Index / ETF Hedge</span>
+                                )}
+                              </td>
+                              <td style={{ fontSize: 13, color: "rgba(244, 243, 239, 0.75)" }}>{p.pitchTeam}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* Closed Hedges Table */}
+              {archivedHedges.length > 0 && (
+                <div>
+                  <h3 style={{ fontSize: 16, color: "rgba(244, 243, 239, 0.6)", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 14 }}>
+                    Closed Hedges
+                  </h3>
+                  <div className="table-wrapper desktop-only">
+                    <table className="research-table">
+                      <thead>
+                        <tr>
+                          <th style={{ textAlign: "left", width: 110 }}>Pitched</th>
+                          <th style={{ textAlign: "left" }}>Hedge Instrument</th>
+                          <th style={{ textAlign: "center", width: 110 }}>Entry</th>
+                          <th style={{ textAlign: "center", width: 110 }}>Exit</th>
+                          <th style={{ textAlign: "center", width: 120 }}>Return</th>
+                          <th style={{ textAlign: "center", width: 110 }}>Date Sold</th>
+                          <th style={{ textAlign: "left", width: 240 }}>Pitch Team</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {archivedHedges.map((p, i) => {
+                          const dtPitched = formatDate(p.datePitched);
+                          const dtSold = formatDate(p.dateSold);
+                          const profitStyle = getProfitStyle(p.profitPct);
+                          return (
+                            <tr key={p.symbol || "archived-hedge-" + i}>
+                              <td>
+                                <div style={{ fontWeight: 500, color: "#ffffff" }}>{dtPitched.line1}</div>
+                                <div style={{ fontSize: 11, color: "rgba(244, 243, 239, 0.5)" }}>{dtPitched.line2}</div>
+                              </td>
+                              <td style={{ fontWeight: 600, color: "#ffffff", fontSize: 15 }}>{p.company}</td>
+                              <td style={{ textAlign: "center", fontWeight: 500, color: "rgba(244, 243, 239, 0.9)" }}>{p.transactionPrice}</td>
+                              <td style={{ textAlign: "center", fontWeight: 500, color: "rgba(244, 243, 239, 0.9)" }}>{p.sellPrice}</td>
+                              <td style={{ textAlign: "center" }}>
+                                <span
+                                  style={{
+                                    padding: "4px 12px",
+                                    fontSize: 12,
+                                    fontWeight: 700,
+                                    borderRadius: 2,
+                                    background: profitStyle.background,
+                                    color: profitStyle.color,
+                                    border: profitStyle.border,
+                                  }}
+                                >
+                                  {p.profitPct}
+                                </span>
+                              </td>
+                              <td style={{ textAlign: "center" }}>
+                                <div style={{ fontWeight: 500, color: "#ffffff" }}>{dtSold.line1}</div>
+                                <div style={{ fontSize: 11, color: "rgba(244, 243, 239, 0.5)" }}>{dtSold.line2}</div>
+                              </td>
+                              <td style={{ fontSize: 13, color: "rgba(244, 243, 239, 0.75)" }}>{p.pitchTeam}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* PDF Modal Viewer */}
+      {openDeck && openDeck.deck && (
         <PdfViewer
-          pdf={openDeckValue.deck}
-          company={openDeckValue.company}
-          onClose={function () { setOpenDeck(null); }}
+          pdf={openDeck.deck}
+          company={openDeck.company}
+          onClose={() => setOpenDeck(null)}
         />
       )}
 
+      {/* Embedded Styles */}
       <style jsx>{`
-        .pitches-mobile { display: none; }
+        .research-kpi-ribbon {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 32px;
+          padding: 20px 28px;
+          background: var(--bg-surface);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 2px;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+          width: fit-content;
+          max-width: 100%;
+          box-sizing: border-box;
+        }
+        .kpi-block {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+        .kpi-label {
+          font-size: 11px;
+          letter-spacing: "0.14em";
+          text-transform: uppercase;
+          color: rgba(244, 243, 239, 0.55);
+          font-weight: 600;
+        }
+        .kpi-value {
+          font-size: 22px;
+          font-weight: 300;
+          color: #ffffff;
+          line-height: 1.1;
+        }
+        .kpi-divider {
+          width: 1px;
+          height: 36px;
+          background: rgba(255, 255, 255, 0.1);
+        }
+        .tab-bar-container {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 16px;
+          margin-bottom: 36px;
+          padding-bottom: 20px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .tabs-group {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+        .tab-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          padding: 10px 18px;
+          background: var(--bg-surface);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 2px;
+          color: rgba(244, 243, 239, 0.75);
+          font-size: 13px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.25s ease;
+        }
+        .tab-btn:hover {
+          background: #0a3a46;
+          border-color: rgba(213, 109, 74, 0.4);
+          color: #ffffff;
+        }
+        .tab-btn.active {
+          background: #0a3a46;
+          border-color: var(--accent-light);
+          color: #ffffff;
+          box-shadow: 0 0 16px rgba(213, 109, 74, 0.2);
+        }
+        .tab-pill {
+          font-size: 11px;
+          font-weight: 700;
+          padding: 2px 7px;
+          border-radius: 2px;
+          background: rgba(255, 255, 255, 0.08);
+          color: var(--accent-light);
+        }
+        .tab-btn.active .tab-pill {
+          background: var(--accent-light);
+          color: #ffffff;
+        }
+        .sort-indicator {
+          font-size: 12px;
+          color: rgba(244, 243, 239, 0.6);
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .sort-indicator strong {
+          color: var(--accent-light);
+        }
+        .table-wrapper {
+          background: var(--bg-surface);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 2px;
+          overflow: hidden;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+        }
+        .research-table {
+          width: 100%;
+          border-collapse: collapse;
+          text-align: left;
+        }
+        .research-table th {
+          background: var(--bg-subsurface);
+          padding: 14px 18px;
+          font-size: 11px;
+          text-transform: uppercase;
+          letter-spacing: 0.12em;
+          color: rgba(244, 243, 239, 0.6);
+          font-weight: 600;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .research-table td {
+          padding: 16px 18px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+          vertical-align: middle;
+          font-size: 14px;
+        }
+        .research-table tr:hover td {
+          background: rgba(255, 255, 255, 0.02);
+        }
+        .research-card {
+          background: var(--bg-surface);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 2px;
+          padding: 20px;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+        }
+        .desktop-only {
+          display: block;
+        }
+        .mobile-only {
+          display: none;
+        }
+        @media (max-width: 860px) {
+          .desktop-only {
+            display: none;
+          }
+          .mobile-only {
+            display: grid;
+          }
+          .kpi-divider {
+            display: none;
+          }
+          .research-kpi-ribbon {
+            gap: 20px;
+          }
+        }
         @media (max-width: 768px) {
-          .pitches-desktop { display: none; }
-          .pitches-mobile { display: block; }
+          .tab-btn {
+            padding: 8px 14px;
+            font-size: 12px;
+            gap: 8px;
+          }
+          .sort-indicator {
+            font-size: 11px;
+          }
+          .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+          }
+          .research-table {
+            min-width: 700px;
+          }
+          .research-table th,
+          .research-table td {
+            padding: 12px 14px;
+            font-size: 13px;
+          }
+        }
+        @media (max-width: 480px) {
+          .tabs-group {
+            width: 100%;
+          }
+          .tab-btn {
+            flex: 1;
+            justify-content: center;
+            padding: 8px 10px;
+            font-size: 11px;
+            gap: 6px;
+          }
+          .tab-bar-container {
+            flex-direction: column;
+            gap: 12px;
+          }
+          .research-kpi-ribbon {
+            flex-direction: column;
+            width: 100%;
+            gap: 16px;
+            padding: 18px 20px;
+          }
+          .pdf-viewer-overlay {
+            padding: 8px !important;
+          }
+          .pdf-viewer-overlay > div {
+            max-height: 96vh !important;
+            border-radius: 2px !important;
+          }
         }
       `}</style>
     </div>

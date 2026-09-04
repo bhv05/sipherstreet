@@ -291,7 +291,7 @@ function MockPhilosophy() {
       <h3 className="page-heading">Risk Controls</h3>
       <ul className="bullets-list">
         <li><strong>Position Size Limits:</strong> Long exposure is capped at 10% per issuer; short exposure capped at 5%.</li>
-        <li><strong>Beta Hedging:</strong> Portfolio net exposure is dynamically managed between 30% and 60% based on market volatility indicators.</li>
+        <li><strong>Beta Hedging:</strong> Portfolio net exposure is maintained at &lt; 30% dynamically based on market volatility indicators.</li>
         <li><strong>Liquidity Buffer:</strong> Minimum 15% cash/liquid treasury holdings maintained at all times.</li>
       </ul>
 
@@ -353,22 +353,23 @@ export default function BookFactsheet() {
 
       const activeRef = isExpanded ? portalPerspectiveRef.current : normalPerspectiveRef.current;
       if (!activeRef) return;
-      const parentWidth = activeRef.offsetWidth || window.innerWidth;
-      const parentHeight = activeRef.offsetHeight || window.innerHeight;
+
+      const container = activeRef.closest ? activeRef.closest(".showcase-book-card") : null;
+      const parentWidth = container ? (container.clientWidth - 40) : (activeRef.parentElement ? activeRef.parentElement.clientWidth : window.innerWidth);
+      const parentHeight = container ? (container.clientHeight - 40) : (activeRef.parentElement ? activeRef.parentElement.clientHeight : 520);
 
       // inline view is 720x500, expanded is 1100x760
       const bookWidth = isExpanded ? 1100 : 720;
       const bookHeight = isExpanded ? 760 : 500;
 
-      // In expanded mode, we account for the fixed control margins (e.g. 240px width margin, 140px height margin)
-      const bufferWidth = isExpanded ? 240 : 0;
-      const bufferHeight = isExpanded ? 140 : 0;
+      // Account for unified left nav controls (36px + 16px = 52px) and margins
+      const bufferWidth = isExpanded ? 240 : 80;
+      const bufferHeight = isExpanded ? 140 : 64;
 
       const scaleX = (parentWidth - bufferWidth) / bookWidth;
       const scaleY = (parentHeight - bufferHeight) / bookHeight;
 
       let newScale = Math.min(scaleX, scaleY);
-      // Cap maximum scale factor at 1.0 (100% size) to prevent browser interpolation blur on canvases/images
       if (newScale > 1.0) newScale = 1.0; 
       if (newScale < 0.2) newScale = 0.2; // Safety lower bound
 
@@ -590,7 +591,7 @@ export default function BookFactsheet() {
       <div className="factsheet-module">
         <div className="book-outer-wrapper" ref={normalPerspectiveRef}>
           <div className="book-stage">
-            {/* Previous controls */}
+            {/* Unified Left Navigation Controls Cluster */}
             <div className="nav-controls-left">
               <button
                 onClick={jumpToStart}
@@ -598,7 +599,7 @@ export default function BookFactsheet() {
                 className="nav-arrow-btn"
                 title="Jump to cover"
               >
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2.5" fill="none">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2.5" fill="none">
                   <polyline points="11 17 6 12 11 7" />
                   <line x1="18" y1="19" x2="18" y2="5" />
                 </svg>
@@ -609,14 +610,45 @@ export default function BookFactsheet() {
                 className="nav-arrow-btn highlight-btn"
                 title="Previous page"
               >
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2.5" fill="none">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2.5" fill="none">
                   <polyline points="15 18 9 12 15 6" />
+                </svg>
+              </button>
+
+              <div className="nav-controls-divider" />
+
+              {/* Next page buttons placed on the left side under the left arrow button */}
+              <button
+                onClick={flipForward}
+                disabled={isMobile ? currentPageIndex === totalPagesCount - 1 : currentSheetIndex === totalSheetsCount}
+                className="nav-arrow-btn highlight-btn"
+                title="Next page"
+              >
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2.5" fill="none">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </button>
+              <button
+                onClick={jumpToEnd}
+                disabled={isMobile ? currentPageIndex === totalPagesCount - 1 : currentSheetIndex === totalSheetsCount}
+                className="nav-arrow-btn"
+                title="Jump to end"
+              >
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2.5" fill="none">
+                  <polyline points="13 7 18 12 13 17" />
+                  <line x1="6" y1="5" x2="6" y2="19" />
                 </svg>
               </button>
             </div>
 
             {/* Book Canvas */}
-            <div className="book-perspective">
+            <div
+              className="book-perspective"
+              style={{
+                width: isMobile ? 320 : Math.round(720 * scale),
+                height: isMobile ? 452 : Math.round(500 * scale),
+              }}
+            >
               {isMobile ? (
                 /* Mobile Single Page View */
                 <div className="mobile-page-holder shadow-premium">
@@ -694,31 +726,6 @@ export default function BookFactsheet() {
                   })}
                 </div>
               )}
-            </div>
-
-            {/* Next controls */}
-            <div className="nav-controls-right">
-              <button
-                onClick={flipForward}
-                disabled={isMobile ? currentPageIndex === totalPagesCount - 1 : currentSheetIndex === totalSheetsCount}
-                className="nav-arrow-btn highlight-btn"
-                title="Next page"
-              >
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2.5" fill="none">
-                  <polyline points="9 18 15 12 9 6" />
-                </svg>
-              </button>
-              <button
-                onClick={jumpToEnd}
-                disabled={isMobile ? currentPageIndex === totalPagesCount - 1 : currentSheetIndex === totalSheetsCount}
-                className="nav-arrow-btn"
-                title="Jump to end"
-              >
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2.5" fill="none">
-                  <polyline points="13 7 18 12 13 17" />
-                  <line x1="6" y1="5" x2="6" y2="19" />
-                </svg>
-              </button>
             </div>
           </div>
 
@@ -984,6 +991,7 @@ export default function BookFactsheet() {
       <style jsx>{`
         .factsheet-module {
           width: 100%;
+          max-width: 100%;
           height: 100%;
           position: relative;
           background: transparent;
@@ -993,7 +1001,8 @@ export default function BookFactsheet() {
           display: flex;
           justify-content: center;
           align-items: center;
-          transition: all 0.3s ease;
+          box-sizing: border-box;
+          overflow: hidden;
         }
 
         .book-outer-wrapper {
@@ -1001,10 +1010,12 @@ export default function BookFactsheet() {
           flex-direction: column;
           align-items: center;
           width: 100%;
+          max-width: 100%;
           height: 100%;
           justify-content: space-between;
-          gap: 20px;
+          gap: 16px;
           position: relative;
+          box-sizing: border-box;
         }
 
         .book-stage {
@@ -1012,8 +1023,12 @@ export default function BookFactsheet() {
           align-items: center;
           justify-content: center;
           width: 100%;
+          max-width: 100%;
           flex: 1;
           position: relative;
+          box-sizing: border-box;
+          padding: 0;
+          gap: 16px;
         }
 
         .nav-controls-left,
@@ -1021,70 +1036,83 @@ export default function BookFactsheet() {
           display: flex;
           flex-direction: column;
           gap: 12px;
-          z-index: 10;
+          z-index: 25;
+          flex-shrink: 0;
         }
 
         .nav-arrow-btn {
-          background: #ffffff;
-          border: 1px solid #cbd5e1;
-          color: #5a6a7e;
-          width: 38px;
-          height: 38px;
+          background: var(--bg-surface);
+          border: 1px solid rgba(255, 255, 255, 0.22);
+          color: #f4f3ef;
+          width: 36px;
+          height: 36px;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
           cursor: pointer;
           transition: all 0.2s ease;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
         .nav-arrow-btn:hover:not(:disabled) {
-          border-color: #1a2a44;
-          color: #1a2a44;
-          transform: scale(1.05);
-          box-shadow: 0 4px 8px rgba(26, 42, 68, 0.08);
+          border-color: var(--accent-light);
+          background: var(--bg-primary);
+          color: #ffffff;
+          transform: scale(1.08);
         }
 
         .nav-arrow-btn:disabled {
-          opacity: 0.3;
+          opacity: 0.2;
           cursor: not-allowed;
         }
 
         .nav-arrow-btn.highlight-btn {
-          background: #1a2a44;
+          background: var(--accent-primary);
           color: #ffffff;
-          border-color: #1a2a44;
+          border-color: var(--accent-primary);
         }
         .nav-arrow-btn.highlight-btn:hover:not(:disabled) {
-          background: #2c3e5a;
-          border-color: #2c3e5a;
+          background: var(--accent-light);
+          border-color: var(--accent-light);
         }
 
         .book-perspective {
           perspective: 1500px;
-          margin: 0 32px;
+          margin: 0;
           display: flex;
           justify-content: center;
           align-items: center;
-          flex: 1;
-          width: 100%;
-          height: 100%;
-          overflow: hidden; /* Prevent cover/back pages translation from overflowing container border */
+          flex: 0 0 auto;
+          position: relative;
+          overflow: visible;
         }
 
-        .book-3d {
-          position: relative;
+        .book-stage .book-3d {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          margin-top: -250px;
+          margin-left: -360px;
           transform-style: preserve-3d;
           transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+          transform-origin: center center;
           transform: scale(var(--scale, 1)) translateX(0);
         }
 
-        .book-3d.closed-right {
+        .book-stage .book-3d.closed-right {
           transform: scale(var(--scale, 1)) translateX(-25%);
         }
-        .book-3d.closed-left {
+        .book-stage .book-3d.closed-left {
           transform: scale(var(--scale, 1)) translateX(25%);
+        }
+
+        .portal-book-3d {
+          position: relative !important;
+          top: auto !important;
+          left: auto !important;
+          margin: 0 auto !important;
+          transform-origin: center center !important;
         }
 
         .book-spine-line {
@@ -1238,48 +1266,64 @@ export default function BookFactsheet() {
           align-items: center;
           justify-content: space-between;
           width: 100%;
-          padding-top: 12px;
-          border-top: 1px solid rgba(0, 0, 0, 0.05);
+          padding: 12px 32px 4px 12px;
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
+          box-sizing: border-box;
+          gap: 12px;
         }
 
         .toolbar-page-num {
-          font-size: 13px;
-          color: #5a6a7e;
+          font-size: 12px;
+          color: rgba(244, 243, 239, 0.65);
           font-weight: 500;
+          white-space: nowrap;
         }
 
         .toolbar-actions {
           display: flex;
-          gap: 12px;
+          gap: 10px;
+          align-items: center;
+          flex-shrink: 0;
+          margin-right: 20px;
+        }
+
+        .nav-controls-divider {
+          width: 20px;
+          height: 1px;
+          background: rgba(255, 255, 255, 0.15);
+          margin: 4px auto;
         }
 
         .toolbar-btn {
-          display: flex;
+          display: inline-flex;
           align-items: center;
-          gap: 8px;
-          background: #ffffff;
-          border: 1px solid #cbd5e1;
-          color: #1a2a44;
-          font-size: 13px;
+          gap: 6px;
+          background: var(--bg-surface);
+          border: 1px solid rgba(255, 255, 255, 0.22);
+          color: #f4f3ef;
+          font-size: 12px;
           font-weight: 500;
-          padding: 8px 16px;
-          border-radius: 4px;
+          padding: 7px 12px;
+          border-radius: 2px;
           cursor: pointer;
+          white-space: nowrap;
+          text-decoration: none;
           transition: all 0.2s ease;
         }
         .toolbar-btn:hover {
-          border-color: #1a2a44;
-          background: rgba(26, 42, 68, 0.02);
+          border-color: var(--accent-light);
+          background: rgba(213, 109, 74, 0.12);
+          color: #ffffff;
         }
 
         .toolbar-btn.highlight-action {
-          background: #1a2a44;
+          background: var(--accent-primary);
           color: #ffffff;
-          border-color: #1a2a44;
+          border-color: var(--accent-primary);
         }
         .toolbar-btn.highlight-action:hover {
-          background: #2c3e5a;
-          border-color: #2c3e5a;
+          background: var(--accent-light);
+          border-color: var(--accent-light);
         }
 
         .blank-page {
