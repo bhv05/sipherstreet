@@ -2,6 +2,7 @@ import "./globals.css";
 import { ViewTransitions } from "next-view-transitions";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import ScrollToTop from "./components/ScrollToTop";
 import { Analytics } from "@vercel/analytics/react";
 
 export const metadata = {
@@ -42,6 +43,7 @@ export default function RootLayout({ children }) {
           />
         </head>
         <body>
+          <ScrollToTop />
           <Navbar />
           <main>{children}</main>
           <Footer />

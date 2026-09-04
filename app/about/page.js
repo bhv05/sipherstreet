@@ -114,8 +114,27 @@ export default function About() {
   const showcaseReveal = useReveal({ threshold: 0.05, rootMargin: "0px 0px -30px 0px" });
 
   useEffect(() => {
-    const timer = setTimeout(() => setHeroLoaded(true), 40);
-    return () => clearTimeout(timer);
+    // Instantly bring to top with zero smooth-scroll lag
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
+    setHeroLoaded(false);
+    const timer = setTimeout(() => setHeroLoaded(true), 50);
+
+    const handleReset = () => {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      setHeroLoaded(false);
+      setTimeout(() => setHeroLoaded(true), 50);
+    };
+
+    window.addEventListener("sipher-nav-reset", handleReset);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("sipher-nav-reset", handleReset);
+    };
   }, []);
 
   return (

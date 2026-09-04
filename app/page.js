@@ -224,6 +224,39 @@ export default function Home() {
           overflow: "hidden",
         }}
       >
+        {/* Animated Ocean Waves Video Background */}
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster="/images/hero-ocean-8k.jpg"
+          style={{
+            position: "absolute",
+            top: 0, left: 0, width: "100%", height: "100%",
+            objectFit: "cover",
+            opacity: 0.78,
+            filter: "contrast(1.18) brightness(1.08) saturate(1.12)",
+            pointerEvents: "none",
+            transform: "translate3d(0, 0, 0)",
+            WebkitTransform: "translate3d(0, 0, 0)",
+            zIndex: 0,
+          }}
+        >
+          <source src="/videos/ocean-waves.mp4" type="video/mp4" />
+        </video>
+
+        {/* Multi-Stop Dark Vignette Overlay for High-Contrast Text Legibility */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0, left: 0, right: 0, bottom: 0,
+            background: "linear-gradient(180deg, rgba(7, 20, 38, 0.40) 0%, rgba(7, 20, 38, 0.58) 45%, rgba(7, 20, 38, 0.88) 85%, var(--bg-primary) 100%)",
+            pointerEvents: "none",
+            zIndex: 0,
+          }}
+        />
+
         {/* Ambient glow */}
         <div
           style={{
@@ -231,9 +264,10 @@ export default function Home() {
             top: "-10%", right: "-12%",
             width: 700, height: 700,
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(30, 58, 95, 0.18) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(30, 58, 95, 0.22) 0%, transparent 70%)",
             pointerEvents: "none",
             animation: "auraBreath 10s ease-in-out infinite alternate",
+            zIndex: 0,
           }}
         />
 
@@ -244,7 +278,7 @@ export default function Home() {
             <h1
               className="reveal-item"
               style={{
-                fontSize: "clamp(52px, 7.8vw, 96px)",
+                fontSize: "clamp(42px, 8.5vw, 96px)",
                 fontWeight: 200,
                 lineHeight: 1.05,
                 letterSpacing: "-0.035em",
@@ -325,74 +359,150 @@ export default function Home() {
       </section>
 
       {/* ══════════════════════════════════════════════════════
-          THREE PILLARS
+          THREE PILLARS (Skyline Background)
           ══════════════════════════════════════════════════════ */}
       <section
         ref={pillarsReveal.ref}
         className={"reveal-group" + (pillarsReveal.inView ? " in-view" : "")}
-        style={{ padding: "96px 24px", maxWidth: 1160, margin: "0 auto" }}
+        style={{
+          position: "relative",
+          padding: "100px 24px",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+          overflow: "hidden",
+        }}
       >
-        <div style={{ textAlign: "center", maxWidth: 700, margin: "0 auto 64px" }}>
-          <p className="section-label reveal-item" style={{ color: "var(--accent-light)" }}>Investment Architecture</p>
-          <h2 className="section-title reveal-item reveal-delay-1" style={{ marginBottom: 16 }}>
-            Built for <em>enduring performance</em>
-          </h2>
-          <p className="reveal-item reveal-delay-2" style={{ color: "rgba(244, 243, 239, 0.8)", fontSize: 16, lineHeight: 1.7 }}>
-            Our partnership structure and focused philosophy enable us to manage capital with complete alignment and long-term conviction.
-          </p>
-        </div>
+        {/* Animated Skyline Video Background */}
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster="/images/skyline-financial-8k.jpg"
+          style={{
+            position: "absolute",
+            top: 0, left: 0, width: "100%", height: "100%",
+            objectFit: "cover",
+            opacity: 0.52,
+            filter: "contrast(1.15) brightness(0.98) saturate(1.12)",
+            pointerEvents: "none",
+            transform: "translate3d(0, 0, 0)",
+            WebkitTransform: "translate3d(0, 0, 0)",
+            zIndex: 0,
+          }}
+        >
+          <source src="/videos/skyline-night.mp4" type="video/mp4" />
+        </video>
 
-        <div className="home-pillars-grid">
-          {PILLARS.map(function (item, idx) {
-            return (
-              <div
-                key={item.num}
-                className={"home-pillar-card hover-lift reveal-item reveal-delay-" + (idx + 1)}
-                style={{
-                  background: "var(--bg-surface)",
-                  color: "#f4f3ef",
-                  padding: "44px 36px",
-                  borderRadius: 2,
-                  display: "flex",
-                  flexDirection: "column",
-                  minHeight: 320,
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
-                  boxShadow: "0 4px 24px rgba(0, 0, 0, 0.2)",
-                  position: "relative",
-                  overflow: "hidden",
-                  boxSizing: "border-box",
-                }}
-              >
-                <h3 style={{ fontSize: 26, fontWeight: 300, color: "#ffffff", marginBottom: 16, lineHeight: 1.2 }}>
+        {/* Darkening Gradient Overlay for readability */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0, left: 0, right: 0, bottom: 0,
+            background: "linear-gradient(180deg, rgba(7, 20, 38, 0.82) 0%, rgba(7, 20, 38, 0.70) 50%, rgba(7, 20, 38, 0.88) 100%)",
+            pointerEvents: "none",
+            zIndex: 0,
+          }}
+        />
+
+        <div style={{ maxWidth: 1160, margin: "0 auto", position: "relative", zIndex: 1 }}>
+          <div style={{ textAlign: "center", maxWidth: 700, margin: "0 auto 64px" }}>
+            <p className="section-label reveal-item" style={{ color: "var(--accent-light)" }}>Investment Architecture</p>
+            <h2 className="section-title reveal-item reveal-delay-1" style={{ marginBottom: 16 }}>
+              Built for <em>enduring performance</em>
+            </h2>
+            <p className="reveal-item reveal-delay-2" style={{ color: "rgba(244, 243, 239, 0.85)", fontSize: 16, lineHeight: 1.7 }}>
+              Our partnership structure and focused philosophy enable us to manage capital with complete alignment and long-term conviction.
+            </p>
+          </div>
+
+          <div className="home-pillars-grid">
+            {PILLARS.map(function (item, idx) {
+              return (
+                <div
+                  key={item.num}
+                  className={"home-pillar-card hover-lift reveal-item reveal-delay-" + (idx + 1)}
+                  style={{
+                    background: "rgba(12, 34, 63, 0.82)",
+                    backdropFilter: "blur(14px)",
+                    WebkitBackdropFilter: "blur(14px)",
+                    color: "#f4f3ef",
+                    padding: "44px 36px",
+                    borderRadius: 3,
+                    display: "flex",
+                    flexDirection: "column",
+                    minHeight: 320,
+                    border: "1px solid rgba(255, 255, 255, 0.12)",
+                    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.35)",
+                    position: "relative",
+                    overflow: "hidden",
+                    boxSizing: "border-box",
+                  }}
+                >
+                  <h3 style={{ fontSize: 26, fontWeight: 300, color: "#ffffff", marginBottom: 16, lineHeight: 1.2 }}>
                     {item.title}{" "}
                     <span className="font-heading" style={{ fontStyle: "italic", color: "var(--accent-light)", fontWeight: 400 }}>
                       {item.italic}
                     </span>
                   </h3>
                   <div className="reveal-line-expand" style={{ width: 40, height: 2, background: "var(--accent-light)", marginBottom: 20 }} />
-                  <p style={{ fontSize: 14, color: "rgba(244, 243, 239, 0.75)", lineHeight: 1.75 }}>
+                  <p style={{ fontSize: 14, color: "rgba(244, 243, 239, 0.8)", lineHeight: 1.75 }}>
                     {item.desc}
-                </p>
-              </div>
-            );
-          })}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </section>
 
       {/* ══════════════════════════════════════════════════════
-          CULTURE & VALUES
+          CULTURE & VALUES (Ocean Swells Background)
           ══════════════════════════════════════════════════════ */}
       <section
         ref={cultureReveal.ref}
         className={"reveal-group" + (cultureReveal.inView ? " in-view" : "")}
         style={{
-          background: "var(--bg-surface)",
-          padding: "96px 24px",
+          position: "relative",
+          padding: "100px 24px",
           borderTop: "1px solid rgba(255, 255, 255, 0.08)",
           borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+          overflow: "hidden",
         }}
       >
-        <div style={{ maxWidth: 1160, margin: "0 auto" }}>
+        {/* Animated Deep Ocean Swells Video Background */}
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster="/images/culture-swells-8k.jpg"
+          style={{
+            position: "absolute",
+            top: 0, left: 0, width: "100%", height: "100%",
+            objectFit: "cover",
+            opacity: 0.50,
+            filter: "contrast(1.15) brightness(0.92) saturate(1.10)",
+            pointerEvents: "none",
+            transform: "translate3d(0, 0, 0)",
+            WebkitTransform: "translate3d(0, 0, 0)",
+            zIndex: 0,
+          }}
+        >
+          <source src="/videos/culture-ocean.mp4" type="video/mp4" />
+        </video>
+
+        {/* Darkening Gradient Overlay for AAA Contrast */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0, left: 0, right: 0, bottom: 0,
+            background: "linear-gradient(180deg, rgba(7, 20, 38, 0.88) 0%, rgba(7, 20, 38, 0.76) 50%, rgba(7, 20, 38, 0.90) 100%)",
+            pointerEvents: "none",
+            zIndex: 0,
+          }}
+        />
+
+        <div style={{ maxWidth: 1160, margin: "0 auto", position: "relative", zIndex: 1 }}>
           <div className="home-culture-split">
             <div style={{ position: "relative" }}>
               <div className="reveal-item" style={{ position: "sticky", top: 120 }}>
@@ -473,66 +583,110 @@ export default function Home() {
       </section>
 
       {/* ══════════════════════════════════════════════════════
-          FUND TERMS TABLE
+          FUND TERMS TABLE (Transatlantic Institutional Background)
           ══════════════════════════════════════════════════════ */}
       <section
         ref={termsReveal.ref}
         className={"reveal-group" + (termsReveal.inView ? " in-view" : "")}
-        style={{ padding: "96px 24px", maxWidth: 1160, margin: "0 auto" }}
+        style={{
+          position: "relative",
+          padding: "100px 24px",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+          overflow: "hidden",
+        }}
       >
-        <div className="reveal-item" style={{ textAlign: "center", maxWidth: 640, margin: "0 auto 48px" }}>
-          <p className="section-label" style={{ color: "var(--accent-light)" }}>Partnership Terms</p>
-          <h2 className="section-title" style={{ marginBottom: 12 }}>
-            Institutional <em>fund terms</em>
-          </h2>
-          <div className="reveal-line-expand" style={{ width: 40, height: 2, background: "var(--accent-light)", margin: "0 auto 20px" }} />
-          <p style={{ color: "rgba(244, 243, 239, 0.8)", fontSize: 15, lineHeight: 1.7 }}>
-            Designed for long-term alignment of interest with fee discipline and complete portfolio transparency.
-          </p>
-        </div>
-
-        <div
-          className="reveal-item reveal-delay-2 fund-terms-wrapper"
+        {/* Animated Skyline Video Background - Boutique Hedge Fund Monochrome Color Grading (Cinematic 0.45x Slow Motion) */}
+        <video
+          ref={function (el) { if (el) el.playbackRate = 0.45; }}
+          onLoadedMetadata={function (e) { e.currentTarget.playbackRate = 0.45; }}
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster="/images/terms-architecture-8k.jpg"
           style={{
-            background: "var(--bg-surface)",
-            border: "1px solid rgba(255, 255, 255, 0.1)",
-            borderRadius: 2,
-            overflow: "hidden",
-            boxShadow: "0 4px 24px rgba(0, 0, 0, 0.25)",
+            position: "absolute",
+            top: 0, left: 0, width: "100%", height: "100%",
+            objectFit: "cover",
+            opacity: 0.70,
+            filter: "grayscale(100%) contrast(1.26) brightness(1.04)",
+            pointerEvents: "none",
+            transform: "translate3d(0, 0, 0)",
+            WebkitTransform: "translate3d(0, 0, 0)",
+            zIndex: 0,
           }}
         >
-          <table className="data-table">
-            <tbody>
-              {[
-                ["Management Fee", "1.00% per annum, calculated and accrued monthly"],
-                ["Performance Fee", "17.50% of net profits subject to high-water mark"],
-                ["Strategy & Structure", "U.S. & European L/S Equity Partnership"],
-                ["Benchmark", "SOFR"],
-                ["Partner Co-Investment", "$10,000 partner capital co-invested into the strategy"],
-                ["Valuation & Pricing", "Rebased NAV computed daily from point-in-time exchange feeds"],
-                ["Transparency & Reporting", "Open-source holdings, trade ledger, and historical pitch models"],
-              ].map(function (row, idx) {
-                return (
-                  <tr key={idx}>
-                    <td style={{ fontWeight: 600, color: "#ffffff", width: "35%", background: "var(--bg-subsurface)", borderRight: "1px solid rgba(255, 255, 255, 0.08)" }}>
-                      {row[0]}
-                    </td>
-                    <td style={{ color: "rgba(244, 243, 239, 0.85)", fontSize: 14 }}>
-                      {row[1]}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+          <source src="/videos/terms-skyline.mp4" type="video/mp4" />
+        </video>
 
-        <div className="reveal-item reveal-delay-3" style={{ textAlign: "center", marginTop: 48 }}>
-          <Link href="/portfolio">
-            <button className="btn-primary" style={{ padding: "14px 36px" }}>
-              Explore Live Portfolio & Performance
-            </button>
-          </Link>
+        {/* Darkening Gradient Overlay for AAA Contrast */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0, left: 0, right: 0, bottom: 0,
+            background: "linear-gradient(180deg, rgba(6, 17, 33, 0.82) 0%, rgba(6, 17, 33, 0.46) 50%, rgba(6, 17, 33, 0.85) 100%)",
+            pointerEvents: "none",
+            zIndex: 0,
+          }}
+        />
+
+        <div style={{ maxWidth: 1160, margin: "0 auto", position: "relative", zIndex: 1 }}>
+          <div className="reveal-item" style={{ textAlign: "center", maxWidth: 640, margin: "0 auto 48px" }}>
+            <p className="section-label" style={{ color: "var(--accent-light)" }}>Partnership Terms</p>
+            <h2 className="section-title" style={{ marginBottom: 12 }}>
+              Institutional <em>fund terms</em>
+            </h2>
+            <div className="reveal-line-expand" style={{ width: 40, height: 2, background: "var(--accent-light)", margin: "0 auto 20px" }} />
+            <p style={{ color: "rgba(244, 243, 239, 0.8)", fontSize: 15, lineHeight: 1.7 }}>
+              Designed for long-term alignment of interest with fee discipline and complete portfolio transparency.
+            </p>
+          </div>
+
+          <div
+            className="reveal-item reveal-delay-2 fund-terms-wrapper"
+            style={{
+              background: "rgba(10, 24, 44, 0.68)",
+              backdropFilter: "blur(14px)",
+              WebkitBackdropFilter: "blur(14px)",
+              border: "1px solid rgba(255, 255, 255, 0.16)",
+              borderRadius: 3,
+              overflow: "hidden",
+              boxShadow: "0 16px 48px rgba(0, 0, 0, 0.50)",
+            }}
+          >
+            <table className="data-table">
+              <tbody>
+                {[
+                  ["Management Fee", "1.00% per annum, calculated and accrued monthly"],
+                  ["Performance Fee", "17.50% of net profits subject to high-water mark"],
+                  ["Strategy & Structure", "U.S. & European L/S Equity Partnership"],
+                  ["Benchmark", "SOFR"],
+                  ["Partner Co-Investment", "$10,000 partner capital co-invested into the strategy"],
+                  ["Valuation & Pricing", "Rebased NAV computed daily from point-in-time exchange feeds"],
+                  ["Transparency & Reporting", "Open-source holdings, trade ledger, and historical pitch models"],
+                ].map(function (row, idx) {
+                  return (
+                    <tr key={idx}>
+                      <td style={{ fontWeight: 600, color: "#ffffff", width: "35%", background: "rgba(9, 27, 50, 0.68)", borderRight: "1px solid rgba(255, 255, 255, 0.08)" }}>
+                        {row[0]}
+                      </td>
+                      <td style={{ color: "rgba(244, 243, 239, 0.90)", fontSize: 14, background: "rgba(6, 18, 36, 0.38)" }}>
+                        {row[1]}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="reveal-item reveal-delay-3" style={{ textAlign: "center", marginTop: 48 }}>
+            <Link href="/portfolio">
+              <button className="btn-primary" style={{ padding: "14px 36px" }}>
+                Explore Live Portfolio & Performance
+              </button>
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -593,6 +747,18 @@ export default function Home() {
             min-width: 140px;
           }
         }
+        @media (max-width: 540px) {
+          .fund-terms-wrapper .data-table td:first-child {
+            width: 40% !important;
+            font-size: 12px !important;
+            padding: 10px 10px !important;
+          }
+          .fund-terms-wrapper .data-table td:last-child {
+            font-size: 12px !important;
+            padding: 10px 12px !important;
+            line-height: 1.55 !important;
+          }
+        }
         @media (max-width: 480px) {
           .hero-actions-group {
             width: 100%;
@@ -602,11 +768,28 @@ export default function Home() {
           }
           .hero-actions-group button {
             width: 100%;
-            padding: 12px 20px !important;
+            padding: 13px 20px !important;
           }
           .hero-live-metrics {
-            flex-direction: column !important;
-            gap: 20px !important;
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 12px !important;
+            width: 100% !important;
+          }
+          .hero-live-metrics > div {
+            min-width: 0;
+          }
+          .hero-live-metrics > div > div:first-child {
+            font-size: 8.5px !important;
+            letter-spacing: 0.10em !important;
+            line-height: 1.25 !important;
+            min-height: 22px !important;
+            display: flex !important;
+            align-items: flex-end !important;
+            text-transform: uppercase !important;
+          }
+          .hero-live-metrics > div > div:last-child {
+            font-size: 20px !important;
           }
         }
         @media (prefers-reduced-motion: reduce) {

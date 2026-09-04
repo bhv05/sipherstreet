@@ -85,6 +85,12 @@ function PerformanceChart({ portfolio, benchmark }) {
   var [dims, setDims] = useState({ w: 800, h: 360 });
   var [hover, setHover] = useState(null);
 
+  // Animation state: 0 (not drawn) to 1 (fully drawn)
+  var [chartInView, setChartInView] = useState(false);
+  var [progress, setProgress] = useState(0);
+  var [isDrawn, setIsDrawn] = useState(false);
+  var animRef = useRef(null);
+
   useEffect(function () {
     function measure() {
       if (containerRef.current) {
@@ -97,6 +103,90 @@ function PerformanceChart({ portfolio, benchmark }) {
     window.addEventListener("resize", measure);
     return function () { window.removeEventListener("resize", measure); };
   }, []);
+
+  // Set up intersection observer directly on the chart SVG container
+  useEffect(function () {
+    if (!containerRef.current) return;
+
+    var observer = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            setChartInView(true);
+            if (observer && entry.target) {
+              observer.unobserve(entry.target);
+            }
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: "0px 0px -40px 0px" }
+    );
+
+    observer.observe(containerRef.current);
+
+    function handleNavReset() {
+      setChartInView(false);
+      setProgress(0);
+      setIsDrawn(false);
+      if (animRef.current) cancelAnimationFrame(animRef.current);
+      requestAnimationFrame(function () {
+        if (containerRef.current) {
+          observer.observe(containerRef.current);
+        }
+      });
+    }
+
+    window.addEventListener("sipher-nav-reset", handleNavReset);
+
+    return function () {
+      observer.disconnect();
+      window.removeEventListener("sipher-nav-reset", handleNavReset);
+      if (animRef.current) cancelAnimationFrame(animRef.current);
+    };
+  }, []);
+
+  // Animate sketch across when chart enters the viewport
+  useEffect(function () {
+    if (!chartInView) {
+      setProgress(0);
+      setIsDrawn(false);
+      if (animRef.current) cancelAnimationFrame(animRef.current);
+      return;
+    }
+
+    if (isDrawn) return;
+
+    // Accessibility check: skip animation if user prefers reduced motion
+    if (typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setProgress(1);
+      setIsDrawn(true);
+      return;
+    }
+
+    var startTime = null;
+    var duration = 1800; // 1.8 seconds total sketch duration
+
+    function step(timestamp) {
+      if (!startTime) startTime = timestamp;
+      var elapsed = timestamp - startTime;
+      var raw = Math.min(1, elapsed / duration);
+
+      setProgress(raw);
+
+      if (raw < 1) {
+        animRef.current = requestAnimationFrame(step);
+      } else {
+        setProgress(1);
+        setIsDrawn(true);
+      }
+    }
+
+    animRef.current = requestAnimationFrame(step);
+
+    return function () {
+      if (animRef.current) cancelAnimationFrame(animRef.current);
+    };
+  }, [chartInView, isDrawn]);
 
   var portMap = {};
   portfolio.forEach(function (p) { portMap[p.date] = p.value; });
@@ -141,6 +231,19 @@ function PerformanceChart({ portfolio, benchmark }) {
   var pad = { top: 20, right: 20, bottom: 50, left: 65 };
   var chartW = dims.w - pad.left - pad.right;
   var chartH = dims.h - pad.top - pad.bottom;
+
+  // Compute staggered easing for all three sketched lines
+  function easeInOutQuad(t) {
+    return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+  }
+
+  var baselineProg = progress >= 1 ? 1 : easeInOutQuad(Math.min(1, Math.max(0, progress / 0.85)));
+  var sofrProg = progress >= 1 ? 1 : easeInOutQuad(Math.min(1, Math.max(0, (progress - 0.05) / 0.88)));
+  var sipherProg = progress >= 1 ? 1 : easeInOutQuad(Math.min(1, Math.max(0, (progress - 0.08) / 0.92)));
+
+  var baselineW = Math.max(0, chartW * baselineProg);
+  var sofrW = Math.max(0, chartW * sofrProg);
+  var sipherW = Math.max(0, chartW * sipherProg);
 
   var allValues = [];
   merged.forEach(function (d) {
@@ -194,6 +297,28 @@ function PerformanceChart({ portfolio, benchmark }) {
   var benchmarkPath = buildPath("benchmark");
   var areaPath = buildArea();
 
+  // Calculate live tracer tip positions during active sketch
+  var sTipX = pad.left + sipherProg * chartW;
+  var sTipIdx = sipherProg * (merged.length - 1);
+  var sFloor = Math.min(merged.length - 1, Math.floor(sTipIdx));
+  var sCeil = Math.min(merged.length - 1, sFloor + 1);
+  var sFrac = sTipIdx - sFloor;
+  var sVal = merged[sFloor].portfolio + sFrac * (merged[sCeil].portfolio - merged[sFloor].portfolio);
+  var sTipY = yScale(sVal);
+
+  var bTipX = pad.left + sofrProg * chartW;
+  var bTipIdx = sofrProg * (merged.length - 1);
+  var bFloor = Math.min(merged.length - 1, Math.floor(bTipIdx));
+  var bCeil = Math.min(merged.length - 1, bFloor + 1);
+  var bFrac = bTipIdx - bFloor;
+  var bVal0 = merged[bFloor].benchmark != null ? merged[bFloor].benchmark : 100000;
+  var bVal1 = merged[bCeil].benchmark != null ? merged[bCeil].benchmark : bVal0;
+  var bVal = bVal0 + bFrac * (bVal1 - bVal0);
+  var bTipY = yScale(bVal);
+
+  var baseTipX = pad.left + baselineProg * chartW;
+  var baseTipY = yScale(100000);
+
   var yTicks = [];
   for (var t = 0; t <= 4; t++) {
     yTicks.push(minVal + (t / 4) * (maxVal - minVal));
@@ -212,21 +337,46 @@ function PerformanceChart({ portfolio, benchmark }) {
   }
 
   function handleMouseMove(e) {
+    if (!isDrawn) return;
     var rect = containerRef.current.getBoundingClientRect();
     var mx = e.clientX - rect.left - pad.left;
-    var idx = Math.round((mx / chartW) * (merged.length - 1));
-    idx = Math.max(0, Math.min(merged.length - 1, idx));
-    setHover(idx);
+    var hoverIdx = Math.round((mx / chartW) * (merged.length - 1));
+    hoverIdx = Math.max(0, Math.min(merged.length - 1, hoverIdx));
+    setHover(hoverIdx);
   }
 
   return (
     <div
       ref={containerRef}
-      style={{ position: "relative", width: "100%" }}
+      style={{
+        position: "relative",
+        width: "100%",
+        cursor: isDrawn ? "crosshair" : "default",
+      }}
       onMouseMove={handleMouseMove}
       onMouseLeave={function () { setHover(null); }}
     >
       <svg width={dims.w} height={dims.h} style={{ display: "block" }}>
+        <defs>
+          <clipPath id="chart-sketch-clip-baseline">
+            <rect x={pad.left} y={0} width={baselineW} height={dims.h} />
+          </clipPath>
+          <clipPath id="chart-sketch-clip-sofr">
+            <rect x={pad.left} y={0} width={sofrW} height={dims.h} />
+          </clipPath>
+          <clipPath id="chart-sketch-clip-sipher">
+            <rect x={pad.left} y={0} width={sipherW} height={dims.h} />
+          </clipPath>
+          <filter id="tracer-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+
+        {/* Background Grid Lines & Y-Ticks */}
         {yTicks.map(function (val, i) {
           var y = yScale(val);
           return (
@@ -239,6 +389,7 @@ function PerformanceChart({ portfolio, benchmark }) {
           );
         })}
 
+        {/* X-Axis Month Labels */}
         {xLabels.map(function (item, i) {
           return (
             <text key={i} x={item.x} y={dims.h - 14} textAnchor="middle" fontSize="11" fill="rgba(244, 243, 239, 0.6)">
@@ -247,27 +398,120 @@ function PerformanceChart({ portfolio, benchmark }) {
           );
         })}
 
-        {/* Portfolio Area Fill */}
-        {areaPath && (
-          <path d={areaPath} fill="rgba(213, 109, 74, 0.08)" />
-        )}
+        {/* 1. $100k Baseline (0 dotted line) — Sketched left to right */}
+        <g clipPath="url(#chart-sketch-clip-baseline)">
+          <line
+            x1={pad.left} y1={yScale(100000)} x2={dims.w - pad.right} y2={yScale(100000)}
+            stroke="rgba(255, 255, 255, 0.22)" strokeWidth="1.5" strokeDasharray="3,3"
+          />
+        </g>
 
-        {/* Benchmark line (SOFR) */}
+        {/* 2. Benchmark line (SOFR) — Sketched left to right */}
         {benchmarkPath && (
-          <path d={benchmarkPath} fill="none" stroke="var(--chart-benchmark)" strokeWidth="2" strokeDasharray="5,5" />
+          <g clipPath="url(#chart-sketch-clip-sofr)">
+            <path d={benchmarkPath} fill="none" stroke="var(--chart-benchmark)" strokeWidth="2" strokeDasharray="5,5" />
+          </g>
         )}
 
-        {/* Portfolio line */}
+        {/* 3. Portfolio Area Fill — Sketched in sync with Sipher Street curve */}
+        {areaPath && (
+          <g clipPath="url(#chart-sketch-clip-sipher)">
+            <path d={areaPath} fill="rgba(213, 109, 74, 0.08)" />
+          </g>
+        )}
+
+        {/* 4. Portfolio line (Sipher Street) — Sketched left to right */}
         {portfolioPath && (
-          <path d={portfolioPath} fill="none" stroke="#ffffff" strokeWidth="2.5" />
+          <g clipPath="url(#chart-sketch-clip-sipher)">
+            <path d={portfolioPath} fill="none" stroke="#ffffff" strokeWidth="2.5" />
+          </g>
         )}
 
-        {/* $100k Baseline */}
-        <line
-          x1={pad.left} y1={yScale(100000)} x2={dims.w - pad.right} y2={yScale(100000)}
-          stroke="rgba(255, 255, 255, 0.18)" strokeWidth="1.5" strokeDasharray="3,3"
-        />
+        {/* Inception Anchor Marker */}
+        {portfolioPath && (
+          <circle
+            cx={pad.left}
+            cy={yScale(merged[0].portfolio)}
+            r="3"
+            fill="#ffffff"
+            opacity={progress > 0 ? 0.75 : 0}
+          />
+        )}
 
+        {/* Active Sketch Tracer Tips & Vertical Scanning Guide */}
+        {!isDrawn && sipherProg > 0 && sipherProg < 1 && (
+          <g pointerEvents="none">
+            <line
+              x1={sTipX}
+              y1={pad.top}
+              x2={sTipX}
+              y2={pad.top + chartH}
+              stroke="rgba(255, 255, 255, 0.14)"
+              strokeWidth="1"
+              strokeDasharray="2,2"
+            />
+            <circle
+              cx={sTipX}
+              cy={sTipY}
+              r="9"
+              fill="rgba(255, 255, 255, 0.22)"
+              filter="url(#tracer-glow)"
+            />
+            <circle
+              cx={sTipX}
+              cy={sTipY}
+              r="4"
+              fill="#ffffff"
+              stroke="var(--bg-surface)"
+              strokeWidth="2"
+            />
+          </g>
+        )}
+
+        {!isDrawn && sofrProg > 0 && sofrProg < 1 && (
+          <g pointerEvents="none">
+            <circle
+              cx={bTipX}
+              cy={bTipY}
+              r="6"
+              fill="var(--chart-benchmark)"
+              opacity="0.3"
+            />
+            <circle
+              cx={bTipX}
+              cy={bTipY}
+              r="3"
+              fill="var(--chart-benchmark)"
+              stroke="var(--bg-surface)"
+              strokeWidth="1"
+            />
+          </g>
+        )}
+
+        {!isDrawn && baselineProg > 0 && baselineProg < 1 && (
+          <g pointerEvents="none">
+            <circle
+              cx={baseTipX}
+              cy={baseTipY}
+              r="2.5"
+              fill="rgba(255, 255, 255, 0.7)"
+            />
+          </g>
+        )}
+
+        {/* Settled Current-Day Anchor Marker */}
+        {isDrawn && portfolioPath && (
+          <circle
+            cx={xScale(merged.length - 1)}
+            cy={yScale(merged[merged.length - 1].portfolio)}
+            r="3.5"
+            fill="#ffffff"
+            stroke="var(--bg-surface)"
+            strokeWidth="1.5"
+          />
+        )}
+
+        {/* Interactive Crosshair & Tooltip Anchor on Hover */}
         {hover !== null && merged[hover] && (
           <g>
             <line
@@ -282,6 +526,7 @@ function PerformanceChart({ portfolio, benchmark }) {
         )}
       </svg>
 
+      {/* Hover Floating Data Card */}
       {hover !== null && merged[hover] && (
         <div
           style={{
@@ -327,7 +572,7 @@ export default function Portfolio() {
 
   var [chartData, setChartData] = useState(null);
 
-  var chartReveal = useReveal();
+  var chartReveal = useReveal({ threshold: 0.12 });
   var tablesReveal = useReveal();
 
   useEffect(function () {
@@ -565,7 +810,7 @@ export default function Portfolio() {
               </div>
             </div>
 
-            <PerformanceChart portfolio={chartData.portfolio} benchmark={chartData.benchmark} />
+            <PerformanceChart portfolio={chartData.portfolio} benchmark={chartData.benchmark} inView={chartReveal.inView} />
             </div>
           </div>
         )}
