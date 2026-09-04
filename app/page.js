@@ -200,6 +200,7 @@ export default function Home() {
 
   var [openAccordion, setOpenAccordion] = useState(0);
   var [heroLoaded, setHeroLoaded] = useState(false);
+  var [heroVideoActive, setHeroVideoActive] = useState(false);
   var heroVideoRef = useRef(null);
 
   // Synchronous ref callback to ensure Safari and iOS WebKit set muted and playsinline attributes before paint
@@ -211,8 +212,15 @@ export default function Home() {
     video.setAttribute("webkit-playsinline", "");
     video.defaultMuted = true;
     video.muted = true;
+    if (video.currentTime > 0.05 && !video.paused) {
+      setHeroVideoActive(true);
+    }
     var p = video.play();
-    if (p !== undefined) p.catch(function () {});
+    if (p !== undefined) {
+      p.then(function () {
+        setHeroVideoActive(true);
+      }).catch(function () {});
+    }
   }, []);
 
   var pillarsVideoRef = useRef(null);
@@ -259,7 +267,11 @@ export default function Home() {
       heroVideoRef.current.defaultMuted = true;
       heroVideoRef.current.muted = true;
       var p = heroVideoRef.current.play();
-      if (p !== undefined) p.catch(function () {});
+      if (p !== undefined) {
+        p.then(function () {
+          setHeroVideoActive(true);
+        }).catch(function () {});
+      }
     }
   }, []);
 
@@ -297,17 +309,18 @@ export default function Home() {
           loop
           playsInline
           preload="auto"
-          onCanPlay={function (e) {
-            e.target.play().catch(function () {});
+          onPlaying={function () {
+            setHeroVideoActive(true);
           }}
-          onLoadedData={function (e) {
-            e.target.play().catch(function () {});
+          onTimeUpdate={function (e) {
+            if (e.target.currentTime > 0.05) setHeroVideoActive(true);
           }}
           style={{
             position: "absolute",
             top: 0, left: 0, width: "100%", height: "100%",
             objectFit: "cover",
-            opacity: 0.82,
+            opacity: heroVideoActive ? 0.82 : 0,
+            transition: "opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1)",
             pointerEvents: "none",
             transform: "translate3d(0, 0, 0)",
             WebkitTransform: "translate3d(0, 0, 0)",
