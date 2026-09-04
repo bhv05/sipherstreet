@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "next-view-transitions";
 import useReveal from "./components/useReveal";
 
@@ -58,7 +58,7 @@ function TickerStrip({ data }) {
   var items = buildTickerItems(data);
   if (items.length === 0) return null;
 
-  var allItems = items.concat(items).concat(items);
+  var allItems = items.concat(items);
   var duration = Math.max(items.length * 4, 25);
 
   return (
@@ -177,18 +177,69 @@ const PILLARS = [
   },
 ];
 
+const INITIAL_PORTFOLIO_DATA = {
+  totalValue: 105747,
+  cash: 4520,
+  totalReturnPct: 5.75,
+  positions: [
+    { symbol: "AVGO", currentPrice: 357.10, totalReturn: 11.87 },
+    { symbol: "CR", currentPrice: 204.69, totalReturn: 12.67 },
+    { symbol: "META", currentPrice: 614.94, totalReturn: 6.05 },
+    { symbol: "BOXX", currentPrice: 118.14, totalReturn: 1.75 },
+    { symbol: "QQQ", currentPrice: 717.50, totalReturn: -0.74 },
+    { symbol: "XLI", currentPrice: 175.27, totalReturn: -2.31 },
+    { symbol: "PPH", currentPrice: 114.21, totalReturn: -2.71 },
+    { symbol: "AZN", currentPrice: 163.04, totalReturn: -4.26 },
+    { symbol: "INTU", currentPrice: 332.00, totalReturn: -30.08 },
+    { symbol: "CASH", currentPrice: null, totalReturn: null },
+  ],
+};
+
 export default function Home() {
-  var stateData = useState(null);
-  var data = stateData[0];
-  var setData = stateData[1];
+  var [data, setData] = useState(INITIAL_PORTFOLIO_DATA);
 
   var [openAccordion, setOpenAccordion] = useState(0);
   var [heroLoaded, setHeroLoaded] = useState(false);
   var heroVideoRef = useRef(null);
 
+  // Synchronous ref callback to ensure Safari and iOS WebKit set muted and playsinline attributes before paint
+  var setHeroVideoRef = useCallback(function (video) {
+    if (!video) return;
+    heroVideoRef.current = video;
+    video.setAttribute("muted", "");
+    video.setAttribute("playsinline", "");
+    video.setAttribute("webkit-playsinline", "");
+    video.defaultMuted = true;
+    video.muted = true;
+    var p = video.play();
+    if (p !== undefined) p.catch(function () {});
+  }, []);
+
+  var pillarsVideoRef = useRef(null);
+  var cultureVideoRef = useRef(null);
+  var termsVideoRef = useRef(null);
+
   var pillarsReveal = useReveal({ threshold: 0.05, rootMargin: "0px 0px -30px 0px" });
   var cultureReveal = useReveal({ threshold: 0.05, rootMargin: "0px 0px -30px 0px" });
   var termsReveal = useReveal({ threshold: 0.05, rootMargin: "0px 0px -30px 0px" });
+
+  useEffect(function () {
+    if (pillarsReveal.inView && pillarsVideoRef.current) {
+      pillarsVideoRef.current.play().catch(function () {});
+    }
+  }, [pillarsReveal.inView]);
+
+  useEffect(function () {
+    if (cultureReveal.inView && cultureVideoRef.current) {
+      cultureVideoRef.current.play().catch(function () {});
+    }
+  }, [cultureReveal.inView]);
+
+  useEffect(function () {
+    if (termsReveal.inView && termsVideoRef.current) {
+      termsVideoRef.current.play().catch(function () {});
+    }
+  }, [termsReveal.inView]);
 
   useEffect(function () {
     fetch("/api/portfolio")
@@ -200,9 +251,11 @@ export default function Home() {
     return function () { clearTimeout(timer); };
   }, []);
 
-  // Ensure instant video playback as soon as DOM mounts
+  // Guarantee instant video playback as soon as component mounts
   useEffect(function () {
     if (heroVideoRef.current) {
+      heroVideoRef.current.setAttribute("muted", "");
+      heroVideoRef.current.setAttribute("playsinline", "");
       heroVideoRef.current.defaultMuted = true;
       heroVideoRef.current.muted = true;
       var p = heroVideoRef.current.play();
@@ -210,10 +263,10 @@ export default function Home() {
     }
   }, []);
 
-  var navVal = data ? "$" + fmt(data.totalValue / 1000, 0) + "K" : "$100K";
+  var navVal = data ? "$" + fmt(data.totalValue / 1000, 0) + "K" : "$105K";
   var totalReturn = data
     ? (data.totalReturnPct >= 0 ? "+" : "") + fmt(data.totalReturnPct, 2) + "%"
-    : "0.00%";
+    : "+5.75%";
 
   return (
     <div style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
@@ -235,9 +288,9 @@ export default function Home() {
           overflow: "hidden",
         }}
       >
-        {/* Animated Ocean Waves Video Background */}
+        {/* Animated Ocean Waves Video Background — Hardware accelerated, zero CSS filter stall for Safari */}
         <video
-          ref={heroVideoRef}
+          ref={setHeroVideoRef}
           src="/videos/ocean-waves.mp4"
           autoPlay
           muted
@@ -254,16 +307,13 @@ export default function Home() {
             position: "absolute",
             top: 0, left: 0, width: "100%", height: "100%",
             objectFit: "cover",
-            opacity: 0.78,
-            filter: "contrast(1.18) brightness(1.08) saturate(1.12)",
+            opacity: 0.82,
             pointerEvents: "none",
             transform: "translate3d(0, 0, 0)",
             WebkitTransform: "translate3d(0, 0, 0)",
             zIndex: 0,
           }}
-        >
-          <source src="/videos/ocean-waves.mp4" type="video/mp4" />
-        </video>
+        />
 
         {/* Multi-Stop Dark Vignette Overlay for High-Contrast Text Legibility */}
         <div
@@ -369,11 +419,9 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Ticker at bottom of fold */}
-        <div className={"reveal-group" + (heroLoaded ? " in-view" : "")} style={{ width: "100%", position: "relative", zIndex: 1 }}>
-          <div className="reveal-item reveal-delay-4">
-            {data && data.positions && <TickerStrip data={data} />}
-          </div>
+        {/* Ticker at bottom of fold — Renders immediately on frame 0 with zero delay */}
+        <div style={{ width: "100%", position: "relative", zIndex: 1 }}>
+          {data && data.positions && <TickerStrip data={data} />}
         </div>
       </section>
 
@@ -392,10 +440,12 @@ export default function Home() {
       >
         {/* Animated Skyline Video Background */}
         <video
+          ref={pillarsVideoRef}
           autoPlay
           muted
           loop
           playsInline
+          preload="none"
           poster="/images/skyline-financial-8k.jpg"
           style={{
             position: "absolute",
@@ -490,10 +540,12 @@ export default function Home() {
       >
         {/* Animated Deep Ocean Swells Video Background */}
         <video
+          ref={cultureVideoRef}
           autoPlay
           muted
           loop
           playsInline
+          preload="none"
           poster="/images/culture-swells-8k.jpg"
           style={{
             position: "absolute",
@@ -616,12 +668,16 @@ export default function Home() {
       >
         {/* Animated Skyline Video Background - Boutique Hedge Fund Monochrome Color Grading (Cinematic 0.45x Slow Motion) */}
         <video
-          ref={function (el) { if (el) el.playbackRate = 0.45; }}
+          ref={function (el) {
+            termsVideoRef.current = el;
+            if (el) el.playbackRate = 0.45;
+          }}
           onLoadedMetadata={function (e) { e.currentTarget.playbackRate = 0.45; }}
           autoPlay
           muted
           loop
           playsInline
+          preload="none"
           poster="/images/terms-architecture-8k.jpg"
           style={{
             position: "absolute",
@@ -711,19 +767,6 @@ export default function Home() {
 
       {/* Single global style block — no nesting */}
       <style jsx global>{`
-        .ticker-track {
-          display: inline-flex;
-          white-space: nowrap;
-          animation: ticker-scroll linear infinite;
-          will-change: transform;
-        }
-        .ticker-track:hover {
-          animation-play-state: paused;
-        }
-        @keyframes ticker-scroll {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
         .home-pillars-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);

@@ -28,7 +28,19 @@ async function fetchAlpaca(endpoint, headers) {
   return res.json();
 }
 
+let cachedData = null;
+let cacheTime = 0;
+const CACHE_TTL_MS = 60 * 1000;
+
 export async function GET() {
+  if (cachedData && Date.now() - cacheTime < CACHE_TTL_MS) {
+    return Response.json(cachedData, {
+      headers: {
+        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120",
+      },
+    });
+  }
+
   const apiKey = process.env.ALPACA_API_KEY;
   const secretKey = process.env.ALPACA_SECRET_KEY;
   if (!apiKey || !secretKey) {
@@ -162,7 +174,14 @@ export async function GET() {
       lastUpdated: new Date().toISOString(),
     };
 
-    return Response.json(data);
+    cachedData = data;
+    cacheTime = Date.now();
+
+    return Response.json(data, {
+      headers: {
+        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120",
+      },
+    });
   } catch (error) {
     console.error("Alpaca API error:", error.message || error);
     return fallbackResponse();
