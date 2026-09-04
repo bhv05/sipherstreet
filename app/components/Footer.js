@@ -6,22 +6,22 @@ export default function Footer() {
     <footer className="site-footer">
       <div className="footer-inner">
         {/* Brand & Partnership */}
-        <div className="footer-col footer-brand">
+        <div className="footer-col footer-brand" style={{ maxWidth: 360 }}>
           <img
             src="/logo.png"
             alt="Sipher Street Capital"
-            width={120}
-            height={32}
+            width={34}
+            height={34}
             style={{
-              height: 30,
-              width: "auto",
+              height: 34,
+              width: 34,
               objectFit: "contain",
               display: "block",
               filter: "brightness(1.2)",
-              marginBottom: 16,
+              margin: "0 auto 16px",
             }}
           />
-          <p style={{ fontSize: 13, color: "rgba(244, 243, 239, 0.7)", lineHeight: 1.7, maxWidth: 360, marginBottom: 20 }}>
+          <p style={{ fontSize: 13, color: "rgba(244, 243, 239, 0.7)", lineHeight: 1.7, marginBottom: 20 }}>
             Sipher Street Capital is an independent investment partnership deploying concentrated long/short equity strategies across global markets.
           </p>
           <span className="footer-copy">
