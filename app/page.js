@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "next-view-transitions";
 import useReveal from "./components/useReveal";
 
@@ -184,6 +184,7 @@ export default function Home() {
 
   var [openAccordion, setOpenAccordion] = useState(0);
   var [heroLoaded, setHeroLoaded] = useState(false);
+  var heroVideoRef = useRef(null);
 
   var pillarsReveal = useReveal({ threshold: 0.05, rootMargin: "0px 0px -30px 0px" });
   var cultureReveal = useReveal({ threshold: 0.05, rootMargin: "0px 0px -30px 0px" });
@@ -197,6 +198,16 @@ export default function Home() {
 
     var timer = setTimeout(function () { setHeroLoaded(true); }, 40);
     return function () { clearTimeout(timer); };
+  }, []);
+
+  // Ensure instant video playback as soon as DOM mounts
+  useEffect(function () {
+    if (heroVideoRef.current) {
+      heroVideoRef.current.defaultMuted = true;
+      heroVideoRef.current.muted = true;
+      var p = heroVideoRef.current.play();
+      if (p !== undefined) p.catch(function () {});
+    }
   }, []);
 
   var navVal = data ? "$" + fmt(data.totalValue / 1000, 0) + "K" : "$100K";
@@ -226,11 +237,19 @@ export default function Home() {
       >
         {/* Animated Ocean Waves Video Background */}
         <video
+          ref={heroVideoRef}
+          src="/videos/ocean-waves.mp4"
           autoPlay
           muted
           loop
           playsInline
-          poster="/images/hero-ocean-8k.jpg"
+          preload="auto"
+          onCanPlay={function (e) {
+            e.target.play().catch(function () {});
+          }}
+          onLoadedData={function (e) {
+            e.target.play().catch(function () {});
+          }}
           style={{
             position: "absolute",
             top: 0, left: 0, width: "100%", height: "100%",
