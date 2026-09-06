@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-05T09:48:40Z",
+  "last_updated": "2026-09-06T10:04:58Z",
   "total_positions": 9,
   "earnings_calendar": [
     {
@@ -36,7 +36,7 @@
       "last_quarter_result": "miss",
       "last_quarter_surprise": -1.04,
       "beat_rate_4q": "3/4",
-      "implied_move": 5.6
+      "implied_move": 4.6
     },
     {
       "ticker": "AZN",
@@ -60,7 +60,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.44,
       "beat_rate_4q": "4/4",
-      "implied_move": 8.2
+      "implied_move": 7.7
     },
     {
       "ticker": "BOXX",
