@@ -1,19 +1,7 @@
 {
-  "last_updated": "2026-09-09T10:35:26Z",
+  "last_updated": "2026-09-10T10:23:30Z",
   "total_positions": 9,
   "earnings_calendar": [
-    {
-      "ticker": "AVGO",
-      "company": "Broadcom Inc.",
-      "date": "2026-09-02",
-      "timing": "AMC",
-      "consensus_eps": 3.83,
-      "consensus_revenue": "$34.88B",
-      "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.04,
-      "beat_rate_4q": "4/4",
-      "implied_move": 9.6
-    },
     {
       "ticker": "CR",
       "company": "Crane Company",
@@ -61,6 +49,18 @@
       "last_quarter_surprise": 0.44,
       "beat_rate_4q": "4/4",
       "implied_move": 7.7
+    },
+    {
+      "ticker": "AVGO",
+      "company": "Broadcom Inc.",
+      "date": "2026-12-09",
+      "timing": "AMC",
+      "consensus_eps": 3.83,
+      "consensus_revenue": "$34.88B",
+      "last_quarter_result": "beat",
+      "last_quarter_surprise": 0.04,
+      "beat_rate_4q": "4/4",
+      "implied_move": 9.6
     },
     {
       "ticker": "BOXX",
