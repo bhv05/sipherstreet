@@ -1,30 +1,18 @@
 {
-  "last_updated": "2026-09-17T10:48:01Z",
-  "total_positions": 9,
+  "last_updated": "2026-09-18T10:23:38Z",
+  "total_positions": 8,
   "earnings_calendar": [
     {
       "ticker": "CR",
       "company": "Crane Company",
       "date": "2026-10-26",
       "timing": "AMC",
-      "consensus_eps": 1.81,
+      "consensus_eps": 1.82,
       "consensus_revenue": "$737M",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.11,
       "beat_rate_4q": "4/4",
       "implied_move": 5.7
-    },
-    {
-      "ticker": "META",
-      "company": "Meta Platforms, Inc.",
-      "date": "2026-10-28",
-      "timing": "AMC",
-      "consensus_eps": 6.97,
-      "consensus_revenue": "$63.32B",
-      "last_quarter_result": "miss",
-      "last_quarter_surprise": -1.04,
-      "beat_rate_4q": "3/4",
-      "implied_move": 9.6
     },
     {
       "ticker": "AZN",
