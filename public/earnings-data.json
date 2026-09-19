@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-18T10:23:38Z",
+  "last_updated": "2026-09-19T10:07:36Z",
   "total_positions": 8,
   "earnings_calendar": [
     {
@@ -24,7 +24,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.07,
       "beat_rate_4q": "3/4",
-      "implied_move": 1.8
+      "implied_move": 6.7
     },
     {
       "ticker": "INTU",
@@ -36,7 +36,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.44,
       "beat_rate_4q": "4/4",
-      "implied_move": 7.7
+      "implied_move": 7.1
     },
     {
       "ticker": "AVGO",
@@ -46,9 +46,9 @@
       "consensus_eps": 3.83,
       "consensus_revenue": "$34.88B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.04,
+      "last_quarter_surprise": 0.08,
       "beat_rate_4q": "4/4",
-      "implied_move": 9.6
+      "implied_move": 4.3
     },
     {
       "ticker": "BOXX",
