@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-01T12:14:09Z",
+  "last_updated": "2026-10-02T11:43:23Z",
   "total_positions": 8,
   "earnings_calendar": [
     {
@@ -44,7 +44,7 @@
       "date": "2026-12-09",
       "timing": "AMC",
       "consensus_eps": 3.83,
-      "consensus_revenue": "$34.88B",
+      "consensus_revenue": "$34.89B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.04,
       "beat_rate_4q": "4/4",
