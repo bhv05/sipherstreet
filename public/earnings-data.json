@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-05T13:18:31Z",
+  "last_updated": "2026-10-06T12:35:04Z",
   "total_positions": 8,
   "earnings_calendar": [
     {
@@ -46,9 +46,9 @@
       "consensus_eps": 3.83,
       "consensus_revenue": "$34.89B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.08,
+      "last_quarter_surprise": 0.04,
       "beat_rate_4q": "4/4",
-      "implied_move": 7.9
+      "implied_move": 9.6
     },
     {
       "ticker": "BOXX",
