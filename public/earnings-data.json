@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-09T12:25:10Z",
+  "last_updated": "2026-10-10T11:44:07Z",
   "total_positions": 8,
   "earnings_calendar": [
     {
@@ -20,11 +20,11 @@
       "date": "2026-10-30",
       "timing": "AMC",
       "consensus_eps": null,
-      "consensus_revenue": "$16.03B",
+      "consensus_revenue": "$16.04B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.07,
       "beat_rate_4q": "3/4",
-      "implied_move": 1.8
+      "implied_move": 5.2
     },
     {
       "ticker": "INTU",
@@ -36,7 +36,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.44,
       "beat_rate_4q": "4/4",
-      "implied_move": 7.7
+      "implied_move": 2.8
     },
     {
       "ticker": "AVGO",
@@ -48,7 +48,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.04,
       "beat_rate_4q": "4/4",
-      "implied_move": 9.6
+      "implied_move": 4.6
     },
     {
       "ticker": "BOXX",
