@@ -1,19 +1,7 @@
 {
-  "last_updated": "2026-10-27T11:24:34Z",
+  "last_updated": "2026-10-28T11:57:21Z",
   "total_positions": 8,
   "earnings_calendar": [
-    {
-      "ticker": "CR",
-      "company": "Crane Company",
-      "date": "2026-10-27",
-      "timing": "AMC",
-      "consensus_eps": 1.82,
-      "consensus_revenue": "$737M",
-      "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.11,
-      "beat_rate_4q": "4/4",
-      "implied_move": 5.7
-    },
     {
       "ticker": "AZN",
       "company": "AstraZeneca PLC",
@@ -43,12 +31,24 @@
       "company": "Broadcom Inc.",
       "date": "2026-12-09",
       "timing": "AMC",
-      "consensus_eps": 3.83,
-      "consensus_revenue": "$34.90B",
+      "consensus_eps": 3.84,
+      "consensus_revenue": "$34.91B",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.08,
       "beat_rate_4q": "4/4",
-      "implied_move": 7.9
+      "implied_move": 3.6
+    },
+    {
+      "ticker": "CR",
+      "company": "Crane Company",
+      "date": "2027-01-25",
+      "timing": "AMC",
+      "consensus_eps": 1.78,
+      "consensus_revenue": "$733M",
+      "last_quarter_result": "beat",
+      "last_quarter_surprise": 0.23,
+      "beat_rate_4q": "4/4",
+      "implied_move": 5.7
     },
     {
       "ticker": "BOXX",
