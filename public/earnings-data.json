@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-28T11:57:21Z",
+  "last_updated": "2026-10-29T12:06:16Z",
   "total_positions": 8,
   "earnings_calendar": [
     {
@@ -34,9 +34,9 @@
       "consensus_eps": 3.84,
       "consensus_revenue": "$34.91B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.08,
+      "last_quarter_surprise": 0.04,
       "beat_rate_4q": "4/4",
-      "implied_move": 3.6
+      "implied_move": 3.7
     },
     {
       "ticker": "CR",
@@ -44,11 +44,11 @@
       "date": "2027-01-25",
       "timing": "AMC",
       "consensus_eps": 1.78,
-      "consensus_revenue": "$733M",
+      "consensus_revenue": "$732M",
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.23,
       "beat_rate_4q": "4/4",
-      "implied_move": 5.7
+      "implied_move": 6.5
     },
     {
       "ticker": "BOXX",
