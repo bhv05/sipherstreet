@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-08T12:36:08Z",
+  "last_updated": "2026-11-09T14:54:17Z",
   "total_positions": 8,
   "earnings_calendar": [
     {
@@ -12,7 +12,7 @@
       "last_quarter_result": "miss",
       "last_quarter_surprise": -0.15,
       "beat_rate_4q": "3/4",
-      "implied_move": 4.4
+      "implied_move": 4.3
     },
     {
       "ticker": "INTU",
@@ -24,7 +24,7 @@
       "last_quarter_result": "beat",
       "last_quarter_surprise": 0.44,
       "beat_rate_4q": "4/4",
-      "implied_move": 5.4
+      "implied_move": 5.6
     },
     {
       "ticker": "AVGO",
@@ -34,9 +34,9 @@
       "consensus_eps": 3.84,
       "consensus_revenue": "$34.91B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.04,
+      "last_quarter_surprise": 0.08,
       "beat_rate_4q": "4/4",
-      "implied_move": 2.9
+      "implied_move": 3.1
     },
     {
       "ticker": "CR",
