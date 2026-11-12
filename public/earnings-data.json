@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-11T13:23:44Z",
+  "last_updated": "2026-11-12T14:28:42Z",
   "total_positions": 8,
   "earnings_calendar": [
     {
@@ -8,7 +8,7 @@
       "date": "2026-10-30",
       "timing": "AMC",
       "consensus_eps": null,
-      "consensus_revenue": "$16.56B",
+      "consensus_revenue": "$16.60B",
       "last_quarter_result": "miss",
       "last_quarter_surprise": -0.15,
       "beat_rate_4q": "3/4",
@@ -34,9 +34,9 @@
       "consensus_eps": 3.84,
       "consensus_revenue": "$34.91B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.08,
+      "last_quarter_surprise": 0.04,
       "beat_rate_4q": "4/4",
-      "implied_move": 2.9
+      "implied_move": 3.5
     },
     {
       "ticker": "CR",
