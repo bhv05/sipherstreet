@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-20T14:44:33Z",
+  "last_updated": "2026-11-21T14:00:02Z",
   "total_positions": 8,
   "earnings_calendar": [
     {
@@ -12,31 +12,31 @@
       "last_quarter_result": "miss",
       "last_quarter_surprise": -0.15,
       "beat_rate_4q": "3/4",
-      "implied_move": 1.0
+      "implied_move": 6.3
     },
     {
       "ticker": "INTU",
       "company": "Intuit Inc.",
       "date": "2026-11-19",
       "timing": "AMC",
-      "consensus_eps": 3.9,
-      "consensus_revenue": "$5.10B",
+      "consensus_eps": 3.2,
+      "consensus_revenue": "$4.94B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.27,
+      "last_quarter_surprise": 0.26,
       "beat_rate_4q": "4/4",
-      "implied_move": 8.3
+      "implied_move": 7.2
     },
     {
       "ticker": "AVGO",
       "company": "Broadcom Inc.",
       "date": "2026-12-09",
       "timing": "AMC",
-      "consensus_eps": 3.84,
-      "consensus_revenue": "$34.91B",
+      "consensus_eps": 3.83,
+      "consensus_revenue": "$34.90B",
       "last_quarter_result": "beat",
-      "last_quarter_surprise": 0.08,
+      "last_quarter_surprise": 0.04,
       "beat_rate_4q": "4/4",
-      "implied_move": 7.9
+      "implied_move": 4.0
     },
     {
       "ticker": "CR",
